@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
 
 class SessionMiddlewareFactory {
     public function __invoke(ContainerInterface $container) {
-        $settings = $container->get('Config')['session'];
+        $settings = $container->get('Config')->getConfig()['session'];
 
         if (PHP_SAPI === 'cli') {
             return new Session(new MockArraySessionStorage());
