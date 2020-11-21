@@ -1,6 +1,6 @@
 <?php
 
-namespace WhmcsMgr\Middleware\Factory;
+namespace App\Middleware\Factory;
 
 use App\Middleware\HttpRendererMiddleware;
 use Psr\Container\ContainerInterface;

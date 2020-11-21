@@ -14,19 +14,23 @@ class Application {
     protected $container;
     protected $application;
 
-    public function __construct($config_dir) {
-        $this->config = new Config($config_dir);
+    public function __construct($config_dirs) {
+        if (!is_array($config_dirs)) {
+            $config_dirs = [$config_dirs];
+        }
+        array_unshift($config_dirs, realpath(__DIR__."/../config"));
 
+        $this->config = new Config($config_dirs);
         $this->buildContainer();
         $this->application = AppFactory::createFromContainer($this->container);
         $this->setRoute();
         $this->setMiddleware();
     }
-    
+
     public function run() {
-        $this->application->run(); 
+        $this->application->run();
     }
-    
+
     private function setRoute() {
         self::addRoute($this->config->getConfig()["routes"], $this->application);
     }
@@ -36,11 +40,13 @@ class Application {
             if ($middleware == RoutingMiddleware::class) {
                 $this->application->addRoutingMiddleware();
                 continue;
-            } 
+            }
+
             if ($middleware == ErrorMiddleware::class) {
                 $this->application->addErrorMiddleware(true, true, true);
                 continue;
-            } 
+            }
+
             $this->application->add($this->container->get($middleware));
         }
     }
@@ -51,13 +57,13 @@ class Application {
             if (!is_array($method)) {
                 $method = [$method];
             }
-            
+
             $path = $route["route"];
             $action = $route["options"]["action"];
 
             if (!$application->getContainer()->has($action)) {
                 throw new Exception("Action $action  not exist");
-            }            
+            }
             $controller = $application->getContainer()->get($action);
 
             $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
@@ -74,7 +80,7 @@ class Application {
 
     private function buildContainer() {
         $this->container = new DI\Container();
-        
+
         $this->container->set('Config', $this->config);
 
         $this->container->set('HtmlRenderer', $this->createRenderer());
@@ -102,4 +108,3 @@ class Application {
     }
 
 }
-
