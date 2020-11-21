@@ -2,6 +2,9 @@
 
 namespace App;
 
+use Laminas\ConfigAggregator\ConfigAggregator;
+use Laminas\ConfigAggregator\PhpFileProvider;
+
 class Config
 {
     protected $config = [];
@@ -18,10 +21,12 @@ class Config
 
     private function parseConfig($config_dirs)
     {
+        $providers = [];
         foreach ($config_dirs as $config_dir) {
-            foreach (glob(sprintf("%s/*.config.php", $config_dir)) as $file) {
-                $this->config = array_merge_recursive($this->config, include $file);
-            }
+            $providers[] = new PhpFileProvider($config_dir);
         }
+
+        $aggregator = new ConfigAggregator($providers);
+        $this->config = $aggregator->getMergedConfig();
     }
 }
