@@ -6,7 +6,8 @@ return [
     "service" => [
         "factories" => [
             Middleware\SessionMiddleware::class => Middleware\Factory\SessionMiddlewareFactory::class,
-            Middleware\AssetMiddleware::class => Middleware\Factory\AssetMiddlewareFactory::class
+            Middleware\AssetMiddleware::class => Middleware\Factory\AssetMiddlewareFactory::class,
+            "HtmlRenderer" => Http\Renderer\Factory\PhpRendererFactory::class
         ]
     ],
     "session" => [
@@ -19,7 +20,4 @@ return [
             ]
         ],
     ],
-    "view" => [
-        "renderer" => Http\Renderer\Factory\PhpRendererFactory::class
-    ]
 ];

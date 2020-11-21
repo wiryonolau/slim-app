@@ -28,5 +28,6 @@ class Config
 
         $aggregator = new ConfigAggregator($providers);
         $this->config = $aggregator->getMergedConfig();
+        debug($this->config);
     }
 }

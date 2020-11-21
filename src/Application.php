@@ -9,17 +9,19 @@ use Psr\Container\ContainerInterface;
 use Slim\Middleware\RoutingMiddleware;
 use Slim\Middleware\ErrorMiddleware;
 
-class Application {
+class Application
+{
     protected $config;
     protected $container;
     protected $application;
     protected $renderer = null;
 
-    public function __construct($config_dirs) {
+    public function __construct($config_dirs)
+    {
         if (!is_array($config_dirs)) {
             $config_dirs = [$config_dirs];
         }
-        array_unshift($config_dirs, realpath(__DIR__."/../config"));
+        array_unshift($config_dirs, __DIR__."/../config/*.config.php");
 
         $this->config = new Config($config_dirs);
         $this->container = new DI\Container();
@@ -30,20 +32,24 @@ class Application {
         $this->setMiddleware();
     }
 
-    public function run() {
+    public function run()
+    {
         $this->application->run();
     }
 
-    public function setRenderer($renderer) {
+    public function setRenderer($renderer)
+    {
         $this->renderer = $renderer;
         return $this;
     }
 
-    private function setRoute() {
+    private function setRoute()
+    {
         self::addRoute($this->config->getConfig()["routes"], $this->application);
     }
 
-    private function setMiddleware() {
+    private function setMiddleware()
+    {
         foreach ($this->config->getConfig()["middleware"]["middleware"] as $middleware) {
             if ($middleware == RoutingMiddleware::class) {
                 $this->application->addRoutingMiddleware();
@@ -59,7 +65,8 @@ class Application {
         }
     }
 
-    private static function addRoute($routes, &$application) {
+    private static function addRoute($routes, &$application)
+    {
         foreach ($routes as $route) {
             $method = (empty($route["method"]) ? "GET" : $route["method"]);
             if (!is_array($method)) {
@@ -76,7 +83,7 @@ class Application {
 
             $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
             if (count($child_routes)) {
-                $application->group($path, function($application) use ($method, $path, $action, $child_routes) {
+                $application->group($path, function ($application) use ($method, $path, $action, $child_routes) {
                     $application->map($method, "", $action);
                     self::addRoute($child_routes, $application);
                 });
@@ -86,23 +93,22 @@ class Application {
         }
     }
 
-    private function buildContainer() {
+    private function buildContainer()
+    {
         $this->addDefinition('Config', $this->config);
 
-        if (is_null($this->renderer)) {
-            $this->addDefinition('HtmlRenderer', DI\factory($this->config->getConfig()["view"]["renderer"]));
-        } else {
+        if (!is_null($this->renderer)) {
             $this->addDefinition('HtmlRenderer', $this->renderer);
         }
 
         # Build Service
-        foreach($this->config->getConfig()["service"]["factories"] as $service => $factory) {
-            $this->addDefinition($service, DI\factory($factory));
+        foreach ($this->config->getConfig()["service"]["factories"] as $service => $factory) {
+            $this->addDefinition($service, $factory);
         }
 
         # Build Action
         foreach ($this->config->getConfig()["action"]["factories"] as $controller => $factory) {
-            $this->addDefinition($controller, function(ContainerInterface $container, $args) use ($factory) {
+            $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($factory) {
                 $obj = new $factory();
                 $obj = $obj($container, $args);
                 $obj->setRenderer($container->get("HtmlRenderer"));
@@ -111,12 +117,12 @@ class Application {
         }
     }
 
-    private function addDefinition($name, $class) {
-        if ($class instanceof DI\Definition) {
+    private function addDefinition($name, $class)
+    {
+        if (is_object($class)) {
             $this->container->set($name, $class);
         } else {
             $this->container->set($name, DI\factory($class));
         }
     }
-
 }
