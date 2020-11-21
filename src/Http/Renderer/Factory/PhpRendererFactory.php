@@ -1,6 +1,6 @@
 <?php
 
-namespace Http\Renderer\Factory;
+namespace App\Http\Renderer\Factory;
 
 use Psr\Container\ContainerInterface;
 
