@@ -13,6 +13,7 @@ class Application {
     protected $config;
     protected $container;
     protected $application;
+    protected $renderer = null;
 
     public function __construct($config_dirs) {
         if (!is_array($config_dirs)) {
@@ -21,6 +22,8 @@ class Application {
         array_unshift($config_dirs, realpath(__DIR__."/../config"));
 
         $this->config = new Config($config_dirs);
+        $this->container = new DI\Container();
+
         $this->buildContainer();
         $this->application = AppFactory::createFromContainer($this->container);
         $this->setRoute();
@@ -29,6 +32,11 @@ class Application {
 
     public function run() {
         $this->application->run();
+    }
+
+    public function setRenderer($renderer) {
+        $this->renderer = $renderer;
+        return $this;
     }
 
     private function setRoute() {
@@ -79,20 +87,22 @@ class Application {
     }
 
     private function buildContainer() {
-        $this->container = new DI\Container();
+        $this->addDefinition('Config', $this->config);
 
-        $this->container->set('Config', $this->config);
-
-        $this->container->set('HtmlRenderer', $this->createRenderer());
+        if (is_null($this->renderer)) {
+            $this->addDefinition('HtmlRenderer', DI\factory($this->config->getConfig()["view"]["renderer"]));
+        } else {
+            $this->addDefinition('HtmlRenderer', $this->renderer);
+        }
 
         # Build Service
         foreach($this->config->getConfig()["service"]["factories"] as $service => $factory) {
-            $this->container->set($service, DI\factory($factory));
+            $this->addDefinition($service, DI\factory($factory));
         }
 
         # Build Action
         foreach ($this->config->getConfig()["action"]["factories"] as $controller => $factory) {
-            $this->container->set($controller, function(ContainerInterface $container, $args) use ($factory) {
+            $this->addDefinition($controller, function(ContainerInterface $container, $args) use ($factory) {
                 $obj = new $factory();
                 $obj = $obj($container, $args);
                 $obj->setRenderer($container->get("HtmlRenderer"));
@@ -101,10 +111,12 @@ class Application {
         }
     }
 
-    private function createRenderer() {
-        $template_path = realpath($this->config->getConfig()["view"]["template_path"]);
-        $renderer = new PhpRenderer($template_path);
-        return $renderer;
+    private function addDefinition($name, $class) {
+        if ($class instanceof DI\Definition) {
+            $this->container->set($name, $class);
+        } else {
+            $this->container->set($name, DI\factory($class));
+        }
     }
 
 }
