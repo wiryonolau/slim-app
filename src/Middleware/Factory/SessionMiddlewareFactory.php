@@ -12,11 +12,9 @@ class SessionMiddlewareFactory {
         $settings = $container->get('Config')->getConfig()['session'];
 
         if (PHP_SAPI === 'cli') {
-            return new Session(new MockArraySessionStorage());
+            return new SessionMiddleware(new MockArraySessionStorage());
         } else {
-            return new Session(new NativeSessionStorage($settings));
+            return new SessionMiddleware(new NativeSessionStorage($settings));
         }
-
-        return new SessionMiddleware($session);
     }
 }
