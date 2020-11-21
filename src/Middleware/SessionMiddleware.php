@@ -16,7 +16,7 @@ class SessionMiddleware {
 
     public function __invoke(Request $request, RequestHandler $handler) {
         $this->session->start();
-        return $handler->hanlde($request);
+        return $handler->handle($request);
     }
 
 }
