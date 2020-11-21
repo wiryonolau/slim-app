@@ -7,7 +7,8 @@ return [
         "factories" => [
             Middleware\SessionMiddleware::class => Middleware\Factory\SessionMiddlewareFactory::class,
             Middleware\AssetMiddleware::class => Middleware\Factory\AssetMiddlewareFactory::class,
-            "HtmlRenderer" => Http\Renderer\Factory\PhpRendererFactory::class
+            "HtmlRenderer" => Http\Renderer\Factory\PhpRendererFactory::class,
+            "Session" => Session\Factory\SessionFactory::class
         ]
     ],
     "session" => [
