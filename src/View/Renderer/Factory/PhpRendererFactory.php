@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Renderer\Factory;
+namespace App\View\Renderer\Factory;
 
 use Slim\Views\PhpRenderer;
 use Psr\Container\ContainerInterface;

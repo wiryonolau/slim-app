@@ -14,7 +14,6 @@ class Application
     protected $config;
     protected $container;
     protected $application;
-    protected $renderer = null;
 
     public function __construct($config_dirs = null)
     {
@@ -43,12 +42,6 @@ class Application
 
     public function getContainer() {
         return $this->container;
-    }
-
-    public function setRenderer($renderer)
-    {
-        $this->renderer = $renderer;
-        return $this;
     }
 
     private function setRoute()
@@ -109,9 +102,7 @@ class Application
     {
         $this->addDefinition('Config', $this->config);
 
-        if (!is_null($this->renderer)) {
-            $this->addDefinition(HtmlRenderer::class, $this->renderer);
-        }
+        $this->addDefinition(HtmlRenderer::class, $this->getConfig()["view"]["renderer"]);
 
         # Build Service
         if (!empty($this->getConfig()["service"]["factories"])) {
