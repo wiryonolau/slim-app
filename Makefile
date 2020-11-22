@@ -13,13 +13,20 @@ THIS_FILE := $(lastword $(MAKEFILE_LIST))
 	@echo ""
 all:
 	@echo ""
-start:
-	docker run --rm -it -d \
-        -v $$(pwd)/src:/srv/$$(basename "`pwd`") \
+run:
+	docker run --rm -it \
+        -v $$(pwd):/srv/$$(basename "`pwd`") \
 		-w /srv/$$(basename "`pwd`") \
 		--user "$$(id -u):$$(id -g)" \
         --name $$(basename "`pwd`")_cli \
     php:7.3-cli $(filter-out $@,$(MAKECMDGOALS))
+unittest:
+	docker run --rm -it \
+        -v $$(pwd):/srv/$$(basename "`pwd`") \
+		-w /srv/$$(basename "`pwd`") \
+		--user "$$(id -u):$$(id -g)" \
+        --name $$(basename "`pwd`")_cli \
+    php:7.3-cli vendor/bin/phpunit tests
 composer-install:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \

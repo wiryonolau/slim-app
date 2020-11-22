@@ -16,7 +16,7 @@ class Application
     protected $application;
     protected $renderer = null;
 
-    public function __construct($config_dirs)
+    public function __construct($config_dirs = null)
     {
         if (!is_array($config_dirs)) {
             $config_dirs = [$config_dirs];
@@ -25,7 +25,7 @@ class Application
 
         $this->config = new Config($config_dirs);
         $this->container = new DI\Container();
-
+        
         $this->buildContainer();
         $this->application = AppFactory::createFromContainer($this->container);
         $this->setRoute();
@@ -36,6 +36,14 @@ class Application
     {
         $this->application->run();
     }
+    
+    public function getConfig() {
+        return $this->config->getConfig();
+    }
+
+    public function getContainer() {
+        return $this->container;
+    }
 
     public function setRenderer($renderer)
     {
@@ -45,23 +53,27 @@ class Application
 
     private function setRoute()
     {
-        self::addRoute($this->config->getConfig()["routes"], $this->application);
+        if (!empty($this->getConfig()["routes"])) {
+            self::addRoute($this->getConfig()["routes"], $this->application);
+        }
     }
 
     private function setMiddleware()
     {
-        foreach ($this->config->getConfig()["middleware"]["middleware"] as $middleware) {
-            if ($middleware == RoutingMiddleware::class) {
-                $this->application->addRoutingMiddleware();
-                continue;
-            }
+        if (!empty($this->getConfig()["middleware"]["middleware"])) {
+            foreach ($this->getConfig()["middleware"]["middleware"] as $middleware) {
+                if ($middleware == RoutingMiddleware::class) {
+                    $this->application->addRoutingMiddleware();
+                    continue;
+                }
 
-            if ($middleware == ErrorMiddleware::class) {
-                $this->application->addErrorMiddleware(true, true, true);
-                continue;
-            }
+                if ($middleware == ErrorMiddleware::class) {
+                    $this->application->addErrorMiddleware(true, true, true);
+                    continue;
+                }
 
-            $this->application->add($this->container->get($middleware));
+                $this->application->add($this->container->get($middleware));
+            }
         }
     }
 
@@ -98,22 +110,26 @@ class Application
         $this->addDefinition('Config', $this->config);
 
         if (!is_null($this->renderer)) {
-            $this->addDefinition('HtmlRenderer', $this->renderer);
+            $this->addDefinition(HtmlRenderer::class, $this->renderer);
         }
 
         # Build Service
-        foreach ($this->config->getConfig()["service"]["factories"] as $service => $factory) {
-            $this->addDefinition($service, $factory);
+        if (!empty($this->getConfig()["service"]["factories"])) {
+            foreach ($this->getConfig()["service"]["factories"] as $service => $factory) {
+                $this->addDefinition($service, $factory);
+            }
         }
 
         # Build Action
-        foreach ($this->config->getConfig()["action"]["factories"] as $controller => $factory) {
-            $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($factory) {
-                $obj = new $factory();
-                $obj = $obj($container, $args);
-                $obj->setRenderer($container->get("HtmlRenderer"));
-                return $obj;
-            });
+        if (!empty($this->getConfig()["action"]["factories"])) {
+            foreach ($this->getConfig()["action"]["factories"] as $controller => $factory) {
+                $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($factory) {
+                    $obj = new $factory();
+                    $obj = $obj($container, $args);
+                    $obj->setRenderer($container->get(HtmlRenderer::class));
+                    return $obj;
+                });
+            }
         }
     }
 
