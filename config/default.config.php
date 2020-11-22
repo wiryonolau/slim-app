@@ -22,6 +22,8 @@ return [
         ],
     ],
     "view" => [
-        "renderer" => HtmlRenderer::class
+        "renderer" => HtmlRenderer::class,
+        "default_layout" => "layout/layout.phtml",
+        "template_path" => __DIR__."/../view"
     ]
 ];
