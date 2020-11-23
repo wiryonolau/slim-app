@@ -6,18 +6,12 @@ class UrlHelper implements ViewHelperInterface
 {
     protected $base_url;
 
-    public function __invoke(string $base_url = "")
-    {
+    public function __construct(string $base_url = "") {
         $this->base_url = $base_url ? $base_url : self::getFullUrl();
         return $this;
     }
 
-    public function getName():string
-    {
-        return "url";
-    }
-
-    public function build(string $path = "/", array $query = []):string
+    public function __invoke(string $path = "/", array $query = []):string
     {
         $url = sprintf("%s%s", $this->base_url, ltrim($path, "/"));
         if (count($query)) {
@@ -25,6 +19,11 @@ class UrlHelper implements ViewHelperInterface
             $url = sprintf("%s/?%s", $url, $query);
         }
         return $url;
+    }
+
+    public function getName():string
+    {
+        return "url";
     }
 
     public static function getUrlOrigin($s = null, $use_forwarded_host = false)

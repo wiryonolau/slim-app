@@ -12,8 +12,7 @@ class PhpRenderer extends SlimPhpRenderer
 
     public function __call($function, $args) {
         if (isset($this->viewHelper[$function])) {
-            $args = implode(', ', $args);
-            return call_user_func($this->viewHelper[$function], $args);
+            return call_user_func_array($this->viewHelper[$function], $args);
         }
     }
 
