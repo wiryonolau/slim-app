@@ -117,7 +117,7 @@ class AssetMiddleware
         $response = new Response();
         $extension = pathinfo($file, PATHINFO_EXTENSION);
 
-        $response->getBody()->write(file_get_content($file));
+        $response->getBody()->write(file_get_contents($file));
 
         if (isset($this->mimeType[$extension])) {
             $response = $response->withHeader("Content-type", $this->mimeType[$extension]);
