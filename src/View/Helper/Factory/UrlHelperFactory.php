@@ -7,6 +7,6 @@ use App\View\Helper\UrlHelper;
 
 class UrlHelperFactory {
     public function __invoke(ContainerInterface $container) {
-        return new UrlHelper;
+        return new UrlHelper();
     }
 }
