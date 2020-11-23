@@ -47,7 +47,7 @@ class Application
     }
 
     public function setViewClass(string $view) {
-        $this->view = $view; 
+        $this->viewClass = $view; 
         return $this;
     }
 
@@ -124,7 +124,7 @@ class Application
                 $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($factory) {
                     $obj = new $factory();
                     $obj = $obj($container, $args);
-                    $view = new $this->view();
+                    $view = new $this->viewClass();
                     $view->setRenderer($container->get(HtmlRenderer::class));
                     $obj->setView($view);
                     return $obj;
