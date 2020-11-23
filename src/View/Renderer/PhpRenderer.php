@@ -8,7 +8,14 @@ use App\View\Helper\ViewHelperInterface;
 
 class PhpRenderer extends SlimPhpRenderer
 {
-    protected $viewHelper;
+    protected $viewHelper = [];
+
+    public function __call($function, $args) {
+        if (isset($this->viewHelper[$function])) {
+            $args = implode(', ', $args);
+            return call_user_func($this->viewHelper[$function], $args);
+        }
+    }
 
     public function addViewHelper(ViewHelperInterface $helper) {
         if ($helper->getName()) {
@@ -16,9 +23,11 @@ class PhpRenderer extends SlimPhpRenderer
         }
     }
 
-    public function fetchTemplate(string $template, array $data = []): string
+    protected function protectedIncludeScope(string $template, array $data): void
     {
         $helper = $this->viewHelper;
-        return parent::fetchTemplate($template, $data);
+        extract($data);
+        include func_get_arg(0);
     }
 }
+

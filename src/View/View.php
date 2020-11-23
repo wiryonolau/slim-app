@@ -11,7 +11,7 @@ class View implements ViewInterface {
         $this->renderer = $renderer;
     }
     
-    public function setLayout($layout) {
+    public function setLayout(string $layout) {
         $layout = sprintf("%s.phtml", $layout);
         $this->renderer->setLayout($layout);
     }
