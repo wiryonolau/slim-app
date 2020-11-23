@@ -2,15 +2,12 @@
 
 namespace App\Action;
 
+use App\View\ViewInterface;
+
 class BaseAction {
-    protected $renderer;
+    protected $view;
 
-    public function setRenderer($renderer) {
-        $this->renderer = $renderer;
-    }
-
-    protected function render($response, $template, $variables) {
-        $template = sprintf("%s.phtml", $template);
-        return $this->renderer->render($response, $template, $variables);
+    public function setView(ViewInterface $view) {
+        $this->view = $view;
     }
 }

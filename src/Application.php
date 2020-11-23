@@ -2,18 +2,20 @@
 
 namespace App;
 
-use Slim\Factory\AppFactory;
-use Slim\Views\PhpRenderer;
 use DI;
 use Psr\Container\ContainerInterface;
+use Slim\Factory\AppFactory;
+use Slim\Views\PhpRenderer;
 use Slim\Middleware\RoutingMiddleware;
 use Slim\Middleware\ErrorMiddleware;
+use App\View;
 
 class Application
 {
     protected $config;
     protected $container;
     protected $application;
+    protected $viewClass = View\View::class;
 
     public function __construct($config_dirs = null)
     {
@@ -42,6 +44,11 @@ class Application
 
     public function getContainer() {
         return $this->container;
+    }
+
+    public function setViewClass(string $view) {
+        $this->view = $view; 
+        return $this;
     }
 
     private function setRoute()
@@ -111,13 +118,15 @@ class Application
             }
         }
 
-        # Build Action
+        # Build Action, Inject View
         if (!empty($this->getConfig()["action"]["factories"])) {
             foreach ($this->getConfig()["action"]["factories"] as $controller => $factory) {
                 $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($factory) {
                     $obj = new $factory();
                     $obj = $obj($container, $args);
-                    $obj->setRenderer($container->get(HtmlRenderer::class));
+                    $view = new $this->view();
+                    $view->setRenderer($container->get(HtmlRenderer::class));
+                    $obj->setView($view);
                     return $obj;
                 });
             }
