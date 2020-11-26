@@ -29,4 +29,3 @@ class PhpRenderer extends SlimPhpRenderer
         include func_get_arg(0);
     }
 }
-

@@ -26,7 +26,7 @@ class Application
 
         $this->config = new Config($config_dirs);
         $this->container = new DI\Container();
-        
+
         $this->buildContainer();
         $this->application = AppFactory::createFromContainer($this->container);
         $this->setRoute();
@@ -37,7 +37,7 @@ class Application
     {
         $this->application->run();
     }
-    
+
     public function getConfig() {
         return $this->config->getConfig();
     }
@@ -47,7 +47,7 @@ class Application
     }
 
     public function setViewClass(string $view) {
-        $this->viewClass = $view; 
+        $this->viewClass = $view;
         return $this;
     }
 
@@ -89,7 +89,7 @@ class Application
             $action = $route["options"]["action"];
 
             if (!$application->getContainer()->has($action)) {
-                throw new Exception("Action $action  not exist");
+                throw new \Exception("Action $action  not exist");
             }
             $controller = $application->getContainer()->get($action);
 

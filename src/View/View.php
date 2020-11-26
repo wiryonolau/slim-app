@@ -58,4 +58,3 @@ class View implements ViewInterface
         return $this->renderer->render($response, $template, $variables);
     }
 }
-
