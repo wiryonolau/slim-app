@@ -9,6 +9,7 @@ use Slim\Views\PhpRenderer;
 use Slim\Middleware\RoutingMiddleware;
 use Slim\Middleware\ErrorMiddleware;
 use App\View;
+use App\Action\BaseAction;
 
 class Application
 {
@@ -121,12 +122,19 @@ class Application
         # Build Action, Inject View
         if (!empty($this->getConfig()["action"]["factories"])) {
             foreach ($this->getConfig()["action"]["factories"] as $controller => $factory) {
-                $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($factory) {
-                    $obj = new $factory();
-                    $obj = $obj($container, $args);
-                    $view = new $this->viewClass();
-                    $view->setRenderer($container->get(HtmlRenderer::class));
-                    $obj->setView($view);
+                $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($controller, $factory) {
+                    if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
+                        $obj = new $controller;
+                    } else {
+                        $obj = new $factory();
+                        $obj = $obj($container, $args);
+                    }
+
+                    if ($obj instanceof BaseAction) {
+                        $view = new $this->viewClass();
+                        $view->setRenderer($container->get(HtmlRenderer::class));
+                        $obj->setView($view);
+                    }
                     return $obj;
                 });
             }
