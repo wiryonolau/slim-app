@@ -14,6 +14,11 @@ class View implements ViewInterface
         $this->renderer = $renderer;
     }
 
+    // Call registered ViewHelper in the renderer
+    public function __call($function, $args) {
+        return call_user_func_array([$this->renderer, $function], $args);
+    }
+
     public function setLayout(string $layout)
     {
         $layout = sprintf("%s.phtml", $layout);
