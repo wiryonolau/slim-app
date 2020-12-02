@@ -9,6 +9,7 @@ return [
             Middleware\AssetMiddleware::class => Middleware\Factory\AssetMiddlewareFactory::class,
             HtmlRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Session::class => Session\Factory\SessionFactory::class,
+            View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
             View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class
         ]
     ],
@@ -27,7 +28,8 @@ return [
         "default_layout" => "layout/layout.phtml",
         "template_path" => __DIR__."/../view",
         "helpers" => [
-            View\Helper\UrlHelper::class 
+            View\Helper\UrlHelper::class,
+            View\Helper\FlashMessageHelper::class
         ]
     ]
 ];
