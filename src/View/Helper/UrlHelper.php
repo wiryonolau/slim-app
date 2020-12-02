@@ -8,25 +8,24 @@ class UrlHelper implements ViewHelperInterface
 
     public function __construct(string $base_url = "") {
         $this->base_url = $base_url ? $base_url : self::getUrlOrigin();
-        return $this;
     }
 
-    public function __invoke(string $path = "/", array $query = []):string
+    public function __invoke(string $path = "/", array $query = []) : string
     {
-        $url = sprintf("%s/%s", $this->base_url, ltrim($path, "/"));
+        $url = sprintf("%s/%s", $this->base_url, trim($path, "/"));
         if (count($query)) {
             $query = http_build_query($query);
-            $url = sprintf("%s/?%s", $url, $query);
+            $url = sprintf("%s?%s", $url, $query);
         }
         return $url;
     }
 
-    public function getName():string
+    public function getName() : string
     {
         return "url";
     }
 
-    public static function getUrlOrigin($s = null, $use_forwarded_host = false)
+    public static function getUrlOrigin($s = null, $use_forwarded_host = false) : string
     {
         if (is_null($s)) {
             $s = $_SERVER;
@@ -41,7 +40,7 @@ class UrlHelper implements ViewHelperInterface
         return $protocol . '://' . $host;
     }
 
-    public static function getFullUrl($s = null, $use_forwarded_host = false)
+    public static function getFullUrl($s = null, $use_forwarded_host = false) : string
     {
         if (is_null($s)) {
             $s = $_SERVER;
