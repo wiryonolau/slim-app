@@ -2,6 +2,8 @@
 
 namespace App\Guard;
 
+use App\Guard\ArrayRoleProvider;
+
 class GuardOption {
 
     protected $identity_provider;
@@ -21,6 +23,8 @@ class GuardOption {
             $authorization_config = $config["authorization"];
             if (isset($authorization_config["role_provider"])) {
                 $this->role_provider = $authorization_config["role_provider"];
+            } else {
+                $this->role_provider = ArrayRoleProvider::class;
             }
 
             if (isset($authorization_config["whitelist"])) {
