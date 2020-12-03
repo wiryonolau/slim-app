@@ -5,8 +5,12 @@ namespace App;
 return [
     "service" => [
         "factories" => [
-            Middleware\SessionMiddleware::class => Middleware\Factory\SessionMiddlewareFactory::class,
-            Middleware\AssetMiddleware::class => Middleware\Factory\AssetMiddlewareFactory::class,
+            Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
+            Asset\AssetMiddleware::class => Asset\Factory\AssetMiddlewareFactory::class,
+            Guard\ArrayRoleProvider::class => Guard\Factory\ArrayRoleProviderFactory::class,
+            Guard\GuardOption::class => Guard\Factory\GuardOptionFactory::class,
+            Guard\RouteGuard::class => Guard\Factory\RouteGuardFactory::class,
+            Guard\RouteGuardMiddleware::class => Guard\Factory\RouteGuardMiddlewareFactory::class,
             HtmlRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Session::class => Session\Factory\SessionFactory::class,
             View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
@@ -21,6 +25,19 @@ return [
         "resolver_configs" => [
             "paths" => [
             ]
+        ],
+    ],
+    "guard" => [
+        "identity_provider" => "",
+        "authentication" => [
+            "login" => "/user/login",
+            "logout" => "/user/logout"
+        ],
+        "authorization" => [
+            "default_role" => "guest",
+            "whitelist" => [],
+            "role_provider" => "",
+            "roles" => []
         ],
     ],
     "view" => [

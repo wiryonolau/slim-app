@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Middleware\Factory;
+namespace App\Session\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\Middleware\SessionMiddleware;
+use App\Session\SessionMiddleware;
 use App\Session;
 
 class SessionMiddlewareFactory {

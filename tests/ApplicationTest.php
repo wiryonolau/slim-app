@@ -6,14 +6,22 @@ use App\Application;
 
 final class ApplicationTest extends TestCase {
     public function testService() {
-        $app = new Application();
+        $app = new Application(__DIR__."/config/*.config.php");
         $serviceFactories = $app->getConfig()["service"]["factories"];
 
         foreach($serviceFactories as $service => $factory) {
-            $this->assertEquals(is_object($app->getContainer()->get($service)), true);
+            try {
+                $object = $app->getContainer()->get($service);
+            } catch (\Exception $e) {
+                fwrite(STDERR, sprintf("\nService : %s\n", $service));
+                fwrite(STDERR, sprintf("ERROR : \n%s\n\n", $e->getMessage()));
+                $object = null;
+            }
+            $this->assertEquals(is_object($object), true);
+
         }
     }
-    
+
 }
 
 

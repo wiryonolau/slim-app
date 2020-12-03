@@ -1,14 +1,14 @@
 # HELP
 # This will output the help for each task
 .PHONY: help
- 
+
 help: ## This help.
     @awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z_-]+:.*?## / {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
- 
+
 .DEFAULT_GOAL := help
- 
+
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
- 
+
 %:
 	@echo ""
 all:
@@ -26,7 +26,7 @@ unittest:
 		-w /srv/$$(basename "`pwd`") \
 		--user "$$(id -u):$$(id -g)" \
         --name $$(basename "`pwd`")_cli \
-    php:7.3-cli vendor/bin/phpunit tests
+    php:7.3-cli vendor/bin/phpunit --verbose --debug tests
 composer-install:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \

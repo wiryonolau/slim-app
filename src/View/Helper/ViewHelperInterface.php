@@ -6,4 +6,3 @@ interface ViewHelperInterface {
     public function __invoke();
     public function getName():string;
 }
-
