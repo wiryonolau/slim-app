@@ -7,10 +7,7 @@ use App\Guard\ArrayRoleProvider;
 return [
     "guard" => [
         "identity_provider" => Provider\IdentityProvider::class,
-        "authentication" => [
-            "login" => "/user/login",
-            "logout" => "/user/logout"
-        ],
+        "login_route" => "/user/login",
         "authorization" => [
             "default_role" => "guest",
             "whitelist" => [

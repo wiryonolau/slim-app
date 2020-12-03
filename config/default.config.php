@@ -29,10 +29,7 @@ return [
     ],
     "guard" => [
         "identity_provider" => "",
-        "authentication" => [
-            "login" => "/user/login",
-            "logout" => "/user/logout"
-        ],
+        "login_route" => "",
         "authorization" => [
             "default_role" => "guest",
             "whitelist" => [],

@@ -30,7 +30,7 @@ class RouteGuardMiddleware {
         $method = $request->getMethod();
         $action = $route->getCallable();
 
-        if ($this->routeGuard->hasIdentity()) {
+        if ($this->routeGuard->getIdentityProvider()->hasIdentity()) {
             if ($this->routeGuard->allow($method, $action)) {
                 return $handler->handle($request);
             }
@@ -38,7 +38,7 @@ class RouteGuardMiddleware {
             $response = new Response();
             return $response->withStatus(403);
         } else {
-            $login_url = $this->urlHelper($this->routeGuard->getOptions()->getLoginRoute());
+            $login_url = call_user_func_array($this->urlHelper,[$this->routeGuard->getOptions()->getLoginRoute()]);
             $response = new Response();
             return $response->withHeader("Location", $login_url);
         }
