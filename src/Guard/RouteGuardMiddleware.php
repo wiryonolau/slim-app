@@ -8,13 +8,15 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Routing\RouteContext;
 use Slim\Psr7\Response;
-
+use App\View\Helper\UrlHelper;
 
 class RouteGuardMiddleware {
     protected $routeGuard;
+    protected $urlHelper;
 
-    public function __construct(RouteGuard $routeGuard) {
+    public function __construct(RouteGuard $routeGuard, UrlHelper $urlHelper) {
         $this->routeGuard = $routeGuard;
+        $this->urlHelper = $urlHelper;
     }
 
     public function __invoke(Request $request, RequestHandler $handler) : Response {
@@ -28,11 +30,18 @@ class RouteGuardMiddleware {
         $method = $request->getMethod();
         $action = $route->getCallable();
 
-        if ($routeGuard->allow($method, $action)) {
-            return $handler->handle($request);
+        if ($this->routeGuard->hasIdentity()) {
+            if ($this->routeGuard->allow($method, $action)) {
+                return $handler->handle($request);
+            }
+
+            $response = new Response();
+            return $response->withStatus(403);
+        } else {
+            $login_url = $this->urlHelper($this->routeGuard->getOptions()->getLoginRoute());
+            $response = new Response();
+            return $response->withHeader("Location", $login_url);
         }
-        $response = new Response();
-        return $response->withStatus(403);
     }
 
     public function getRouteGuard() {

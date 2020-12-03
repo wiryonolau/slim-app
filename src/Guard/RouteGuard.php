@@ -6,6 +6,7 @@ use App\Guard\GuardOption;
 use App\Guard\IdentityProviderInterface;
 use App\Guard\RoleProviderInterface;
 use App\Guard\RouteGuardInterface;
+use App\Guard\IdentityInterface;
 
 class RouteGuard implements RouteGuardInterface {
     protected $identityProvider;
@@ -16,6 +17,14 @@ class RouteGuard implements RouteGuardInterface {
         $this->identityProvider = $identityProvider;
         $this->roleProvider = $roleProvider;
         $this->options = $options;
+    }
+
+    public function getIdentityProvider() {
+        return $this->identityProvider;
+    }
+
+    public function getOptions() {
+        return $this->options;
     }
 
     public function allow(string $method, string $action) : bool {
@@ -31,8 +40,6 @@ class RouteGuard implements RouteGuardInterface {
         if (count($whitelisted)) {
             return true;
         }
-
-
 
         foreach ($roles as $role_name) {
             $role = $this->roleProvider->getRole($role_name);

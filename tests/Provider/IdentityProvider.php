@@ -12,6 +12,10 @@ class Identity implements IdentityInterface {
 }
 
 class IdentityProvider implements IdentityProviderInterface {
+    public function hasIdentity() : bool {
+        return true;
+    }
+    
     public function getIdentity() : IdentityInterface {
         return new Identity();
     }
