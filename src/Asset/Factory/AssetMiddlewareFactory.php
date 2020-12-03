@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Middleware\Factory;
+namespace App\Asset\Factory;
 
-use App\Middleware\AssetMiddleware;
+use App\Asset\AssetMiddleware;
 use Psr\Container\ContainerInterface;
 
 class AssetMiddlewareFactory {

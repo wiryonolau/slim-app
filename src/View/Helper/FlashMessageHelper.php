@@ -2,6 +2,7 @@
 
 namespace App\View\Helper;
 
+use App\View\Helper\ViewHelperInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
@@ -32,11 +33,11 @@ class FlashMessageHelper implements ViewHelperInterface {
         $this->session->getFlashBag()->add($level, $message);
     }
 
-    public function set(string $level, mixed $message) : void {
+    public function set(string $level, $message) : void {
         $this->session->getFlashBag()->set($level, $message);
     }
 
-    public function get(string $level, string $placeholder = "") : mixed {
+    public function get(string $level, array $placeholder = []) {
         return $this->session->getFlashBag()->get($level, $placeholder);
     }
 

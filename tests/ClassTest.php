@@ -9,7 +9,7 @@ final class ClassTest extends TestCase {
         $view = new View\View();
         $this->assertEquals(is_object($view), true);
     }
-    
+
 }
 
 

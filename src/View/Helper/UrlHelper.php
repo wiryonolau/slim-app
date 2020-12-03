@@ -2,6 +2,8 @@
 
 namespace App\View\Helper;
 
+use App\View\Helper\ViewHelperInterface;
+
 class UrlHelper implements ViewHelperInterface
 {
     protected $base_url;

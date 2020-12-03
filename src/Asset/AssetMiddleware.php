@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Middleware;
+namespace App\Asset;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
@@ -74,7 +74,7 @@ class AssetMiddleware
         $this->parseConfig($config);
     }
 
-    public function __invoke(Request $request, RequestHandler $handler)
+    public function __invoke(Request $request, RequestHandler $handler) : Response
     {
         try {
             $response = $handler->handle($request);
@@ -86,7 +86,7 @@ class AssetMiddleware
     }
 
 
-    private function parseConfig($config)
+    private function parseConfig($config) : void
     {
         if (isset($config["resolver_configs"]["paths"])) {
             foreach ($config["resolver_configs"]["paths"] as $path) {
@@ -95,7 +95,7 @@ class AssetMiddleware
         }
     }
 
-    private function searchFile($file)
+    private function searchFile($file) : ?string
     {
         foreach ($this->path as $path) {
             $file_path = sprintf("%s%s", $path, $file);
@@ -106,7 +106,7 @@ class AssetMiddleware
         return null;
     }
 
-    private function findAsset(Request $request)
+    private function findAsset(Request $request) : Response
     {
         $request_file = $request->getRequestTarget();
         $file = $this->searchFile($request_file);
