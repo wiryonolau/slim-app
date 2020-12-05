@@ -43,7 +43,7 @@ return [
     "view_helper" => [
         "aliasses" => [
             "url" => View\Helper\UrlHelper::class,
-            "flashMessage" => View\Helper\FlashMessageHelper::class
+            "flash" => View\Helper\FlashMessageHelper::class
         ],
         "factories" => [
             View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
