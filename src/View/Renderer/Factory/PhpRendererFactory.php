@@ -13,16 +13,13 @@ class PhpRendererFactory {
         $renderer = new PhpRenderer($template_path);
         $renderer->setLayout($config->getConfig()["view"]["default_layout"]);
 
-        if (!empty($config->getConfig()["view"]["helpers"])) {
-            foreach($config->getConfig()["view"]["helpers"] as $helper) {
-                if (!$container->has($helper)) {
-                    continue;
-                }
-                $renderer->addViewHelper($container->get($helper));
+        if (!empty($config->getConfig()["view_helper"]["aliasses"])) {
+            foreach($config->getConfig()["view_helper"]["aliasses"] as $alias => $helper) {
+                $alias = is_int($alias) ? "" : $alias;
+                $renderer->addViewHelper($container->get($helper), $alias);
             }
         }
 
         return $renderer;
     }
 }
-

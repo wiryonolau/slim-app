@@ -119,6 +119,13 @@ class Application
             }
         }
 
+        # Build View Helper
+        if (!empty($this->getConfig()["view_helper"]["factories"])) {
+            foreach ($this->getConfig()["view_helper"]["factories"] as $service => $factory) {
+                $this->addDefinition($service, $factory);
+            }
+        }
+
         # Build Action, Inject View
         if (!empty($this->getConfig()["action"]["factories"])) {
             foreach ($this->getConfig()["action"]["factories"] as $controller => $factory) {

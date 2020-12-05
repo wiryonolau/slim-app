@@ -2,9 +2,7 @@
 
 namespace App\View\Helper;
 
-use App\View\Helper\ViewHelperInterface;
-
-class UrlHelper implements ViewHelperInterface
+class UrlHelper
 {
     protected $base_url;
 
@@ -20,11 +18,6 @@ class UrlHelper implements ViewHelperInterface
             $url = sprintf("%s?%s", $url, $query);
         }
         return $url;
-    }
-
-    public function getName() : string
-    {
-        return "url";
     }
 
     public static function getUrlOrigin($s = null, $use_forwarded_host = false) : string

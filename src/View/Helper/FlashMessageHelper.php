@@ -2,11 +2,10 @@
 
 namespace App\View\Helper;
 
-use App\View\Helper\ViewHelperInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 
-class FlashMessageHelper implements ViewHelperInterface {
+class FlashMessageHelper {
     const LEVEL_INFO = "info";
     const LEVEL_WARNING = "warning";
     const LEVEL_ERROR = "error";
@@ -19,10 +18,6 @@ class FlashMessageHelper implements ViewHelperInterface {
 
     public function __invoke() : self {
         return $this;
-    }
-
-    public function getName() : string {
-        return "flash";
     }
 
     public function getFlashBag() : FlashBagInterface {

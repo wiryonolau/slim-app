@@ -5,6 +5,7 @@ namespace App\View\Renderer;
 
 use Slim\Views\PhpRenderer as SlimPhpRenderer;
 use App\View\Helper\ViewHelperInterface;
+use ReflectionClass;
 
 class PhpRenderer extends SlimPhpRenderer
 {
@@ -16,10 +17,13 @@ class PhpRenderer extends SlimPhpRenderer
         }
     }
 
-    public function addViewHelper(ViewHelperInterface $helper) {
-        if ($helper->getName()) {
-            $this->viewHelper[$helper->getName()] = $helper;
+    public function addViewHelper($helper, $name = "") {
+        if (is_null($name) or $name == "") {
+            $class = new ReflectionClass($helper);
+            $name = lcfirst($class->getShortName());
         }
+
+        $this->viewHelper[$name] = $helper;
     }
 
     protected function protectedIncludeScope(string $template, array $data): void

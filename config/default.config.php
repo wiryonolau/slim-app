@@ -13,8 +13,6 @@ return [
             Guard\RouteGuardMiddleware::class => Guard\Factory\RouteGuardMiddlewareFactory::class,
             HtmlRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Session::class => Session\Factory\SessionFactory::class,
-            View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
-            View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class
         ]
     ],
     "session" => [
@@ -41,9 +39,15 @@ return [
         "renderer" => HtmlRenderer::class,
         "default_layout" => "layout/layout.phtml",
         "template_path" => __DIR__."/../view",
-        "helpers" => [
-            View\Helper\UrlHelper::class,
-            View\Helper\FlashMessageHelper::class
+    ],
+    "view_helper" => [
+        "aliasses" => [
+            "url" => View\Helper\UrlHelper::class,
+            "flashMessage" => View\Helper\FlashMessageHelper::class
+        ],
+        "factories" => [
+            View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
+            View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class
         ]
     ]
 ];
