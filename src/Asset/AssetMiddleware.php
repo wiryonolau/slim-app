@@ -108,15 +108,15 @@ class AssetMiddleware
 
     private function findAsset(Request $request) : Response
     {
+        $response = new Response();
+
         $request_file = $request->getRequestTarget();
         $file = $this->searchFile($request_file);
         if (is_null($file)) {
-            throw new HttpNotFoundException($request, "File not found");
+            return $response->withStatus(403);
         }
 
-        $response = new Response();
         $extension = pathinfo($file, PATHINFO_EXTENSION);
-
         $response->getBody()->write(file_get_contents($file));
 
         if (isset($this->mimeType[$extension])) {
