@@ -2,20 +2,31 @@
 
 namespace App\View\Renderer\Factory;
 
+use DI;
 use App\View\Renderer\PhpRenderer;
 use Psr\Container\ContainerInterface;
 
 class PhpRendererFactory {
     public function __invoke(ContainerInterface $container) {
-        $config = $container->get("Config");
-        $template_path = realpath($config->getConfig()["view"]["template_path"]);
+        $config = $container->get("Config")->getConfig();
+        $viewConfig = $config["view"];
+        $viewHelperConfig = $config["view_helpers"];
 
+        $template_path = realpath($viewConfig["template_path"]);
         $renderer = new PhpRenderer($template_path);
-        $renderer->setLayout($config->getConfig()["view"]["default_layout"]);
 
-        if (!empty($config->getConfig()["view_helper"]["aliasses"])) {
-            foreach($config->getConfig()["view_helper"]["aliasses"] as $alias => $helper) {
-                $alias = is_int($alias) ? "" : $alias;
+        if (!empty($viewHelperConfig["factories"])) {
+            foreach ($viewHelperConfig["factories"] as $view => $factory) {
+                if (is_object($class)) {
+                    $container->set($view, $factory);
+                } else {
+                    $container->set($view, DI\factory($factory));
+                }
+            }
+        }
+
+        if (!empty($viewHelperConfig["aliases"])) {
+            foreach($viewHelperConfig["aliases"] as $alias => $helper) {
                 $renderer->addViewHelper($container->get($helper), $alias);
             }
         }

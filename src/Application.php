@@ -16,7 +16,6 @@ class Application
     protected $config;
     protected $container;
     protected $application;
-    protected $viewClass = View\View::class;
 
     public function __construct($config_dirs = null)
     {
@@ -45,11 +44,6 @@ class Application
 
     public function getContainer() {
         return $this->container;
-    }
-
-    public function setViewClass(string $view) {
-        $this->viewClass = $view;
-        return $this;
     }
 
     private function setRoute()
@@ -119,13 +113,6 @@ class Application
             }
         }
 
-        # Build View Helper
-        if (!empty($this->getConfig()["view_helper"]["factories"])) {
-            foreach ($this->getConfig()["view_helper"]["factories"] as $service => $factory) {
-                $this->addDefinition($service, $factory);
-            }
-        }
-
         # Build Action, Inject View
         if (!empty($this->getConfig()["action"]["factories"])) {
             foreach ($this->getConfig()["action"]["factories"] as $controller => $factory) {
@@ -137,9 +124,14 @@ class Application
                         $obj = $obj($container, $args);
                     }
 
+                    $viewClass = $container->get("Config")->getConfig()["view"]["view"];
+                    $rendererClass = $container->get("Config")->getConfig()["view"]["renderer"];
+                    $layout = $container->get("Config")->getConfig()["view"]["default_layout"];
+
                     if ($obj instanceof BaseAction) {
-                        $view = new $this->viewClass();
-                        $view->setRenderer($container->get(HtmlRenderer::class));
+                        $view = new $viewClass();
+                        $view->setRenderer($container->get($rendererClass));
+                        $view->setLayout($layout);
                         $obj->setView($view);
                     }
                     return $obj;

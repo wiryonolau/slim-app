@@ -11,7 +11,7 @@ return [
             Guard\GuardOption::class => Guard\Factory\GuardOptionFactory::class,
             Guard\RouteGuard::class => Guard\Factory\RouteGuardFactory::class,
             Guard\RouteGuardMiddleware::class => Guard\Factory\RouteGuardMiddlewareFactory::class,
-            HtmlRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
+            View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Session::class => Session\Factory\SessionFactory::class,
         ]
     ],
@@ -36,12 +36,13 @@ return [
         ],
     ],
     "view" => [
-        "renderer" => HtmlRenderer::class,
-        "default_layout" => "layout/layout.phtml",
+        "view" => View\View::class,
+        "renderer" => View\Renderer\PhpRenderer::class,
+        "default_layout" => "layout/layout",
         "template_path" => __DIR__."/../view",
     ],
-    "view_helper" => [
-        "aliasses" => [
+    "view_helpers" => [
+        "aliases" => [
             "url" => View\Helper\UrlHelper::class,
             "flash" => View\Helper\FlashMessageHelper::class
         ],
