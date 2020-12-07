@@ -126,10 +126,12 @@ class Application
 
                     $viewClass = $container->get("Config")->getConfig()["view"]["view"];
                     $rendererClass = $container->get("Config")->getConfig()["view"]["renderer"];
+                    $default_layout = $container->get("Config")->getConfig()["view"]["default_layout"];
 
                     if ($obj instanceof BaseAction) {
                         $view = new $viewClass();
                         $view->setRenderer($container->get($rendererClass));
+                        $view->setLayout($default_layout);
                         $obj->setView($view);
                     }
                     return $obj;
