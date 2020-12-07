@@ -19,13 +19,12 @@ class View implements ViewInterface
         return call_user_func_array([$this->renderer, $function], $args);
     }
 
-    public function setLayout(string $layout)
+    public function setLayout(string $layout) : void
     {
-        $layout = sprintf("%s.phtml", $layout);
         $this->renderer->setLayout($layout);
     }
 
-    public function appendScript($type, $path, array $options = []):void
+    public function appendScript($type, $path, array $options = []) : void
     {
         if (in_array($type, ["js", "css"])) {
             $path = ltrim($path, "/");
@@ -38,7 +37,7 @@ class View implements ViewInterface
         }
     }
 
-    public function appendScripts(array $scripts = []):void {
+    public function appendScripts(array $scripts = []) : void {
         foreach ($scripts as $script) {
             if (count($script) == 2) {
                 list($type, $path) = $script;
@@ -52,14 +51,13 @@ class View implements ViewInterface
         }
     }
 
-    public function render(Response $response, string $template, array $variables = [], string $layout = "")
+    public function render(Response $response, string $template, array $variables = [], string $layout = "") : Response
     {
-        if (empty($variables["scripts"])) {
-            $variables["scripts"] = [];
+        if (empty($variables["layout"])) {
+            $variables["layout"] = [];
         }
-        $variables["scripts"] = array_merge_recursive($variables["scripts"], $this->scripts);
+        $variables["layout"]["scripts"] = $this->scripts;
 
-        $template = sprintf("%s.phtml", $template);
         return $this->renderer->render($response, $template, $variables);
     }
 }

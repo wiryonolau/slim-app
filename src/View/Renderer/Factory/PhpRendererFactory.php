@@ -13,7 +13,10 @@ class PhpRendererFactory {
         $viewHelperConfig = $config["view_helpers"];
 
         $template_path = realpath($viewConfig["template_path"]);
+
         $renderer = new PhpRenderer($template_path);
+        $renderer->setLayout($viewConfig["default_layout"]);
+        $renderer->setTemplateSuffix($viewConfig["default_template_suffix"]);
 
         if (!empty($viewHelperConfig["factories"])) {
             foreach ($viewHelperConfig["factories"] as $view => $factory) {

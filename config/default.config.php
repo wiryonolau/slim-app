@@ -39,6 +39,7 @@ return [
         "view" => View\View::class,
         "renderer" => View\Renderer\PhpRenderer::class,
         "default_layout" => "layout/layout",
+        "default_template_suffix" => "phtml",
         "template_path" => __DIR__."/../view",
     ],
     "view_helpers" => [
