@@ -8,7 +8,8 @@ use App\Session;
 
 class SessionMiddlewareFactory {
     public function __invoke(ContainerInterface $container) {
-        $session = $container->get(Session::class);
+        $sessionClass = $container->get("Config")->getConfig()["session"]["class"];
+        $session = $container->get($sessionClass);
         return new SessionMiddleware($session);
     }
 }

@@ -124,7 +124,7 @@ class Application
                         $obj = $obj($container, $args);
                     }
 
-                    $viewClass = $container->get("Config")->getConfig()["view"]["view"];
+                    $viewClass = $container->get("Config")->getConfig()["view"]["class"];
                     $rendererClass = $container->get("Config")->getConfig()["view"]["renderer"];
                     $default_layout = $container->get("Config")->getConfig()["view"]["default_layout"];
 

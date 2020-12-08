@@ -16,8 +16,12 @@ return [
         ]
     ],
     "session" => [
-        'name' => 'App',
-        'cache_expire' => 0
+        'class' => Session::class,
+        'options' => [
+            'name' => 'App',
+            'cache_expire' => 0,
+            'cookie_samesite' => 'strict'
+        ]
     ],
     "asset" => [
         "resolver_configs" => [
@@ -36,7 +40,7 @@ return [
         ],
     ],
     "view" => [
-        "view" => View\View::class,
+        "class" => View\View::class,
         "renderer" => View\Renderer\PhpRenderer::class,
         "default_layout" => "layout/layout",
         "default_template_suffix" => "phtml",

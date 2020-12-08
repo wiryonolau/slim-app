@@ -40,11 +40,11 @@ composer-update:
         -w /srv/$$(basename "`pwd`") \
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
-    composer composer update -v --no-dev
+    composer composer update -v --no-dev --ignore-platform-reqs
 composer:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \
         -w /srv/$$(basename "`pwd`") \
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
-    composer composer $(filter-out $@,$(MAKECMDGOALS))
+    composer composer --ignore-platform-reqs $(filter-out $@,$(MAKECMDGOALS))
