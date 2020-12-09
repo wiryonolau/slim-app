@@ -4,11 +4,11 @@ namespace App\View\Helper\Factory;
 
 use Psr\Container\ContainerInterface;
 use App\View\Helper\FlashMessageHelper;
-use App\Session;
 
 class FlashMessageHelperFactory {
     public function __invoke(ContainerInterface $container) {
-        $session = $container->get(Session::class);
+        $config = $container->get("Config")->getConfig();
+        $session = $container->get($config["session"]["class"]);
         return new FlashMessageHelper($session);
     }
 }
