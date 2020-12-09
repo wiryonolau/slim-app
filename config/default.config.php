@@ -12,6 +12,8 @@ return [
             Guard\RouteGuard::class => Guard\Factory\RouteGuardFactory::class,
             Guard\RouteGuardMiddleware::class => Guard\Factory\RouteGuardMiddlewareFactory::class,
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
+            Csrf\CsrfTokenManager::class => Csrf\Factory\CsrfTokenManagerFactory::class,
+            Csrf\CsrfMiddleware::class => Csrf\Factory\CsrfMiddlewareFactory::class,
             Session::class => Session\Factory\SessionFactory::class,
         ]
     ],
@@ -21,7 +23,9 @@ return [
             'name' => 'App',
             'cache_expire' => 0,
             'cookie_samesite' => 'strict'
-        ]
+        ],
+        'csrf_field_name' => '_csrf',
+        'csrf_token_id' => 'app'
     ],
     "asset" => [
         "resolver_configs" => [
@@ -49,11 +53,13 @@ return [
     "view_helpers" => [
         "aliases" => [
             "url" => View\Helper\UrlHelper::class,
-            "flash" => View\Helper\FlashMessageHelper::class
+            "flash" => View\Helper\FlashMessageHelper::class,
+            "csrf" => View\Helper\CsrfTokenHelper::class,
         ],
         "factories" => [
             View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
-            View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class
+            View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class,
+            View\Helper\CsrfTokenHelper::class => View\Helper\Factory\CsrfTokenHelperFactory::class
         ]
     ]
 ];
