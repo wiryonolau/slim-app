@@ -26,9 +26,9 @@ class Application
 
         $this->config = new Config($config_dirs);
         $this->container = new DI\Container();
+        $this->application = AppFactory::createFromContainer($this->container);
 
         $this->buildContainer();
-        $this->application = AppFactory::createFromContainer($this->container);
         $this->setRoute();
         $this->setMiddleware();
     }
@@ -44,6 +44,10 @@ class Application
 
     public function getContainer() {
         return $this->container;
+    }
+
+    public function getApplication() {
+        return $this->application;
     }
 
     private function setRoute()
@@ -103,8 +107,6 @@ class Application
     private function buildContainer()
     {
         $this->addDefinition('Config', $this->config);
-
-        $this->addDefinition(HtmlRenderer::class, $this->getConfig()["view"]["renderer"]);
 
         # Build Service
         if (!empty($this->getConfig()["service"]["factories"])) {

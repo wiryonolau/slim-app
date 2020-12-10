@@ -5,20 +5,19 @@ use PHPUnit\Framework\TestCase;
 use App\Application;
 
 final class ApplicationTest extends TestCase {
-    public function testService() {
+    public function testDI() {
         $app = new Application(__DIR__."/config/*.config.php");
-        $serviceFactories = $app->getConfig()["service"]["factories"];
-
-        foreach($serviceFactories as $service => $factory) {
+        // $config = $app->getConfig();
+        $entries = $app->getContainer()->getKnownEntryNames();
+        foreach($entries as $entry) {
             try {
-                $object = $app->getContainer()->get($service);
+                $object = $app->getContainer()->get($entry);
             } catch (\Exception $e) {
-                fwrite(STDERR, sprintf("\nService : %s\n", $service));
+                fwrite(STDERR, sprintf("\nService : %s\n", $entry));
                 fwrite(STDERR, sprintf("ERROR : \n%s\n\n", $e->getMessage()));
                 $object = null;
             }
             $this->assertEquals(is_object($object), true);
-
         }
     }
 

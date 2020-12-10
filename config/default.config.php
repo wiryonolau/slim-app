@@ -61,5 +61,9 @@ return [
             View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class,
             View\Helper\CsrfTokenHelper::class => View\Helper\Factory\CsrfTokenHelperFactory::class
         ]
+    ],
+    "console" => [
+        "commands" => [],
+        "factories" => []
     ]
 ];
