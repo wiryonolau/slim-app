@@ -12,7 +12,7 @@ class PhpRendererFactory {
         $viewConfig = $config["view"];
         $viewHelperConfig = $config["view_helpers"];
 
-        $template_path = realpath($viewConfig["template_path"]);
+        $template_path = $viewConfig["template_path"];
 
         $renderer = new PhpRenderer($template_path);
         $renderer->setLayout($viewConfig["default_layout"]);

@@ -113,7 +113,7 @@ class AssetMiddleware
         $request_file = $request->getRequestTarget();
         $file = $this->searchFile($request_file);
         if (is_null($file)) {
-            return $response->withStatus(403);
+            throw new HttpNotFoundException($request);
         }
 
         $extension = pathinfo($file, PATHINFO_EXTENSION);

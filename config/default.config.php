@@ -14,6 +14,7 @@ return [
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Csrf\CsrfTokenManager::class => Csrf\Factory\CsrfTokenManagerFactory::class,
             Csrf\CsrfMiddleware::class => Csrf\Factory\CsrfMiddlewareFactory::class,
+            Http\HttpExceptionMiddleware::class => Http\Factory\HttpExceptionMiddlewareFactory::class,
             Session::class => Session\Factory\SessionFactory::class,
         ]
     ],
@@ -47,8 +48,9 @@ return [
         "class" => View\View::class,
         "renderer" => View\Renderer\PhpRenderer::class,
         "default_layout" => "layout/layout",
+        "error_layout" => "layout/error",
         "default_template_suffix" => "phtml",
-        "template_path" => __DIR__."/../view",
+        "template_path" => __DIR__."/../view"
     ],
     "view_helpers" => [
         "aliases" => [
