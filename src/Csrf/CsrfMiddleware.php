@@ -7,8 +7,9 @@ use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Slim\Psr7\Response;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Routing\RouteContext;
+use Slim\Psr7\Response;
 
 class CsrfMiddleware {
     protected $field_name;
@@ -26,9 +27,28 @@ class CsrfMiddleware {
             return $handler->handle($request);
         }
 
-        // TODO : Need to validate csrf value
+        // Check if csrf is forced disable in route definition
+        $routeContext = RouteContext::fromRequest($request);
+        $route = $routeContext->getRoute();
+        if (empty($route)) {
+            throw new HttpNotFoundException($request);
+        }
+        if ($route->getArgument("csrf", true) == false) {
+            return $handler->handle($request);
+        }
+
+        $csrf_value = [];
+
+        // Retrieve from POST
         $data = (array)$request->getParsedBody();
-        $csrf_value = (empty($data[$this->field_name]) ? "" : $data[$this->field_name]);
+        $csrf_value[] = (empty($data[$this->field_name]) ? "" : $data[$this->field_name]);
+
+        // Retrieve from Header for ajax
+        if ($request->hasHeader("X-CSRF-TOKEN")) {
+            $csrf_value[] = $request->getHeader("X-CSRF-TOKEN");
+        }
+
+        $csrf_value = reset(array_filter($csrf_value));
         $csrfToken = new CsrfToken($this->tokenManager->getId(), $csrf_value);
 
         if ($this->tokenManager->isTokenValid($csrfToken)) {

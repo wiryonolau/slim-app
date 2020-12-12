@@ -53,7 +53,7 @@ class Application
     private function setRoute()
     {
         if (!empty($this->getConfig()["routes"])) {
-            self::addRoute($this->getConfig()["routes"], $this->application);
+            self::addRoute(null, $this->getConfig()["routes"], $this->application);
         }
     }
 
@@ -76,16 +76,19 @@ class Application
         }
     }
 
-    private static function addRoute($routes, &$application)
+    private static function addRoute(?string $namespace, array $routes, &$application)
     {
-        foreach ($routes as $route) {
+        foreach ($routes as $name => $route) {
             $method = (empty($route["method"]) ? "GET" : $route["method"]);
             if (!is_array($method)) {
                 $method = [$method];
             }
 
+            $name = sprintf("%s/%s", $namespace, strval($name));
             $path = $route["route"];
             $action = $route["options"]["action"];
+            $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
+            $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
 
             if (!$application->getContainer()->has($action)) {
                 throw new \Exception("Action $action  not exist");
@@ -94,12 +97,21 @@ class Application
 
             $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
             if (count($child_routes)) {
-                $application->group($path, function ($application) use ($method, $path, $action, $child_routes) {
+                $application->group($path, function ($application) use ($name, $method, $path, $action, $child_routes) {
                     $application->map($method, "", $action);
-                    self::addRoute($child_routes, $application);
+                    self::addRoute($name, $child_routes, $application);
                 });
             } else {
-                $application->map($method, $path, $action);
+                $addedRoute = $application->map($method, $path, $action);
+                if (count($arguments)) {
+                    $addedRoute->addArguments($arguments);
+                }
+
+                if (!is_null($middleware) and $this->container->has($middleware)) {
+                    $addedRoute->add($this->container->get($middleware));
+                }
+
+                $addedRoute->setName($name);
             }
         }
     }
