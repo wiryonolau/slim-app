@@ -57,7 +57,7 @@ class Application
     public function setConfigPath($path) : self
     {
         if (is_array($path)) {
-            ArrayUtils::merge($this->options["config_path"], $path);
+            $this->options["config_path"] = ArrayUtils::merge($this->options["config_path"], $path);
         } else {
             $this->options["config_path"][] = $path;
         }
@@ -79,7 +79,7 @@ class Application
     }
 
     public function setConsoleOptions(array $options = []) {
-        ArrayUtils::merge($this->options["console"], $options);
+        $this->options["console"] = ArrayUtils::merge($this->options["console"], $options);
     }
 
     public function build()

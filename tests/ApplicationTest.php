@@ -7,10 +7,10 @@ use App\Application;
 final class ApplicationTest extends TestCase {
     public function testDI() {
         $app = new Application([
-            "config_path" => __DIR__."/config/*.config.php"
+            "config_path" => [__DIR__."/config/*.config.php"]
         ]);
         $app->build();
-        
+
         $entries = $app->getContainer()->getKnownEntryNames();
         foreach($entries as $entry) {
             try {
