@@ -8,46 +8,132 @@ use Slim\Factory\AppFactory;
 use Slim\Views\PhpRenderer;
 use Slim\Middleware\RoutingMiddleware;
 use Slim\Middleware\ErrorMiddleware;
+use Laminas\Stdlib\ArrayUtils;
+use Symfony\Component\Console\Application as ConsoleApplication;
 use App\View;
 use App\Action\BaseAction;
 
 class Application
 {
-    protected $config;
-    protected $container;
-    protected $application;
+    const APP_CONSOLE = "console";
+    const APP_HTTP = "http";
 
-    public function __construct($config_dirs = null)
+    protected $config = null;
+    protected $container = null;
+    protected $application = null;
+    protected $options = [
+        "config_path" => [
+            __DIR__."/../config/*.config.php"
+        ],
+        "container_cache_path" => null,
+        "application_type" => "http",
+        "console" => [
+            "name" => "",
+            "version" => ""
+        ]
+    ];
+
+    public function __construct(array $options = [])
     {
-        if (!is_array($config_dirs)) {
-            $config_dirs = [$config_dirs];
+        foreach ($options as $key => $value) {
+            switch ($key) {
+                case "config_path":
+                    $this->setConfigPath($value);
+                    break;
+                case "container_cache_path":
+                    $this->setContainerCachePath($value);
+                    break;
+                case "application_type" :
+                    $this->setApplicationType($value);
+                    break;
+                case "console":
+                    $this->setConsoleOptions($value);
+                    break;
+                default:
+            }
         }
-        array_unshift($config_dirs, __DIR__."/../config/*.config.php");
+    }
 
-        $this->config = new Config($config_dirs);
-        $this->container = new DI\Container();
-        $this->application = AppFactory::createFromContainer($this->container);
+    public function setConfigPath($path) : self
+    {
+        if (is_array($path)) {
+            ArrayUtils::merge($this->options["config_path"], $path);
+        } else {
+            $this->options["config_path"][] = $path;
+        }
+        return $this;
+    }
 
+    public function setContainerCachePath(string $path) : self
+    {
+        $this->options["container_cache_path"] = $path;
+        return $this;
+    }
+
+    public function setApplicationType(string $type) : self
+    {
+        if (in_array($type, [self::APP_CONSOLE, self::APP_HTTP])) {
+            $this->options["application_type"] = $type;
+            return $this;
+        }
+    }
+
+    public function setConsoleOptions(array $options = []) {
+        ArrayUtils::merge($this->options["console"], $options);
+    }
+
+    public function build()
+    {
+        $this->config = new Config($this->options["config_path"]);
+
+        $containerBuilder = new DI\ContainerBuilder();
+        if (!is_null($this->options["container_cache_path"])) {
+            $containerBuilder->enableCompiliation($this->options["container_cache_path"]);
+        }
+        $this->container = $containerBuilder->build();
         $this->buildContainer();
-        $this->setRoute();
-        $this->setMiddleware();
+
+        if ($this->options["application_type"] == self::APP_HTTP) {
+            $this->application = AppFactory::createFromContainer($this->container);
+            $this->setRoute();
+            $this->setMiddleware();
+        } else if ($this->options["application_type"] == self::APP_CONSOLE) {
+            $this->application = new ConsoleApplication($this->options["console"]["name"], $this->options["console"]["version"]);
+            $this->setCommand();
+        }
     }
 
     public function run()
     {
+        if (is_null($this->config) or is_null($this->container) or is_null($this->application)) {
+            $this->build();
+        }
         $this->application->run();
     }
 
-    public function getConfig() {
+    public function getConfig()
+    {
         return $this->config->getConfig();
     }
 
-    public function getContainer() {
+    public function getContainer()
+    {
         return $this->container;
     }
 
-    public function getApplication() {
+    public function getApplication()
+    {
         return $this->application;
+    }
+
+    private function setCommand() {
+        $commands = [];
+        if (!empty($this->getConfig()["console"]["commands"])) {
+            foreach ($this->getConfig()["console"]["commands"] as $command) {
+                $commands[] = $this->container->get($command);
+            }
+        }
+        $this->application->addCommands($commands);
     }
 
     private function setRoute()
@@ -127,31 +213,46 @@ class Application
             }
         }
 
-        # Build Action, Inject View
-        if (!empty($this->getConfig()["action"]["factories"])) {
-            foreach ($this->getConfig()["action"]["factories"] as $controller => $factory) {
-                $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($controller, $factory) {
-                    if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
-                        $obj = new $controller;
-                    } else {
-                        $obj = new $factory();
-                        $obj = $obj($container, $args);
-                    }
-
-                    $viewClass = $container->get("Config")->getConfig()["view"]["class"];
-                    $rendererClass = $container->get("Config")->getConfig()["view"]["renderer"];
-                    $default_layout = $container->get("Config")->getConfig()["view"]["default_layout"];
-
-                    if ($obj instanceof BaseAction) {
-                        $view = new $viewClass();
-                        $view->setRenderer($container->get($rendererClass));
-                        $view->setLayout($default_layout);
-                        $obj->setView($view);
-                    }
-                    return $obj;
-                });
+        # Build Console
+        if ($this->options["application_type"] == self::APP_CONSOLE) {
+            if (!empty($this->getConfig()["console"]["factories"])) {
+                array_walk($this->getConfig()["console"]["factories"], [$this, "registerCommand"]);
             }
         }
+
+        # Build Action, Inject View
+        if ($this->options["application_type"] == self::APP_HTTP) {
+            if (!empty($this->getConfig()["action"]["factories"])) {
+                array_walk($this->getConfig()["action"]["factories"], [$this, "registerHttpAction"]);
+            }
+        }
+    }
+
+    private function registerCommand($factory, $command) {
+        $this->addDefinition($command, $factory);
+    }
+
+    private function registerHttpAction($factory, $controller) {
+        $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($controller, $factory) {
+            if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
+                $obj = new $controller;
+            } else {
+                $obj = new $factory();
+                $obj = $obj($container, $args);
+            }
+
+            $viewClass = $this->getConfig()["view"]["class"];
+            $rendererClass = $this->getConfig()["view"]["renderer"];
+            $default_layout = $this->getConfig()["view"]["default_layout"];
+
+            if ($obj instanceof BaseAction) {
+                $view = new $viewClass();
+                $view->setRenderer($container->get($rendererClass));
+                $view->setLayout($default_layout);
+                $obj->setView($view);
+            }
+            return $obj;
+        });
     }
 
     private function addDefinition($name, $class)

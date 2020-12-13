@@ -8,7 +8,11 @@ use App\Guard\RouteGuardMiddleware;
 
 final class GuardTest extends TestCase {
     public function testGuardWithConfig() {
-        $app = new Application(__DIR__."/config/*.config.php");
+        $app = new Application([
+            "config_path" => __DIR__."/config/*.config.php"
+        ]);
+        $app->build();
+        
         $routeGuardMiddleware = $app->getContainer()->get(RouteGuardMiddleware::class);
 
         $routeGuard = $routeGuardMiddleware->getRouteGuard();
