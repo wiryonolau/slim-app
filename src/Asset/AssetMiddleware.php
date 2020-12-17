@@ -9,7 +9,7 @@ use Slim\Psr7\Response;
 
 class AssetMiddleware
 {
-    protected $path = [];
+    protected $assetManager;
 
     protected $mimeType = [
         'txt' => 'text/plain',
@@ -69,41 +69,18 @@ class AssetMiddleware
         'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
     ];
 
-    public function __construct(array $config = [])
+    public function __construct(AssetManager $assetManager)
     {
-        $this->parseConfig($config);
+        $this->assetManager = $assetManager;
     }
 
     public function __invoke(Request $request, RequestHandler $handler) : Response
     {
         try {
-            $response = $handler->handle($request);
+            return $handler->handle($request);
         } catch (HttpNotFoundException $e) {
-            $response = $this->findAsset($request);
+            return $this->findAsset($request);
         }
-
-        return $response;
-    }
-
-
-    private function parseConfig($config) : void
-    {
-        if (isset($config["resolver_configs"]["paths"])) {
-            foreach ($config["resolver_configs"]["paths"] as $path) {
-                $this->path[] = realpath($path);
-            }
-        }
-    }
-
-    private function searchFile($file) : ?string
-    {
-        foreach ($this->path as $path) {
-            $file_path = sprintf("%s%s", $path, $file);
-            if (realpath($file_path)) {
-                return $file_path;
-            }
-        }
-        return null;
     }
 
     private function findAsset(Request $request) : Response
@@ -111,14 +88,16 @@ class AssetMiddleware
         $response = new Response();
 
         $request_file = $request->getRequestTarget();
-        $file = $this->searchFile($request_file);
-        if (is_null($file)) {
+        $file_path = $this->assetManager->getAssetRealPath($request_file);
+
+        if (is_null($file_path)) {
             throw new HttpNotFoundException($request);
         }
 
-        $extension = pathinfo($file, PATHINFO_EXTENSION);
-        $response->getBody()->write(file_get_contents($file));
+        $content = $this->assetManager->getAsset($file_path);
+        $response->getBody()->write($content);
 
+        $extension = pathinfo($file_path, PATHINFO_EXTENSION);
         if (isset($this->mimeType[$extension])) {
             $response = $response->withHeader("Content-type", $this->mimeType[$extension]);
         }

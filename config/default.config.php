@@ -6,6 +6,7 @@ return [
     "service" => [
         "factories" => [
             Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
+            Asset\AssetManager::class => Asset\Factory\AssetManagerFactory::class,
             Asset\AssetMiddleware::class => Asset\Factory\AssetMiddlewareFactory::class,
             Guard\ArrayRoleProvider::class => Guard\Factory\ArrayRoleProviderFactory::class,
             Guard\GuardOption::class => Guard\Factory\GuardOptionFactory::class,
@@ -33,6 +34,9 @@ return [
             "paths" => [
             ]
         ],
+        "caching" => [
+            "class" => ""
+        ]
     ],
     "guard" => [
         "identity_provider" => "",
