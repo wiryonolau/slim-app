@@ -194,7 +194,7 @@ class Application
                 }
 
                 if (!is_null($middleware)) {
-                    $middleware = $application->getCallableResolver()->resolve($middleware);
+                    $middleware = $application->getContainer()->get($middleware);
                     $addedRoute->add($middleware);
                 }
 
