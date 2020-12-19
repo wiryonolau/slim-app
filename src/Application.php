@@ -193,8 +193,9 @@ class Application
                     $addedRoute->addArguments($arguments);
                 }
 
-                if (!is_null($middleware) and $this->container->has($middleware)) {
-                    $addedRoute->add($this->container->get($middleware));
+                if (!is_null($middleware)) {
+                    $middleware = $application->getCallableResolver()->resolve($middleware);
+                    $addedRoute->add($middleware);
                 }
 
                 $addedRoute->setName($name);
