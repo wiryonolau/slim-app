@@ -7,7 +7,14 @@ class UrlHelper
     protected $base_url;
 
     public function __construct(string $base_url = "") {
-        $this->base_url = $base_url ? $base_url : self::getUrlOrigin();
+        if ($base_url) {
+            $this->base_url = $base_url;
+        }
+
+        // Prevent Console from using $_SERVER
+        if (empty($base_url) and php_sapi_name() !== "cli") {
+            $this->base_url = self::getUrlOrigin();
+        }
     }
 
     public function __invoke(string $path = "/", array $query = []) : string

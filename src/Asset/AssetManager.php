@@ -4,15 +4,45 @@ namespace App\Asset;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface as CacheAdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
 
 class AssetManager {
     protected $paths = [];
     protected $cache;
 
     public function __construct(array $paths = [], CacheAdapterInterface $cache) {
-        // TODO: Implement cache
         $this->paths = array_map("realpath", $paths);
         $this->cache = $cache;
+    }
+
+    public function build() {
+        $assets = [];
+
+        foreach($this->paths as $path) {
+            $dir = new RecursiveDirectoryIterator($path);
+            $iter = new RecursiveIteratorIterator($dir);
+            $cssFiles = new RegexIterator($iter, '/.*.css/', RegexIterator::GET_MATCH);
+            $jsFiles = new RegexIterator($iter, '/.*.js/', RegexIterator::GET_MATCH);
+            foreach($cssFiles as $file) {
+                $assets = array_merge($assets, $file);
+            }
+            foreach($jsFiles as $file) {
+                $assets = array_merge($assets, $file);
+
+            }
+        }
+
+        foreach ($assets as $file) {
+            $name = $this->hashName($file);
+            $asset = $this->cache->getItem($name);
+            $this->setAsset($asset, $file);
+        }
+    }
+
+    public function clear() {
+        $this->cache->prune();
     }
 
     public function getAsset(string $file_path) : ?string {
@@ -37,9 +67,40 @@ class AssetManager {
     }
 
     protected function setAsset(ItemInterface &$asset, string $file_path) : void {
+        $minify = true;
+        $extension = pathinfo($file_path, PATHINFO_EXTENSION);
+        switch ($extension) {
+            case "js":
+                $pattern = "/.*(.min.css$)/";
+            break;
+            case "css":
+                $pattern = "/.*(.min.js$)/";
+            break;
+        }
+
+        if (preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) === 1) {
+            $minify = false;
+        }
+
+        $content = file_get_contents($file_path);
+        if ($minify) $content = $this->minify($extension, $content);
+
         $name = $this->hashName($file_path);
-        $asset->set(file_get_contents($file_path));
+        $asset->set($content);
         $this->cache->save($asset);
+    }
+
+    protected function minify(string $extension, string $content) : string {
+        switch ($extension) {
+            case "js":
+                return Filter\JSMin::minify($content);
+            break;
+            case "css":
+                return Filter\CssMin::minify($content);
+            break;
+            default:
+                return $content;
+        }
     }
 
     protected function hashName(string $file_path) : string {

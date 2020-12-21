@@ -32,20 +32,19 @@ class RouteGuardMiddleware {
 
         // Guest Access
         $allow_access = $this->routeGuard->allow($method, $action);
+        $has_identity = $this->routeGuard->getIdentityProvider()->hasIdentity();
 
-        if ($this->routeGuard->getIdentityProvider()->hasIdentity()) {
-            if (!$allow_access) {
-                $response = new Response();
-                return $response->withStatus(403);
-            }
-        } else  {
-            if (!$allow_access) {
-                $login_url = call_user_func_array($this->urlHelper,[$this->routeGuard->getOptions()->getLoginRoute()]);
-                $response = new Response();
-                return $response->withHeader("Location", $login_url);
-            }
+        if ($has_identity == false and $allow_access == false) {
+            $login_url = call_user_func_array($this->urlHelper,[$this->routeGuard->getOptions()->getLoginRoute()]);
+            $response = new Response();
+            return $response->withHeader("Location", $login_url);
         }
-        
+
+        if ($has_identity == true and $allow_access == false) {
+            $response = new Response();
+            return $response->withStatus(403);
+        }
+
         return $handler->handle($request);
     }
 

@@ -35,7 +35,10 @@ return [
             ]
         ],
         "caching" => [
-            "class" => ""
+            "class" => "",
+            "namespace" => "asset",
+            "ttl" => 3600,
+            "path" => ""
         ]
     ],
     "guard" => [
@@ -69,7 +72,11 @@ return [
         ]
     ],
     "console" => [
-        "commands" => [],
-        "factories" => []
+        "commands" => [
+            Asset\Console\Command\AssetCommand::class,
+        ],
+        "factories" => [
+            Asset\Console\Command\AssetCommand::class => Asset\Console\Command\Factory\AssetCommandFactory::class,
+        ]
     ]
 ];

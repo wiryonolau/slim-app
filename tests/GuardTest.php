@@ -12,7 +12,7 @@ final class GuardTest extends TestCase {
             "config_path" => __DIR__."/config/*.config.php"
         ]);
         $app->build();
-        
+
         $routeGuardMiddleware = $app->getContainer()->get(RouteGuardMiddleware::class);
 
         $routeGuard = $routeGuardMiddleware->getRouteGuard();

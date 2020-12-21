@@ -14,7 +14,7 @@ final class ApplicationTest extends TestCase {
         $entries = $app->getContainer()->getKnownEntryNames();
         foreach($entries as $entry) {
             try {
-                $object = $app->getContainer()->get($entry);
+                $object = $app->getApplication()->getContainer()->get($entry);
             } catch (\Exception $e) {
                 fwrite(STDERR, sprintf("\nService : %s\n", $entry));
                 fwrite(STDERR, sprintf("ERROR : \n%s\n\n", $e->getMessage()));

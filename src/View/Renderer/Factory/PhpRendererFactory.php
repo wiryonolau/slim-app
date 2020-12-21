@@ -20,7 +20,7 @@ class PhpRendererFactory {
 
         if (!empty($viewHelperConfig["factories"])) {
             foreach ($viewHelperConfig["factories"] as $view => $factory) {
-                if (is_object($class)) {
+                if (is_object($factory)) {
                     $container->set($view, $factory);
                 } else {
                     $container->set($view, DI\factory($factory));
