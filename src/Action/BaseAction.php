@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Action;
+namespace Itseasy\Action;
 
-use App\View\ViewInterface;
+use Itseasy\View\ViewInterface;
 
 class BaseAction {
     protected $view;

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Guard\Factory;
+namespace Itseasy\Guard\Factory;
 
-use App\Guard\RouteGuard;
-use App\Guard\RouteGuardMiddleware;
-use App\View\Helper\UrlHelper;
 use Psr\Container\ContainerInterface;
+use Itseasy\Guard\RouteGuard;
+use Itseasy\Guard\RouteGuardMiddleware;
+use Itseasy\View\Helper\UrlHelper;
 
 class RouteGuardMiddlewareFactory {
     public function __invoke(ContainerInterface $container) {

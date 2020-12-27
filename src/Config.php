@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Itseasy;
 
 use Laminas\ConfigAggregator\ConfigAggregator;
 use Laminas\ConfigAggregator\PhpFileProvider;

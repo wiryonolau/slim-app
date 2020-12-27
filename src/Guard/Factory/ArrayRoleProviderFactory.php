@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Guard\Factory;
+namespace Itseasy\Guard\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\Guard\GuardOption;
-use App\Guard\ArrayRoleProvider;
+use Itseasy\Guard\GuardOption;
+use Itseasy\Guard\ArrayRoleProvider;
 
 class ArrayRoleProviderFactory {
     public function __invoke(ContainerInterface $container) {

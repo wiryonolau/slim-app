@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Itseasy;
 
 use DI;
 use Psr\Container\ContainerInterface;
@@ -10,8 +10,8 @@ use Slim\Middleware\RoutingMiddleware;
 use Slim\Middleware\ErrorMiddleware;
 use Laminas\Stdlib\ArrayUtils;
 use Symfony\Component\Console\Application as ConsoleApplication;
-use App\View;
-use App\Action\BaseAction;
+use Itseasy\View;
+use Itseasy\Action\BaseAction;
 
 class Application
 {

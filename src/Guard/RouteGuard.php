@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
-use App\Guard\GuardOption;
-use App\Guard\IdentityProviderInterface;
-use App\Guard\RoleProviderInterface;
-use App\Guard\RouteGuardInterface;
-use App\Guard\IdentityInterface;
+use Itseasy\Guard\GuardOption;
+use Itseasy\Guard\IdentityProviderInterface;
+use Itseasy\Guard\RoleProviderInterface;
+use Itseasy\Guard\RouteGuardInterface;
+use Itseasy\Guard\IdentityInterface;
 
 class RouteGuard implements RouteGuardInterface {
     protected $identityProvider;

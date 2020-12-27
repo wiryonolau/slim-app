@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
-use App\Guard\RoleInterface;
-use App\Guard\Role;
-use App\Guard\Permission;
+use Itseasy\Guard\RoleInterface;
+use Itseasy\Guard\Role;
+use Itseasy\Guard\Permission;
 
 class ArrayRoleProvider implements RoleProviderInterface {
     protected $roles = [];

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http;
+namespace Itseasy\Http;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;

@@ -1,8 +1,8 @@
 <?php
-namespace App\Tests;
+namespace AItseasypp\Tests;
 
 use PHPUnit\Framework\TestCase;
-use App\Application;
+use Itseasy\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Command\Command;
 

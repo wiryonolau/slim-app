@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Csrf\Factory;
+namespace Itseasy\Csrf\Factory;
 
-use App\Session;
 use Psr\Container\ContainerInterface;
-use App\Csrf\CsrfTokenManager;
+use Itseasy\Session;
+use Itseasy\Csrf\CsrfTokenManager;
 use Symfony\Component\Security\Csrf\TokenGenerator\UriSafeTokenGenerator;
 use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 

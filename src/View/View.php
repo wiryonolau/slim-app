@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View;
+namespace Itseasy\View;
 
 use Psr\Http\Message\ResponseInterface as Response;
 

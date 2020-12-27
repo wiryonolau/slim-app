@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Asset;
+namespace Itseasy\Asset;
 
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;

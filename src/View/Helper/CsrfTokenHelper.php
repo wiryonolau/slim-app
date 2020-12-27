@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Helper;
+namespace Itseasy\View\Helper;
 
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;

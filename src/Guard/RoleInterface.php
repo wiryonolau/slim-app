@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
-use App\Guard\PermissionInterface;
+use Itseasy\Guard\PermissionInterface;
 
 interface RoleInterface {
     public function getName() : string;

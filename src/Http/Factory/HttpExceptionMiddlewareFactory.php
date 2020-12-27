@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Factory;
+namespace Itseasy\Http\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\Http\HttpExceptionMiddleware;
+use Itseasy\Http\HttpExceptionMiddleware;
 
 class HttpExceptionMiddlewareFactory {
     public function __invoke(ContainerInterface $container) {

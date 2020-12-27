@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Asset\Factory;
+namespace Itseasy\Asset\Factory;
 
-use App\Asset\AssetManager;
-use App\Asset\AssetMiddleware;
+use Itseasy\Asset\AssetManager;
+use Itseasy\Asset\AssetMiddleware;
 use Psr\Container\ContainerInterface;
 
 class AssetMiddlewareFactory {

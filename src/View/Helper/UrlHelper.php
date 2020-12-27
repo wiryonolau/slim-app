@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Helper;
+namespace Itseasy\View\Helper;
 
 class UrlHelper
 {

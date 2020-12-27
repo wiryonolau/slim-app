@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Asset\Filter;
+namespace Itseasy\Asset\Filter;
 /**
  * JSMin.php - modified PHP implementation of Douglas Crockford's JSMin.
  *

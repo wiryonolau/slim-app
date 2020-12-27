@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Guard\Factory;
+namespace Itseasy\Guard\Factory;
 
-use App\Guard\GuardOption;
 use Psr\Container\ContainerInterface;
+use Itseasy\Guard\GuardOption;
 
 class GuardOptionFactory {
     public function __invoke(ContainerInterface $container) {

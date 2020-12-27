@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace App\View\Renderer;
+namespace Itseasy\View\Renderer;
 
 use Slim\Views\PhpRenderer as SlimPhpRenderer;
-use App\View\Helper\ViewHelperInterface;
+use Itseasy\View\Helper\ViewHelperInterface;
 use ReflectionClass;
 
 class PhpRenderer extends SlimPhpRenderer

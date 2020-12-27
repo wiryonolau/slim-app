@@ -1,5 +1,5 @@
 <?php
-namespace App\Csrf;
+namespace Itseasy\Csrf;
 
 use Symfony\Component\Security\Csrf\TokenGenerator\TokenGeneratorInterface;
 use Symfony\Component\Security\Csrf\TokenStorage\TokenStorageInterface;

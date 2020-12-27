@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Test;
+namespace Itseasy\Test;
 
 return [
     "asset" => [

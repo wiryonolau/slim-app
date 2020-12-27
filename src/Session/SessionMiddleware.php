@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Session;
+namespace Itseasy\Session;
 
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;

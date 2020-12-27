@@ -1,10 +1,10 @@
 <?php
 
-namespace App\View\Helper\Factory;
+namespace Itseasy\View\Helper\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\View\Helper\CsrfTokenHelper;
-use App\Csrf\CsrfTokenManager;
+use Itseasy\View\Helper\CsrfTokenHelper;
+use Itseasy\Csrf\CsrfTokenManager;
 
 class CsrfTokenHelperFactory {
     public function __invoke(ContainerInterface $container) {

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
-use App\Guard\RoleInterface;
+use Itseasy\Guard\RoleInterface;
 use ArrayIterator;
 
 class Role implements RoleInterface {

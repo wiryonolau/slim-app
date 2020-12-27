@@ -1,8 +1,8 @@
 <?php
-namespace App\Tests;
+namespace Itseasy\Tests;
 
 use PHPUnit\Framework\TestCase;
-use App\Application;
+use Itseasy\Application;
 
 final class ApplicationTest extends TestCase {
     public function testDI() {

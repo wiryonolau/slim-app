@@ -1,6 +1,6 @@
 <?php
 
-namespace App\View\Helper;
+namespace Itseasy\View\Helper;
 
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;

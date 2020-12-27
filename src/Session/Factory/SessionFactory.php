@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Session\Factory;
+namespace Itseasy\Session\Factory;
 
 use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;

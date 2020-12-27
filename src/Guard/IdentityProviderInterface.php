@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
-use App\Guard\IdentityInterface;
+use Itseasy\Guard\IdentityInterface;
 
 interface IdentityProviderInterface {
     public function hasIdentity() : bool;

@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Test;
+namespace Itseasy\Test;
 
-use App\Guard\ArrayRoleProvider;
+use Itseasy\Guard\ArrayRoleProvider;
 
 return [
     "guard" => [

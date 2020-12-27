@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
-use App\Guard\RouteGuard;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Routing\RouteContext;
 use Slim\Psr7\Response;
-use App\View\Helper\UrlHelper;
+use Itseasy\Guard\RouteGuard;
+use Itseasy\View\Helper\UrlHelper;
 
 class RouteGuardMiddleware {
     protected $routeGuard;

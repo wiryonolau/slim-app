@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Session\Factory;
+namespace Itseasy\Session\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\Session\SessionMiddleware;
-use App\Session;
+use Itseasy\Session\SessionMiddleware;
+use Itseasy\Session;
 
 class SessionMiddlewareFactory {
     public function __invoke(ContainerInterface $container) {

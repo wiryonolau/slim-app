@@ -1,9 +1,9 @@
 <?php
 
-namespace App\View\Helper\Factory;
+namespace Itseasy\View\Helper\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\View\Helper\UrlHelper;
+use Itseasy\View\Helper\UrlHelper;
 
 class UrlHelperFactory {
     public function __invoke(ContainerInterface $container) {

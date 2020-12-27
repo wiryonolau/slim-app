@@ -1,5 +1,5 @@
 {
-    "name": "wiryonolau/slim-app",
+    "name": "itseasy/slim-app",
     "description": "Slim Application",
     "type": "library",
     "keywords": [
@@ -19,12 +19,12 @@
     },
     "autoload" : {
         "psr-4" : {
-            "App\\": "src/"
+            "Itseasy\\": "src/"
         }
     },
     "autoload-dev" : {
         "psr-4" : {
-            "App\\Test\\" : "tests/"
+            "Itseasy\\Test\\" : "tests/"
         }
     },
     "license": "MIT",

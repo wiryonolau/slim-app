@@ -1,10 +1,10 @@
 <?php
-namespace App\Test;
+namespace Itseasy\Test;
 
 use DI;
 use PHPUnit\Framework\TestCase;
-use App\Application;
-use App\Guard\RouteGuardMiddleware;
+use Itseasy\Application;
+use Itseasy\Guard\RouteGuardMiddleware;
 
 final class GuardTest extends TestCase {
     public function testGuardWithConfig() {

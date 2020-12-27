@@ -1,5 +1,5 @@
 <?php
-namespace App\Test;
+namespace Itseasy\Test;
 
 return [
     "console" => [

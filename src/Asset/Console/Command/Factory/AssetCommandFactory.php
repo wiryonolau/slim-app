@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Asset\Console\Command\Factory;
+namespace Itseasy\Asset\Console\Command\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\Asset\Console\Command\AssetCommand;
-use App\Asset\AssetManager;
+use Itseasy\Asset\Console\Command\AssetCommand;
+use Itseasy\Asset\AssetManager;
 
 
 class AssetCommandFactory {

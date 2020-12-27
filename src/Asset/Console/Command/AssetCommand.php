@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Asset\Console\Command;
+namespace Itseasy\Asset\Console\Command;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use App\Asset\AssetManager;
+use Itseasy\Asset\AssetManager;
 use Exception;
 
 class AssetCommand extends Command {

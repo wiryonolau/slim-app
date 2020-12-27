@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Asset;
+namespace Itseasy\Asset;
 
 use Symfony\Component\Cache\Adapter\AdapterInterface as CacheAdapterInterface;
 use Symfony\Contracts\Cache\ItemInterface;

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Asset\Factory;
+namespace Itseasy\Asset\Factory;
 
 use Psr\Container\ContainerInterface;
-use App\Asset\AssetManager;
+use Itseasy\Asset\AssetManager;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
 class AssetManagerFactory {

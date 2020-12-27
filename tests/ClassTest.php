@@ -1,8 +1,8 @@
 <?php
-namespace App\Tests;
+namespace Itseasy\Tests;
 
 use PHPUnit\Framework\TestCase;
-use App\View\View;
+use Itseasy\View\View;
 
 final class ClassTest extends TestCase {
     public function testView() {

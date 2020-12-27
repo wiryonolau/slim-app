@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Guard;
+namespace Itseasy\Guard;
 
 interface IdentityInterface {
     public function getRoles() : array;

@@ -1,10 +1,10 @@
 <?php
 
-namespace App\View\Renderer\Factory;
+namespace Itseasy\View\Renderer\Factory;
 
-use DI;
-use App\View\Renderer\PhpRenderer;
 use Psr\Container\ContainerInterface;
+use Itseasy\View\Renderer\PhpRenderer;
+use DI;
 
 class PhpRendererFactory {
     public function __invoke(ContainerInterface $container) {

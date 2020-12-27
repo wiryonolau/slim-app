@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Csrf\Factory;
+namespace Itseasy\Csrf\Factory;
 
-use App\Csrf\CsrfMiddleware;
 use Psr\Container\ContainerInterface;
-use App\Csrf\CsrfTokenManager;
-use App\View\Helper\FlashMessageHelper;
+use Itseasy\Csrf\CsrfMiddleware;
+use Itseasy\Csrf\CsrfTokenManager;
+use Itseasy\View\Helper\FlashMessageHelper;
 
 class CsrfMiddlewareFactory {
     public function __invoke(ContainerInterface $container) {
