@@ -58,32 +58,32 @@ class AssetManager {
     public function getAssetRealPath(string $file_path) : ?string
     {
         foreach ($this->paths as $path) {
-            $file_path = sprintf("%s%s", $path, $file_path);
-            if (realpath($file_path)) {
-                return $file_path;
+            $real_path = sprintf("%s%s", $path, $file_path);
+            if (realpath($real_path) !== false) {
+                return $real_path;
             }
         }
         return null;
     }
 
     protected function setAsset(ItemInterface &$asset, string $file_path) : void {
-        $minify = true;
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
-        switch ($extension) {
-            case "js":
-                $pattern = "/.*(.min.css$)/";
-            break;
-            case "css":
-                $pattern = "/.*(.min.js$)/";
-            break;
-        }
-
-        if (preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) === 1) {
-            $minify = false;
-        }
-
         $content = file_get_contents($file_path);
-        if ($minify) $content = $this->minify($extension, $content);
+
+        if (in_array($extension, ["css", "js"])) {
+            switch ($extension) {
+                case "js":
+                    $pattern = "/.*(.min.css$)/";
+                break;
+                case "css":
+                    $pattern = "/.*(.min.js$)/";
+                break;
+            }
+
+            if (preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
+                $content = $this->minify($extension, $content);
+            }
+        }
 
         $name = $this->hashName($file_path);
         $asset->set($content);

@@ -87,7 +87,7 @@ class AssetMiddleware
     {
         $response = new Response();
 
-        $request_file = $request->getRequestTarget();
+        $request_file = $request->getUri()->getPath();
         $file_path = $this->assetManager->getAssetRealPath($request_file);
 
         if (is_null($file_path)) {
