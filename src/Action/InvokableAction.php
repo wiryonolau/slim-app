@@ -34,6 +34,13 @@ class InvokableAction extends BaseAction {
         return $this->response;
     }
 
+    protected function render(string $template, array $variables = [], string $layout = "") : ResponseInterface {
+        if (!is_null($this->view)) {
+            return $this->view->render($this->response, $template, $variables, $layout);
+        }
+        return $this->response;
+    }
+
     protected function parseRequest() {
         // overload this function to parse request during invoke
     }
