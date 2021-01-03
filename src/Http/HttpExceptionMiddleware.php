@@ -6,8 +6,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Response;
+use Itseasy\Middleware\BaseMiddleware;
 
-class HttpExceptionMiddleware {
+class HttpExceptionMiddleware extends BaseMiddleware {
     public function __construct($view) {
         $this->view = $view;
     }

@@ -6,8 +6,9 @@ use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
+use Itseasy\Middleware\BaseMiddleware;
 
-class AssetMiddleware
+class AssetMiddleware extends BaseMiddleware
 {
     protected $assetManager;
 

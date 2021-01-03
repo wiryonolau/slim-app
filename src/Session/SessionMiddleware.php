@@ -6,8 +6,9 @@ use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Itseasy\Middleware\BaseMiddleware;
 
-class SessionMiddleware {
+class SessionMiddleware extends BaseMiddleware {
     private $session;
 
     public function __construct(Session $session) {

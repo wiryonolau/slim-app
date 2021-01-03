@@ -9,8 +9,9 @@ use Slim\Routing\RouteContext;
 use Slim\Psr7\Response;
 use Itseasy\Guard\RouteGuard;
 use Itseasy\View\Helper\UrlHelper;
+use Itseasy\Middleware\BaseMiddleware;
 
-class RouteGuardMiddleware {
+class RouteGuardMiddleware extends BaseMiddleware {
     protected $routeGuard;
     protected $urlHelper;
 
@@ -20,8 +21,7 @@ class RouteGuardMiddleware {
     }
 
     public function __invoke(Request $request, RequestHandler $handler) : Response {
-        $routeContext = RouteContext::fromRequest($request);
-        $route = $routeContext->getRoute();
+        $route = $this->getRoute($request);
 
         if (empty($route)) {
             throw new HttpNotFoundException($request);

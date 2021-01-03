@@ -2,12 +2,14 @@
 
 namespace Itseasy\View;
 
+use Laminas\Stdlib\ArrayUtils;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class View implements ViewInterface
 {
     protected $renderer;
     protected $scripts = [];
+    protected $variables = [];
 
     public function setRenderer($renderer)
     {
@@ -22,6 +24,17 @@ class View implements ViewInterface
     public function setLayout(string $layout) : void
     {
         $this->renderer->setLayout($layout);
+    }
+
+    public function setVariable($key, $value, $for_layout = false) {
+        if ($for_layout) {
+            if (!isset($this->variables["layout"])) {
+                $this->variables["layout"] = [];
+            }
+            $this->variables["layout"][$key] = $value;
+        } else {
+            $this->variables[$key] = $value;
+        }
     }
 
     public function appendScript($type, $path, array $options = []) : void
@@ -53,6 +66,8 @@ class View implements ViewInterface
 
     public function render(Response $response, string $template, array $variables = [], string $layout = "") : Response
     {
+        $variables = ArrayUtils::merge($this->variables, $variables);
+
         if (empty($variables["layout"])) {
             $variables["layout"] = [];
         }

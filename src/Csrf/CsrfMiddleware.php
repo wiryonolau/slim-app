@@ -10,8 +10,9 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Routing\RouteContext;
 use Slim\Psr7\Response;
+use Itseasy\Middleware\BaseMiddleware;
 
-class CsrfMiddleware {
+class CsrfMiddleware extends BaseMiddleware {
     protected $field_name;
     protected $tokenManager;
     protected $session;
@@ -27,9 +28,7 @@ class CsrfMiddleware {
             return $handler->handle($request);
         }
 
-        // Check if csrf is forced disable in route definition
-        $routeContext = RouteContext::fromRequest($request);
-        $route = $routeContext->getRoute();
+        $route = $this->getRoute($request);
         if (empty($route)) {
             throw new HttpNotFoundException($request);
         }
