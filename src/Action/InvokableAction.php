@@ -6,7 +6,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Exception;
 
-class BaseInvokableAction extends BaseAction {
+class InvokableAction extends BaseAction {
     protected $request = null;
     protected $response = null;
     protected $arguments = [];
@@ -22,13 +22,20 @@ class BaseInvokableAction extends BaseAction {
             throw new Exception("Invalid HTTP Method");
         }
 
+        $this->parseRequest();
+
         $function_name = sprintf("%s%s", "http", ucfirst(strtolower($method)));
 
+        // call function base on http method e.g httpGet, httpPost, etc
         if (method_exists($this, $function_name)) {
             return call_user_func_array([$this, $function_name], []);
         }
 
         return $this->response;
+    }
+
+    protected function parseRequest() {
+        // overload this function to parse request during invoke
     }
 
     protected function getQuery(string $key, $placeholder = null) {
