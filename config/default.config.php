@@ -45,7 +45,7 @@ return [
     ],
     "navigation" => [
         "default" => []
-    ]
+    ],
     "guard" => [
         "identity_provider" => "",
         "login_route" => "",
