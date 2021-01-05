@@ -5,6 +5,7 @@ namespace Itseasy;
 return [
     "service" => [
         "factories" => [
+            Session::class => Session\Factory\SessionFactory::class,
             Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
             Asset\AssetManager::class => Asset\Factory\AssetManagerFactory::class,
             Asset\AssetMiddleware::class => Asset\Factory\AssetMiddlewareFactory::class,
@@ -12,11 +13,12 @@ return [
             Guard\GuardOption::class => Guard\Factory\GuardOptionFactory::class,
             Guard\RouteGuard::class => Guard\Factory\RouteGuardFactory::class,
             Guard\RouteGuardMiddleware::class => Guard\Factory\RouteGuardMiddlewareFactory::class,
-            View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Csrf\CsrfTokenManager::class => Csrf\Factory\CsrfTokenManagerFactory::class,
             Csrf\CsrfMiddleware::class => Csrf\Factory\CsrfMiddlewareFactory::class,
             Http\HttpExceptionMiddleware::class => Http\Factory\HttpExceptionMiddlewareFactory::class,
-            Session::class => Session\Factory\SessionFactory::class,
+            Navigation\Navigation::class => Navigation\Factory\NavigationFactory::class,
+            Navigation\NavigationMiddleware::class => Navigation\Factory\NavigationMiddlewareFactory::class,
+            View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
         ]
     ],
     "session" => [
@@ -41,6 +43,9 @@ return [
             "path" => ""
         ]
     ],
+    "navigation" => [
+        "default" => []
+    ]
     "guard" => [
         "identity_provider" => "",
         "login_route" => "",
