@@ -10,6 +10,7 @@ use Slim\Psr7\Response;
 use Itseasy\Guard\RouteGuard;
 use Itseasy\View\Helper\UrlHelper;
 use Itseasy\Middleware\BaseMiddleware;
+use Closure;
 
 class RouteGuardMiddleware extends BaseMiddleware {
     protected $routeGuard;
@@ -29,6 +30,11 @@ class RouteGuardMiddleware extends BaseMiddleware {
 
         $method = $request->getMethod();
         $action = $route->getCallable();
+
+        // Guard can only check if action is string
+        if ($action instanceof Closure) {
+            return $handler->handle($request);
+        }
 
         // Guest Access
         $allow_access = $this->routeGuard->allow($method, $action);

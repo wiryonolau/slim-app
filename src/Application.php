@@ -165,41 +165,73 @@ class Application
     private static function addRoute(?string $namespace, array $routes, &$application)
     {
         foreach ($routes as $name => $route) {
-            $method = (empty($route["method"]) ? "GET" : $route["method"]);
-            if (!is_array($method)) {
-                $method = [$method];
+            $namespace = sprintf("%s/%s", $namespace, strval($name));
+            if ($route["options"]["redirect"]) {
+                self::addActionRedirect($namespace, $route, $application);
+                continue;
             }
 
-            $name = sprintf("%s/%s", $namespace, strval($name));
-            $path = $route["route"];
-            $action = $route["options"]["action"];
-            $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
-            $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
-
-            if (!$application->getContainer()->has($action)) {
-                throw new \Exception("Action $action  not exist");
+            if ($route["options"]["action"]) {
+                self::addActionRoute($namespace, $route, $application);
+                continue;
             }
-            $controller = $application->getContainer()->get($action);
+        }
+    }
 
-            $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
-            if (count($child_routes)) {
-                $application->group($path, function ($application) use ($name, $method, $path, $action, $child_routes) {
-                    $application->map($method, "", $action);
-                    self::addRoute($name, $child_routes, $application);
-                });
-            } else {
-                $addedRoute = $application->map($method, $path, $action);
-                if (count($arguments)) {
-                    $addedRoute->addArguments($arguments);
-                }
+    private static function addActionRedirect($namespace, $route, &$application) {
+        $path = $route["route"];
+        $redirect = $route["options"]["redirect"];
+        $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
 
-                if (!is_null($middleware)) {
-                    $middleware = $application->getContainer()->get($middleware);
-                    $addedRoute->add($middleware);
-                }
+        $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
 
-                $addedRoute->setName($name);
+        $addedRoute = $application->redirect($path, $redirect, 301);
+        if (count($arguments)) {
+            $addedRoute->addArguments($arguments);
+        }
+        $addedRoute->setName($namespace);
+
+        if (count($child_routes)) {
+            $application->group($path, function ($application) use ($namespace, $path, $redirect, $child_routes) {
+                self::addRoute($namespace, $child_routes, $application);
+            });
+        }
+    }
+
+    private static function addActionRoute($namespace, $route, &$application) {
+        $method = (empty($route["method"]) ? "GET" : $route["method"]);
+        if (!is_array($method)) {
+            $method = [$method];
+        }
+
+        $path = $route["route"];
+        $action = $route["options"]["action"];
+        $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
+        $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
+
+        if (!$application->getContainer()->has($action)) {
+            throw new \Exception("Action $action  not exist");
+        }
+        $controller = $application->getContainer()->get($action);
+
+        $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
+        if (count($child_routes)) {
+            $application->group($path, function ($application) use ($namespace, $method, $path, $action, $child_routes) {
+                $application->map($method, "", $action);
+                self::addRoute($namespace, $child_routes, $application);
+            });
+        } else {
+            $addedRoute = $application->map($method, $path, $action);
+            if (count($arguments)) {
+                $addedRoute->addArguments($arguments);
             }
+
+            if (!is_null($middleware)) {
+                $middleware = $application->getContainer()->get($middleware);
+                $addedRoute->add($middleware);
+            }
+
+            $addedRoute->setName($namespace);
         }
     }
 

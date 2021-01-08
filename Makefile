@@ -47,4 +47,4 @@ composer:
         -w /srv/$$(basename "`pwd`") \
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
-    composer composer --ignore-platform-reqs $(filter-out $@,$(MAKECMDGOALS))
+    composer composer $(filter-out $@,$(MAKECMDGOALS))
