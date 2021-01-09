@@ -166,14 +166,37 @@ class Application
     {
         foreach ($routes as $name => $route) {
             $namespace = sprintf("%s/%s", $namespace, strval($name));
-            if ($route["options"]["redirect"]) {
+            if (!empty($route["options"]["redirect"])) {
                 self::addActionRedirect($namespace, $route, $application);
                 continue;
             }
 
-            if ($route["options"]["action"]) {
+            if (!empty($route["options"]["action"])) {
                 self::addActionRoute($namespace, $route, $application);
                 continue;
+            }
+
+            if (!empty($route["child_routes"])) {
+                self::addGroupRoute($namespace, $route, $application);
+                continue;
+            }
+        }
+    }
+
+    private static function addGroupRoute($namespace, $route, &$application) {
+        $path = $route["route"];
+        $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
+        $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
+        $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
+
+        if (count($child_routes)) {
+            $addedRoute = $application->group($path, function ($application) use ($namespace, $child_routes) {
+                self::addRoute($namespace, $child_routes, $application);
+            });
+
+            if (!is_null($middleware)) {
+                $middleware = $application->getContainer()->get($middleware);
+                $addedRoute->add($middleware);
             }
         }
     }
@@ -185,16 +208,29 @@ class Application
 
         $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
 
+        // Same as get
         $addedRoute = $application->redirect($path, $redirect, 301);
+
         if (count($arguments)) {
             $addedRoute->addArguments($arguments);
         }
+
+        if (!is_null($middleware)) {
+            $middleware = $application->getContainer()->get($middleware);
+            $addedRoute->add($middleware);
+        }
+
         $addedRoute->setName($namespace);
 
         if (count($child_routes)) {
             $application->group($path, function ($application) use ($namespace, $path, $redirect, $child_routes) {
                 self::addRoute($namespace, $child_routes, $application);
             });
+
+            if (!is_null($middleware)) {
+                $middleware = $application->getContainer()->get($middleware);
+                $addedRoute->add($middleware);
+            }
         }
     }
 
@@ -212,27 +248,27 @@ class Application
         if (!$application->getContainer()->has($action)) {
             throw new \Exception("Action $action  not exist");
         }
-        $controller = $application->getContainer()->get($action);
 
         $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
         if (count($child_routes)) {
-            $application->group($path, function ($application) use ($namespace, $method, $path, $action, $child_routes) {
+            $addedRoute = $application->group($path, function ($application) use ($namespace, $method, $path, $action, $child_routes) {
                 $application->map($method, "", $action);
                 self::addRoute($namespace, $child_routes, $application);
             });
         } else {
             $addedRoute = $application->map($method, $path, $action);
+            $addedRoute->setName($namespace);
+
             if (count($arguments)) {
                 $addedRoute->addArguments($arguments);
             }
-
-            if (!is_null($middleware)) {
-                $middleware = $application->getContainer()->get($middleware);
-                $addedRoute->add($middleware);
-            }
-
-            $addedRoute->setName($namespace);
         }
+
+        if (!is_null($middleware)) {
+            $middleware = $application->getContainer()->get($middleware);
+            $addedRoute->add($middleware);
+        }
+
     }
 
     private function buildContainer()
@@ -265,10 +301,10 @@ class Application
         $this->addDefinition($command, $factory);
     }
 
-    private function registerHttpAction($factory, $controller) {
-        $this->addDefinition($controller, function (ContainerInterface $container, $args) use ($controller, $factory) {
+    private function registerHttpAction($factory, $action) {
+        $this->addDefinition($action, function (ContainerInterface $container, $args) use ($action, $factory) {
             if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
-                $obj = new $controller;
+                $obj = new $action;
             } else {
                 $obj = new $factory();
                 $obj = $obj($container, $args);
