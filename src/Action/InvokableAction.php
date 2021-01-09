@@ -4,6 +4,7 @@ namespace Itseasy\Action;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Exception\HttpForbiddenException;
 use Exception;
 
 class InvokableAction extends BaseAction {
@@ -70,6 +71,10 @@ class InvokableAction extends BaseAction {
         } catch (Exception $e) {
             return $placeholder;
         }
+    }
+
+    protected function forbidden(string $message = "") {
+        throw new HttpForbiddenException($this->request, $message);
     }
 
     protected function asJson() {

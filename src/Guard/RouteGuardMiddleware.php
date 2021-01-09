@@ -5,6 +5,7 @@ namespace Itseasy\Guard;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpForbiddenException;
 use Slim\Routing\RouteContext;
 use Slim\Psr7\Response;
 use Itseasy\Guard\RouteGuard;
@@ -47,8 +48,7 @@ class RouteGuardMiddleware extends BaseMiddleware {
         }
 
         if ($has_identity == true and $allow_access == false) {
-            $response = new Response();
-            return $response->withStatus(403);
+            throw new HttpForbiddenException($request, "Unauthorized Access");
         }
 
         return $handler->handle($request);
