@@ -59,7 +59,9 @@ class PhpRenderer extends SlimPhpRenderer
 
     public function fetchTemplate(string $template, array $data = []): string
     {
-        $template = sprintf("%s.%s", $template, $this->templateSuffix);
+        if (end(explode(".", $template)) !== $this->templateSuffix) {
+            $template = sprintf("%s.%s", $template, $this->templateSuffix);
+        }
         return parent::fetchTemplate($template, $data);
     }
 
