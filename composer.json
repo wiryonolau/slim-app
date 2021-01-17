@@ -15,7 +15,8 @@
         "laminas/laminas-config-aggregator": "^1.4",
         "symfony/security-csrf": "^5.2",
         "symfony/console": "^5.2",
-        "symfony/cache": "^5.2"
+        "symfony/cache": "^5.2",
+        "laminas/laminas-navigation": "^2.10"
     },
     "autoload" : {
         "psr-4" : {
