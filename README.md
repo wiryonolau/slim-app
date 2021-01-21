@@ -20,4 +20,6 @@ Component:
 
 All middleware are optionals
 
-Check docs folder for documentation
+Check wiki folder for documentation
+
+Skeleton Application is available using [cookiecutter](https://pypi.org/project/cookiecutter/) in [gh:wiryonolau/cookiecutter-slim-app](https://github.com/wiryonolau/cookiecutter-slim-app)
