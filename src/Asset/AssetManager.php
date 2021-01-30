@@ -26,10 +26,10 @@ class AssetManager {
             $cssFiles = new RegexIterator($iter, '/.*(.css)$/', RegexIterator::GET_MATCH);
             $jsFiles = new RegexIterator($iter, '/.*(.js)$/', RegexIterator::GET_MATCH);
             foreach($cssFiles as $file) {
-                $assets = array_merge($assets, $file);
+                $assets = array_merge($assets, [$file[0]]);
             }
             foreach($jsFiles as $file) {
-                $assets = array_merge($assets, $file);
+                $assets = array_merge($assets, [$file[0]]);
 
             }
         }
