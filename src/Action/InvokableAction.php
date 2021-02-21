@@ -67,7 +67,7 @@ class InvokableAction extends BaseAction {
             if ($this->request->getMethod() != "POST") {
                 throw new Exception("Request is not a POST");
             }
-            $value = return $request->getParsedBody()[$key];
+            $value = $request->getParsedBody()[$key];
 
             if ($ignore_empty) {
                 return $value;
@@ -98,8 +98,8 @@ class InvokableAction extends BaseAction {
         }
     }
 
-    protected function redirect(string $path) : Response {
-        return $this->response->withHeader("Location", $this->view->url($path));
+    protected function redirect(string $path, array $query = []) : ResponseInterface {
+        return $this->response->withHeader("Location", $this->view->url($path, $query));
     }
 
     protected function forbidden(string $message = "") {
