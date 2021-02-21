@@ -46,31 +46,60 @@ class InvokableAction extends BaseAction {
         // overload this function to parse request during invoke
     }
 
-    protected function getQuery(string $key, $placeholder = null) {
+    protected function getQuery(string $key, $placeholder = null, $ignore_empty = false) {
         try {
-            return $this->request->getQueryParams()[$key];
+            $value = $this->request->getQueryParams()[$key];
+            if ($ignore_empty) {
+                return $value;
+            }
+
+            if (empty($value)) {
+                throw new Exception("Empty Value");
+            }
+            return $value;
         } catch (Exception $e) {
             return $placeholder;
         }
     }
 
-    protected function getPost(string $key, $placeholder = null) {
+    protected function getPost(string $key, $placeholder = null, $ignore_empty = false) {
         try {
             if ($this->request->getMethod() != "POST") {
-                return $placeholder;
+                throw new Exception("Request is not a POST");
             }
-            return $request->getParsedBody()[$key];
+            $value = return $request->getParsedBody()[$key];
+
+            if ($ignore_empty) {
+                return $value;
+            }
+
+            if (empty($value)) {
+                throw new Exception("Empty Value");
+            }
+            return $value;
         } catch (Exception $e) {
             return $placeholder;
         }
     }
 
-    protected function getArgument(string $key, $placeholder = null) {
+    protected function getArgument(string $key, $placeholder = null, $ignore_empty = false) {
         try {
-            return $this->arguments[$key];
+            $value = $this->arguments[$key];
+            if ($ignore_empty) {
+                return $value;
+            }
+
+            if (empty($value)) {
+                throw new Exception("Empty Value");
+            }
+            return $value;
         } catch (Exception $e) {
             return $placeholder;
         }
+    }
+
+    protected function redirect(string $path) : Response {
+        return $this->response->withHeader("Location", $this->view->url($path));
     }
 
     protected function forbidden(string $message = "") {
