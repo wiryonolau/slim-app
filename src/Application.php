@@ -21,6 +21,11 @@ class Application
     protected $config = null;
     protected $container = null;
     protected $application = null;
+
+    protected $errorRenderer = [];
+    protected $errorHandlers = null;
+    protected $error_options = [true, true, true , null];
+
     protected $options = [
         "config_path" => [
             __DIR__."/../config/*.config.php"
@@ -80,6 +85,28 @@ class Application
 
     public function setConsoleOptions(array $options = []) {
         $this->options["console"] = ArrayUtils::merge($this->options["console"], $options);
+    }
+
+    public function setErrorRenderer(string $contentType, string $errorRenderer) : self {
+        $this->errorRenderer[$contentType] = $errorRenderer;
+        return $this;
+    }
+
+    public function setErrorHandler(callable $handler) : self {
+        $this->errorHandler = $handler;
+        return $this;
+    }
+
+    public function setErrorOptions(bool $display_error_details = true,
+        bool $log_errors = true, bool $log_error_details = true, ?LoggerInterface $logger = null
+    ) : self {
+        $this->error_options = [
+            $display_error_details,
+            $log_errors,
+            $log_error_details,
+            $logger
+        ];
+        return $this;
     }
 
     public function build()
@@ -153,7 +180,17 @@ class Application
                 }
 
                 if ($middleware == ErrorMiddleware::class) {
-                    $this->application->addErrorMiddleware(true, true, true);
+
+                    $errorMiddleware = call_user_func_array([$this->application, "addErrorMiddleware"], $this->error_options);
+                    if (!is_null($this->errorHandler)) {
+                        $errorMiddleware->setDefaultErrorHandler($this->errorHandler);
+                    }
+                    if (count($this->errorRenderer)) {
+                        $errorHandler = $errorMiddleware->getDefaultErrorHandler();
+                        foreach ($this->errorRenderer as $content_type => $renderer) {
+                            $errorHandler->registerErrorRenderer($content_type, $renderer);
+                        }
+                    }
                     continue;
                 }
 
