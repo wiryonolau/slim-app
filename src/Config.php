@@ -14,7 +14,14 @@ class Config
         $this->parseConfig($config_dirs);
     }
 
-    public function getConfig()
+    public function get($key, $placeholder = null) {
+        if (empty($this->config[$key])) {
+            return $placeholder;
+        }
+        return $this->config[$key];
+    }
+
+    public function getConfig() : array
     {
         return $this->config;
     }

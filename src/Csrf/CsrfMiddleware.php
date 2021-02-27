@@ -13,6 +13,8 @@ use Slim\Psr7\Response;
 use Itseasy\Middleware\BaseMiddleware;
 
 class CsrfMiddleware extends BaseMiddleware {
+    const CSRF_HEADER = "X-CSRF-TOKEN";
+
     protected $field_name;
     protected $tokenManager;
     protected $session;
@@ -25,6 +27,14 @@ class CsrfMiddleware extends BaseMiddleware {
 
     public function __invoke(Request $request, RequestHandler $handler) : Response {
         if (in_array($request->getMethod(), ["GET", "HEAD", "OPTIONS"])) {
+            // get, head, options method is forbidden to have csrf header value
+            if ($request->hasHeader(self::CSRF_HEADER)) {
+                throw new HttpForbiddenException("Invalid Request");
+            }
+            // get, head, options method is forbidden to have csrf value in query
+            if (!empty($request->getQueryParams()[$this->field_name])) {
+                throw new HttpForbiddenException("Invalid Request");
+            }
             return $handler->handle($request);
         }
 
@@ -32,6 +42,8 @@ class CsrfMiddleware extends BaseMiddleware {
         if (empty($route)) {
             throw new HttpNotFoundException($request);
         }
+
+        // Disable csrf check from route.config.php
         if ($route->getArgument("csrf", true) == false) {
             return $handler->handle($request);
         }
@@ -43,8 +55,8 @@ class CsrfMiddleware extends BaseMiddleware {
         $csrf_value[] = (empty($data[$this->field_name]) ? "" : $data[$this->field_name]);
 
         // Retrieve from Header for ajax
-        if ($request->hasHeader("X-CSRF-TOKEN")) {
-            $csrf_value[] = $request->getHeader("X-CSRF-TOKEN");
+        if ($request->hasHeader(self::CSRF_HEADER)) {
+            $csrf_value[] = $request->getHeader(self::CSRF_HEADER);
         }
 
         $csrf_value = reset(array_filter($csrf_value));
