@@ -10,12 +10,14 @@ use Exception;
 class InvokableAction extends BaseAction {
     protected $request = null;
     protected $response = null;
+    protected $parsedBody = [];
     protected $arguments = [];
 
     public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $arguments = []) : ResponseInterface {
         $this->request = $request;
         $this->response = $response;
         $this->arguments = $arguments;
+        $this->parsedBody = (array)$this->request->getParsedBody();
 
         $method = $this->request->getMethod();
 
@@ -63,11 +65,15 @@ class InvokableAction extends BaseAction {
     }
 
     protected function getPost(string $key, $placeholder = null, $ignore_empty = false) {
+        return $this->getParsedBody($key, $placeholder, $ignore_empty);
+    }
+
+    protected function getParsedBody(string $key, $placeholder = null, $ignore_empty = false) {
         try {
-            if ($this->request->getMethod() != "POST") {
-                throw new Exception("Request is not a POST");
+            if (!in_array($this->request->getMethod(), ["POST", "PUT"])) {
+                throw new Exception("Request is not a POST or PUT");
             }
-            $value = $request->getParsedBody()[$key];
+            $value = $this->parsedBody[$key];
 
             if ($ignore_empty) {
                 return $value;
