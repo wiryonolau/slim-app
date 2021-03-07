@@ -56,7 +56,7 @@ class CsrfMiddleware extends BaseMiddleware {
 
         // Retrieve from Header for ajax
         if ($request->hasHeader(self::CSRF_HEADER)) {
-            $csrf_value[] = $request->getHeader(self::CSRF_HEADER);
+            $csrf_value[] = reset($request->getHeader(self::CSRF_HEADER, []));
         }
 
         $csrf_value = reset(array_filter($csrf_value));
