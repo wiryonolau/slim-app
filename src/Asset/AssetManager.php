@@ -47,6 +47,7 @@ class AssetManager {
 
     public function getAsset(string $file_path) : ?string {
         $name = $this->hashName($file_path);
+
         $asset = $this->cache->getItem($name);
 
         if (!$asset->isHit() or $asset->get() == "") {
@@ -70,19 +71,19 @@ class AssetManager {
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
         $content = file_get_contents($file_path);
 
-        if (in_array($extension, ["css", "js"])) {
-            switch ($extension) {
-                case "js":
-                    $pattern = "/.*(.min.css$)/";
-                break;
-                case "css":
-                    $pattern = "/.*(.min.js$)/";
-                break;
-            }
+        switch ($extension) {
+            case "js":
+                $pattern = "/.*(.min.js$)/";
+            break;
+            case "css":
+                $pattern = "/.*(.min.css$)/";
+            break;
+            default:
+                $pattern = null;
+        }
 
-            if (preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
-                $content = $this->minify($extension, $content);
-            }
+        if (!is_null($pattern) and preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
+            $content = $this->minify($extension, $content);
         }
 
         $name = $this->hashName($file_path);
