@@ -22,7 +22,7 @@ class RouteGuard implements RouteGuardInterface
         $this->options = $options;
     }
 
-    public function getIdentityProvider() : IdentityInterface
+    public function getIdentityProvider() : IdentityProviderInterface
     {
         return $this->identityProvider;
     }
