@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Session;
 
@@ -8,16 +9,18 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Itseasy\Middleware\BaseMiddleware;
 
-class SessionMiddleware extends BaseMiddleware {
+class SessionMiddleware extends BaseMiddleware
+{
     private $session;
 
-    public function __construct(Session $session) {
+    public function __construct(Session $session)
+    {
         $this->session = $session;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response {
+    public function __invoke(Request $request, RequestHandler $handler) : Response
+    {
         $this->session->start();
         return $handler->handle($request);
     }
-
 }

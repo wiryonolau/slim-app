@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\View\Helper;
 
@@ -6,7 +7,8 @@ class UrlHelper
 {
     protected $base_url;
 
-    public function __construct(string $base_url = "") {
+    public function __construct(string $base_url = "")
+    {
         if ($base_url) {
             $this->base_url = $base_url;
         }

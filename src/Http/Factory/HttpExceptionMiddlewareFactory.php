@@ -1,12 +1,15 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Http\Factory;
 
 use Psr\Container\ContainerInterface;
 use Itseasy\Http\HttpExceptionMiddleware;
 
-class HttpExceptionMiddlewareFactory {
-    public function __invoke(ContainerInterface $container) {
+class HttpExceptionMiddlewareFactory
+{
+    public function __invoke(ContainerInterface $container) : HttpExceptionMiddleware
+    {
         $config = $container->get("Config")->getConfig();
 
         $viewClass = $config["view"]["class"];

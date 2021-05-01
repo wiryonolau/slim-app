@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Action;
 
@@ -7,13 +8,15 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpForbiddenException;
 use Exception;
 
-class InvokableAction extends BaseAction {
+class InvokableAction extends BaseAction
+{
     protected $request = null;
     protected $response = null;
     protected $parsedBody = [];
     protected $arguments = [];
 
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $arguments = []) : ResponseInterface {
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $arguments = []) : ResponseInterface
+    {
         $this->request = $request;
         $this->response = $response;
         $this->arguments = $arguments;
@@ -37,18 +40,24 @@ class InvokableAction extends BaseAction {
         return $this->response;
     }
 
-    protected function render(string $template, array $variables = [], string $layout = "") : ResponseInterface {
+    protected function render(string $template, array $variables = [], string $layout = "") : ResponseInterface
+    {
         if (!is_null($this->view)) {
             return $this->view->render($this->response, $template, $variables, $layout);
         }
         return $this->response;
     }
 
-    protected function parseRequest() {
+    protected function parseRequest() : void
+    {
         // overload this function to parse request during invoke
     }
 
-    protected function getQuery(string $key, $placeholder = null, $ignore_empty = false) {
+    /**
+      * @return string|array|null
+      */
+    protected function getQuery(string $key, $placeholder = null, $ignore_empty = false)
+    {
         try {
             $value = $this->request->getQueryParams()[$key];
             if ($ignore_empty) {
@@ -64,11 +73,19 @@ class InvokableAction extends BaseAction {
         }
     }
 
-    protected function getPost(string $key, $placeholder = null, $ignore_empty = false) {
+    /**
+      * @return string|array|null
+      */
+    protected function getPost(string $key, $placeholder = null, $ignore_empty = false)
+    {
         return $this->getParsedBody($key, $placeholder, $ignore_empty);
     }
 
-    protected function getParsedBody(string $key, $placeholder = null, $ignore_empty = false) {
+    /**
+      * @return string|array|null
+      */
+    protected function getParsedBody(string $key, $placeholder = null, $ignore_empty = false)
+    {
         try {
             if (!in_array($this->request->getMethod(), ["POST", "PUT"])) {
                 throw new Exception("Request is not a POST or PUT");
@@ -88,7 +105,11 @@ class InvokableAction extends BaseAction {
         }
     }
 
-    protected function getArgument(string $key, $placeholder = null, $ignore_empty = false) {
+    /**
+      * @return string|array|null
+      */
+    protected function getArgument(string $key, $placeholder = null, $ignore_empty = false)
+    {
         try {
             $value = $this->arguments[$key];
             if ($ignore_empty) {
@@ -104,15 +125,18 @@ class InvokableAction extends BaseAction {
         }
     }
 
-    protected function redirect(string $path, array $query = []) : ResponseInterface {
+    protected function redirect(string $path, array $query = []) : ResponseInterface
+    {
         return $this->response->withHeader("Location", $this->view->url($path, $query));
     }
 
-    protected function forbidden(string $message = "") {
+    protected function forbidden(string $message = "") : void
+    {
         throw new HttpForbiddenException($this->request, $message);
     }
 
-    protected function asJson() {
+    protected function asJson() : bool
+    {
         try {
             $format = $this->getQuery("format", "html");
             return ($format == "json");

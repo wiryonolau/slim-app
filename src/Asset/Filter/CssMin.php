@@ -1,10 +1,12 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Asset\Filter;
 
-class CssMin {
-
-    public static function minify($css) {
+class CssMin
+{
+    public static function minify(string $css) : string
+    {
         $css = preg_replace('/\s+/', ' ', $css);
 
         // Remove spaces before and after comment
@@ -29,5 +31,4 @@ class CssMin {
 
         return trim($css);
     }
-
 }

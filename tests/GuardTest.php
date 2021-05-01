@@ -6,8 +6,10 @@ use PHPUnit\Framework\TestCase;
 use Itseasy\Application;
 use Itseasy\Guard\RouteGuardMiddleware;
 
-final class GuardTest extends TestCase {
-    public function testGuardWithConfig() {
+final class GuardTest extends TestCase
+{
+    public function testGuardWithConfig()
+    {
         $app = new Application([
             "config_path" => __DIR__."/config/*.config.php"
         ]);
@@ -21,6 +23,3 @@ final class GuardTest extends TestCase {
         $this->assertEquals($routeGuard->allow("POST", Action\TestAction::class), false);
     }
 }
-
-
-?>

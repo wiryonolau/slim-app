@@ -1,11 +1,12 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
 use Itseasy\Guard\ArrayRoleProvider;
 
-class GuardOption {
-
+class GuardOption
+{
     protected $identity_provider;
     protected $role_provider;
     protected $login_route = "/";
@@ -13,7 +14,8 @@ class GuardOption {
     protected $whitelist;
     protected $roles = [];
 
-    public function __construct(array $config = []) {
+    public function __construct(array $config = [])
+    {
         if (!empty($config["identity_provider"])) {
             $this->identity_provider = $config["identity_provider"];
         }
@@ -44,27 +46,33 @@ class GuardOption {
         }
     }
 
-    public function getIdentityProvider() : string {
+    public function getIdentityProvider() : string
+    {
         return $this->identity_provider;
     }
 
-    public function getRoleProvider() : string {
+    public function getRoleProvider() : string
+    {
         return $this->role_provider;
     }
 
-    public function getLoginRoute() : string {
+    public function getLoginRoute() : string
+    {
         return $this->login_route;
     }
 
-    public function getDefaultRole() : string {
+    public function getDefaultRole() : string
+    {
         return $this->default_role;
     }
 
-    public function getWhitelist() : array {
+    public function getWhitelist() : array
+    {
         return $this->whitelist;
     }
 
-    public function getRoles() : array {
+    public function getRoles() : array
+    {
         return $this->roles;
     }
 }

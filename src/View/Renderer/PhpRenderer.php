@@ -12,21 +12,28 @@ class PhpRenderer extends SlimPhpRenderer
     protected $templateSuffix = "phtml";
     protected $viewHelper = [];
 
-    public function __call($function, $args) {
+    /**
+     * @return mixed
+     */
+    public function __call($function, $args)
+    {
         if (isset($this->viewHelper[$function])) {
             return call_user_func_array($this->viewHelper[$function], $args);
         }
     }
 
-    public function setTemplateSuffix(string $suffix) : void {
+    public function setTemplateSuffix(string $suffix) : void
+    {
         $this->templateSuffix = $suffix;
     }
 
-    public function getTemplateSuffix() : string {
+    public function getTemplateSuffix() : string
+    {
         return $this->templateSuffix;
     }
 
-    public function addViewHelper($helper, $name = "") {
+    public function addViewHelper($helper, $name = "")
+    {
         if (is_null($name) or $name == "") {
             $class = new ReflectionClass($helper);
             $name = lcfirst($class->getShortName());

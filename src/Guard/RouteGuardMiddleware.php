@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
@@ -13,16 +14,19 @@ use Itseasy\View\Helper\UrlHelper;
 use Itseasy\Middleware\BaseMiddleware;
 use Closure;
 
-class RouteGuardMiddleware extends BaseMiddleware {
+class RouteGuardMiddleware extends BaseMiddleware
+{
     protected $routeGuard;
     protected $urlHelper;
 
-    public function __construct(RouteGuard $routeGuard, UrlHelper $urlHelper) {
+    public function __construct(RouteGuard $routeGuard, UrlHelper $urlHelper)
+    {
         $this->routeGuard = $routeGuard;
         $this->urlHelper = $urlHelper;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response {
+    public function __invoke(Request $request, RequestHandler $handler) : Response
+    {
         $route = $this->getRoute($request);
 
         if (empty($route)) {
@@ -42,7 +46,7 @@ class RouteGuardMiddleware extends BaseMiddleware {
         $has_identity = $this->routeGuard->getIdentityProvider()->hasIdentity();
 
         if ($has_identity == false and $allow_access == false) {
-            $login_url = call_user_func_array($this->urlHelper,[$this->routeGuard->getOptions()->getLoginRoute()]);
+            $login_url = call_user_func_array($this->urlHelper, [$this->routeGuard->getOptions()->getLoginRoute()]);
             $response = new Response();
             return $response->withHeader("Location", $login_url);
         }
@@ -54,7 +58,8 @@ class RouteGuardMiddleware extends BaseMiddleware {
         return $handler->handle($request);
     }
 
-    public function getRouteGuard() {
+    public function getRouteGuard() : RouteGuardInterface
+    {
         return $this->routeGuard;
     }
 }

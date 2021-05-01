@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\View;
 
@@ -11,13 +12,14 @@ class View implements ViewInterface
     protected $scripts = [];
     protected $variables = [];
 
-    public function setRenderer($renderer)
+    public function setRenderer($renderer) : void
     {
         $this->renderer = $renderer;
     }
 
     // Call registered ViewHelper in the renderer
-    public function __call($function, $args) {
+    public function __call($function, $args)
+    {
         return call_user_func_array([$this->renderer, $function], $args);
     }
 
@@ -26,7 +28,8 @@ class View implements ViewInterface
         $this->renderer->setLayout($layout);
     }
 
-    public function setVariable($key, $value, $for_layout = false) {
+    public function setVariable($key, $value, $for_layout = false) : void
+    {
         if ($for_layout) {
             if (!isset($this->variables["layout"])) {
                 $this->variables["layout"] = [];
@@ -50,12 +53,13 @@ class View implements ViewInterface
         }
     }
 
-    public function appendScripts(array $scripts = []) : void {
+    public function appendScripts(array $scripts = []) : void
+    {
         foreach ($scripts as $script) {
             if (count($script) == 2) {
                 list($type, $path) = $script;
                 $options = [];
-            } else if (count($script) == 3) {
+            } elseif (count($script) == 3) {
                 list($type, $path, $options) = $script;
             } else {
                 continue;

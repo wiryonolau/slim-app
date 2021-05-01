@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy;
 
@@ -14,7 +15,11 @@ class Config
         $this->parseConfig($config_dirs);
     }
 
-    public function get($key, $placeholder = null) {
+    /**
+     * @return mixed|null
+     */
+    public function get($key, $placeholder = null)
+    {
         if (empty($this->config[$key])) {
             return $placeholder;
         }
@@ -26,7 +31,7 @@ class Config
         return $this->config;
     }
 
-    private function parseConfig($config_dirs)
+    private function parseConfig($config_dirs) : void
     {
         $providers = [];
         foreach ($config_dirs as $config_dir) {

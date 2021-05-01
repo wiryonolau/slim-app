@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\View\Renderer\Factory;
 
@@ -6,8 +7,10 @@ use Psr\Container\ContainerInterface;
 use Itseasy\View\Renderer\PhpRenderer;
 use DI;
 
-class PhpRendererFactory {
-    public function __invoke(ContainerInterface $container) {
+class PhpRendererFactory
+{
+    public function __invoke(ContainerInterface $container) : PhpRenderer
+    {
         $config = $container->get("Config")->getConfig();
         $viewConfig = $config["view"];
         $viewHelperConfig = $config["view_helpers"];
@@ -29,7 +32,7 @@ class PhpRendererFactory {
         }
 
         if (!empty($viewHelperConfig["aliases"])) {
-            foreach($viewHelperConfig["aliases"] as $alias => $helper) {
+            foreach ($viewHelperConfig["aliases"] as $alias => $helper) {
                 $renderer->addViewHelper($container->get($helper), $alias);
             }
         }

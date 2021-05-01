@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Asset\Factory;
 
@@ -6,8 +7,10 @@ use Psr\Container\ContainerInterface;
 use Itseasy\Asset\AssetManager;
 use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 
-class AssetManagerFactory {
-    public function __invoke(ContainerInterface $container) {
+class AssetManagerFactory
+{
+    public function __invoke(ContainerInterface $container) : AssetManager
+    {
         $asset = $container->get("Config")->getConfig()["asset"];
         $paths = empty($asset["resolver_configs"]["paths"]) ? [] : $asset["resolver_configs"]["paths"];
 

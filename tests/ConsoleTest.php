@@ -1,13 +1,15 @@
 <?php
-namespace AItseasypp\Tests;
+namespace Itseasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Itseasy\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Command\Command;
 
-final class ConsoleTest extends TestCase {
-    public function testConsole() {
+final class ConsoleTest extends TestCase
+{
+    public function testConsole()
+    {
         $app = new Application([
             "config_path" => __DIR__."/config/*.config.php"
         ]);
@@ -21,7 +23,8 @@ final class ConsoleTest extends TestCase {
         $this->assertEquals($output, "Hello $username\n");
     }
 
-    public function testAssetConsole() {
+    public function testAssetConsole()
+    {
         $app = new Application([
             "config_path" => __DIR__."/config/*.config.php"
         ]);
@@ -32,8 +35,4 @@ final class ConsoleTest extends TestCase {
         $commandTester->execute(["--build" => true]);
         $this->assertEquals($commandTester->getStatusCode(), Command::SUCCESS);
     }
-
 }
-
-
-?>

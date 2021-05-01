@@ -1,17 +1,19 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy;
 
 use DI;
-use Psr\Container\ContainerInterface;
-use Slim\Factory\AppFactory;
-use Slim\Views\PhpRenderer;
-use Slim\Middleware\RoutingMiddleware;
-use Slim\Middleware\ErrorMiddleware;
-use Laminas\Stdlib\ArrayUtils;
-use Symfony\Component\Console\Application as ConsoleApplication;
-use Itseasy\View;
 use Itseasy\Action\BaseAction;
+use Itseasy\View;
+use Laminas\Stdlib\ArrayUtils;
+use Psr\Container\ContainerInterface;
+use Slim\App;
+use Slim\Factory\AppFactory;
+use Slim\Middleware\ErrorMiddleware;
+use Slim\Middleware\RoutingMiddleware;
+use Slim\Views\PhpRenderer;
+use Symfony\Component\Console\Application as ConsoleApplication;
 
 class Application
 {
@@ -48,7 +50,7 @@ class Application
                 case "container_cache_path":
                     $this->setContainerCachePath($value);
                     break;
-                case "application_type" :
+                case "application_type":
                     $this->setApplicationType($value);
                     break;
                 case "console":
@@ -83,22 +85,28 @@ class Application
         }
     }
 
-    public function setConsoleOptions(array $options = []) {
+    public function setConsoleOptions(array $options = []) : void
+    {
         $this->options["console"] = ArrayUtils::merge($this->options["console"], $options);
     }
 
-    public function setErrorRenderer(string $contentType, string $errorRenderer) : self {
+    public function setErrorRenderer(string $contentType, string $errorRenderer) : self
+    {
         $this->errorRenderer[$contentType] = $errorRenderer;
         return $this;
     }
 
-    public function setErrorHandler(callable $handler) : self {
+    public function setErrorHandler(callable $handler) : self
+    {
         $this->errorHandler = $handler;
         return $this;
     }
 
-    public function setErrorOptions(bool $display_error_details = true,
-        bool $log_errors = true, bool $log_error_details = true, ?LoggerInterface $logger = null
+    public function setErrorOptions(
+        bool $display_error_details = true,
+        bool $log_errors = true,
+        bool $log_error_details = true,
+        ?LoggerInterface $logger = null
     ) : self {
         $this->error_options = [
             $display_error_details,
@@ -109,7 +117,7 @@ class Application
         return $this;
     }
 
-    public function build()
+    public function build() : void
     {
         $this->config = new Config($this->options["config_path"]);
 
@@ -124,13 +132,13 @@ class Application
             $this->application = AppFactory::createFromContainer($this->container);
             $this->setRoute();
             $this->setMiddleware();
-        } else if ($this->options["application_type"] == self::APP_CONSOLE) {
+        } elseif ($this->options["application_type"] == self::APP_CONSOLE) {
             $this->application = new ConsoleApplication($this->options["console"]["name"], $this->options["console"]["version"]);
             $this->setCommand();
         }
     }
 
-    public function run()
+    public function run() : void
     {
         if (is_null($this->config) or is_null($this->container) or is_null($this->application)) {
             $this->build();
@@ -138,22 +146,26 @@ class Application
         $this->application->run();
     }
 
-    public function getConfig()
+    public function getConfig() : array
     {
         return $this->config->getConfig();
     }
 
-    public function getContainer()
+    public function getContainer() : ?ContainerInterface
     {
         return $this->container;
     }
 
+    /**
+     * @return Slim\App|Symfony\Component\Console\Application|null
+     */
     public function getApplication()
     {
         return $this->application;
     }
 
-    private function setCommand() {
+    private function setCommand() : void
+    {
         $commands = [];
         if (!empty($this->getConfig()["console"]["commands"])) {
             foreach ($this->getConfig()["console"]["commands"] as $command) {
@@ -163,14 +175,14 @@ class Application
         $this->application->addCommands($commands);
     }
 
-    private function setRoute()
+    private function setRoute() : void
     {
         if (!empty($this->getConfig()["routes"])) {
             self::addRoute(null, $this->getConfig()["routes"], $this->application);
         }
     }
 
-    private function setMiddleware()
+    private function setMiddleware() : void
     {
         if (!empty($this->getConfig()["middleware"]["middleware"])) {
             foreach ($this->getConfig()["middleware"]["middleware"] as $middleware) {
@@ -180,7 +192,6 @@ class Application
                 }
 
                 if ($middleware == ErrorMiddleware::class) {
-
                     $errorMiddleware = call_user_func_array([$this->application, "addErrorMiddleware"], $this->error_options);
                     if (!is_null($this->errorHandler)) {
                         $errorMiddleware->setDefaultErrorHandler($this->errorHandler);
@@ -199,7 +210,7 @@ class Application
         }
     }
 
-    private static function addRoute(?string $namespace, array $routes, &$application)
+    private static function addRoute(?string $namespace, array $routes, &$application) : void
     {
         foreach ($routes as $name => $route) {
             $namespace = sprintf("%s/%s", $namespace, strval($name));
@@ -220,7 +231,8 @@ class Application
         }
     }
 
-    private static function addGroupRoute($namespace, $route, &$application) {
+    private static function addGroupRoute($namespace, $route, &$application) : void
+    {
         $path = $route["route"];
         $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
         $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
@@ -238,7 +250,8 @@ class Application
         }
     }
 
-    private static function addActionRedirect($namespace, $route, &$application) {
+    private static function addActionRedirect($namespace, $route, &$application) : void
+    {
         $path = $route["route"];
         $redirect = $route["options"]["redirect"];
         $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
@@ -271,7 +284,8 @@ class Application
         }
     }
 
-    private static function addActionRoute($namespace, $route, &$application) {
+    private static function addActionRoute($namespace, $route, &$application) : void
+    {
         $method = (empty($route["method"]) ? "GET" : $route["method"]);
         if (!is_array($method)) {
             $method = [$method];
@@ -305,10 +319,9 @@ class Application
             $middleware = $application->getContainer()->get($middleware);
             $addedRoute->add($middleware);
         }
-
     }
 
-    private function buildContainer()
+    private function buildContainer() : void
     {
         $this->addDefinition('Config', $this->config);
 
@@ -334,11 +347,13 @@ class Application
         }
     }
 
-    private function registerCommand($factory, $command) {
+    private function registerCommand($factory, $command) : void
+    {
         $this->addDefinition($command, $factory);
     }
 
-    private function registerHttpAction($factory, $action) {
+    private function registerHttpAction($factory, $action) : void
+    {
         $this->addDefinition($action, function (ContainerInterface $container, $args) use ($action, $factory) {
             if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
                 $obj = new $action;
@@ -361,7 +376,7 @@ class Application
         });
     }
 
-    private function addDefinition($name, $class)
+    private function addDefinition($name, $class) : void
     {
         if (is_object($class)) {
             $this->container->set($name, $class);

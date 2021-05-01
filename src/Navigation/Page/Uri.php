@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Navigation\Page;
 
@@ -10,11 +11,11 @@ class Uri extends AbstractPage
     protected $uri = null;
     protected $request;
 
-    public function setUri($uri)
+    public function setUri($uri) : self
     {
         if (null !== $uri && ! is_string($uri)) {
             throw new Exception\InvalidArgumentException(
-             'Invalid argument: $uri must be a string or null'
+                'Invalid argument: $uri must be a string or null'
          );
         }
 
@@ -22,12 +23,12 @@ class Uri extends AbstractPage
         return $this;
     }
 
-    public function getUri()
+    public function getUri() : string
     {
         return $this->uri;
     }
 
-    public function getHref()
+    public function getHref() : string
     {
         $uri = $this->getUri();
 
@@ -43,7 +44,7 @@ class Uri extends AbstractPage
         return $uri;
     }
 
-    public function isActive($recursive = false)
+    public function isActive($recursive = false) : bool
     {
         if (! $this->active) {
             if ($this->getRequest() instanceof ServerRequestInterface) {
@@ -57,24 +58,24 @@ class Uri extends AbstractPage
         return parent::isActive($recursive);
     }
 
-    public function getRequest()
+    public function getRequest() : ServerRequestInterface
     {
         return $this->request;
     }
 
-    public function setRequest(ServerRequestInterface $request = null)
+    public function setRequest(ServerRequestInterface $request = null) : self
     {
         $this->request = $request;
         return $this;
     }
 
-    public function toArray()
+    public function toArray() : array
     {
         return array_merge(
-         parent::toArray(),
-         [
+            parent::toArray(),
+            [
              'uri' => $this->getUri(),
-         ]
-     );
+            ]
+        );
     }
 }

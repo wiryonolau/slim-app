@@ -1,4 +1,5 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
@@ -8,26 +9,31 @@ use Itseasy\Guard\RoleProviderInterface;
 use Itseasy\Guard\RouteGuardInterface;
 use Itseasy\Guard\IdentityInterface;
 
-class RouteGuard implements RouteGuardInterface {
+class RouteGuard implements RouteGuardInterface
+{
     protected $identityProvider;
     protected $roleProvider;
     protected $options;
 
-    public function __construct(IdentityProviderInterface $identityProvider, RoleProviderInterface $roleProvider, GuardOption $options) {
+    public function __construct(IdentityProviderInterface $identityProvider, RoleProviderInterface $roleProvider, GuardOption $options)
+    {
         $this->identityProvider = $identityProvider;
         $this->roleProvider = $roleProvider;
         $this->options = $options;
     }
 
-    public function getIdentityProvider() {
+    public function getIdentityProvider() : IdentityInterface
+    {
         return $this->identityProvider;
     }
 
-    public function getOptions() {
+    public function getOptions() : array
+    {
         return $this->options;
     }
 
-    public function allow(string $method, string $action) : bool {
+    public function allow(string $method, string $action) : bool
+    {
         $identity = $this->identityProvider->getIdentity();
         $roles = $identity->getRoles();
 
