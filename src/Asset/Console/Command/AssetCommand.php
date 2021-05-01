@@ -10,16 +10,19 @@ use Symfony\Component\Console\Input\InputOption;
 use Itseasy\Asset\AssetManager;
 use Exception;
 
-class AssetCommand extends Command {
+class AssetCommand extends Command
+{
     protected static $defaultName = "asset";
 
-    public function __construct(AssetManager $assetManager) {
+    public function __construct(AssetManager $assetManager)
+    {
         parent::__construct();
 
         $this->assetManager = $assetManager;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : int {
+    public function execute(InputInterface $input, OutputInterface $output) : int
+    {
         if ($input->getOption("clear") or $input->getOption("build")) {
             try {
                 $output->writeln("Clearing asset cache");
@@ -43,7 +46,8 @@ class AssetCommand extends Command {
         return Command::SUCCESS;
     }
 
-    protected function configure() : void {
+    protected function configure() : void
+    {
         $this->addOption(
             "clear",
             null,
