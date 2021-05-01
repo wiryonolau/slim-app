@@ -262,7 +262,13 @@ class Application
         $addedRoute = $application->redirect($path, $redirect, 301);
 
         if (count($arguments)) {
-            $addedRoute->addArguments($arguments);
+            $arguments = array_map(function($argument) {
+                if (is_bool($argument) and $argument === false) {
+                    return "0";
+                }
+                return strval($argument);
+            }, $arguments);
+            $addedRoute->setArguments($arguments);
         }
 
         if (!is_null($middleware)) {
@@ -311,7 +317,13 @@ class Application
             $addedRoute->setName($namespace);
 
             if (count($arguments)) {
-                $addedRoute->addArguments($arguments);
+                $arguments = array_map(function($argument) {
+                    if (is_bool($argument) and $argument === false) {
+                        return "0";
+                    }
+                    return strval($argument);
+                }, $arguments);
+                $addedRoute->setArguments($arguments);
             }
         }
 

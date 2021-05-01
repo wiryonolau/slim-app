@@ -27,7 +27,7 @@ class RouteGuard implements RouteGuardInterface
         return $this->identityProvider;
     }
 
-    public function getOptions() : array
+    public function getOptions() : GuardOption
     {
         return $this->options;
     }
