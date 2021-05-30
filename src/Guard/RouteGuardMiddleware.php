@@ -46,7 +46,8 @@ class RouteGuardMiddleware extends BaseMiddleware
         $has_identity = $this->routeGuard->getIdentityProvider()->hasIdentity();
 
         if ($has_identity == false and $allow_access == false) {
-            $login_url = call_user_func_array($this->urlHelper, [$this->routeGuard->getOptions()->getLoginRoute()]);
+            $query = $this->getRedirectQuery($request->getRequestTarget());
+            $login_url = call_user_func_array($this->urlHelper, [$this->routeGuard->getOptions()->getLoginRoute(), $query]);
             $response = new Response();
             return $response->withHeader("Location", $login_url);
         }
@@ -61,5 +62,29 @@ class RouteGuardMiddleware extends BaseMiddleware
     public function getRouteGuard() : RouteGuardInterface
     {
         return $this->routeGuard;
+    }
+
+    private function getRedirectQuery(string $target) : array {
+        $target = trim($target);
+
+        if (!$this->routeGuard->getOptions()->useRedirect()) {
+            return [];
+        }
+
+        if ($target == "" ) {
+            return [];
+        }
+
+        if ($target == "/") {
+            return [];
+        }
+
+        if ($target == $this->routeGuard->getOptions()->getLoginRoute()) {
+            return [];
+        }
+
+        return [
+            "redirect" => base64_encode($target)
+        ];
     }
 }

@@ -49,6 +49,7 @@ return [
     "guard" => [
         "identity_provider" => "",
         "login_route" => "",
+        "use_redirect" => true,
         "authorization" => [
             "default_role" => "guest",
             "whitelist" => [],

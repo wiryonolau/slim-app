@@ -11,6 +11,7 @@ class GuardOption
     protected $role_provider;
     protected $login_route = "/";
     protected $default_role = "guest";
+    protected $use_redirect = true;
     protected $whitelist;
     protected $roles = [];
 
@@ -22,6 +23,10 @@ class GuardOption
 
         if (!empty($config["login_route"])) {
             $this->login_route = $config["login_route"];
+        }
+
+        if (!empty($config["use_redirect"])) {
+            $this->use_redirect = $config["use_redirect"];
         }
 
         if (!empty($config["authorization"])) {
@@ -44,6 +49,11 @@ class GuardOption
                 $this->roles = $authorization_config["roles"];
             }
         }
+    }
+
+    public function useRedirect() : bool
+    {
+        return $this->use_redirect;
     }
 
     public function getIdentityProvider() : string
