@@ -5,8 +5,10 @@ namespace Itseasy;
 
 use Laminas\ConfigAggregator\ConfigAggregator;
 use Laminas\ConfigAggregator\PhpFileProvider;
+use ArrayAccess;
+use Exception;
 
-class Config
+class Config implements ArrayAccess
 {
     protected $config = [];
 
@@ -40,5 +42,21 @@ class Config
 
         $aggregator = new ConfigAggregator($providers);
         $this->config = $aggregator->getMergedConfig();
+    }
+
+    public function offsetExists($offset) {
+        return isset($this->config[$offset]);
+    }
+
+    public function offsetGet($offset) {
+        return $this->config[$offset];
+    }
+
+    public function offsetSet($offset , $value) {
+        throw new Exception("Cannot set config programmatically");
+    }
+
+    public function offsetUnset($offset) {
+        throw new Exception("Cannot set config programmatically");
     }
 }
