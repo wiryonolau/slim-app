@@ -1,10 +1,10 @@
 <?php
 declare(strict_types = 1);
 
-namespace Itseasy\View\Helper\Factory;
+namespace Itseasy\Csrf\View\Helper\Factory;
 
 use Psr\Container\ContainerInterface;
-use Itseasy\View\Helper\CsrfTokenHelper;
+use Itseasy\Csrf\View\Helper\CsrfTokenHelper;
 use Itseasy\Csrf\CsrfTokenManager;
 
 class CsrfTokenHelperFactory
