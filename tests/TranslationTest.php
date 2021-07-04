@@ -15,7 +15,8 @@ final class TranslationTest extends TestCase
         $app->build();
 
         $translator = $app->getApplication()->getContainer()->get(Translator::class);
-        $test = $translator->translate("project", "default", "id_ID");
-        $this->assertEquals($test, "proyek");
+
+        $this->assertEquals($translator->translate("project", "default", "id_ID"), "proyek");
+        $this->assertEquals($translator->translate("notexist", "default", "id_ID"), "{{notexist}}");
     }
 }

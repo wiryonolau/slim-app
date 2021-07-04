@@ -3,7 +3,7 @@
 namespace Itseasy\Translator\Factory;
 
 use Psr\Container\ContainerInterface;
-use Laminas\I18n\Translator\Translator;
+use Itseasy\Translator\Translator;
 use Laminas\I18n\Translator\TranslatorInterface;
 
 class TranslatorFactory
