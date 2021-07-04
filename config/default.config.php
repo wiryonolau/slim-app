@@ -73,13 +73,16 @@ return [
             "url" => View\Helper\UrlHelper::class,
             "flash" => View\Helper\FlashMessageHelper::class,
             "csrf" => Csrf\View\Helper\CsrfTokenHelper::class,
+            "_" => Translator\View\Helper\TranslateViewHelper::class,
             "translate" => Translator\View\Helper\TranslateViewHelper::class,
             "translatePlural" => Translator\View\Helper\TranslatePluralViewHelper::class
         ],
         "factories" => [
             View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
             View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class,
-            Csrf\View\Helper\CsrfTokenHelper::class => Csrf\View\Helper\Factory\CsrfTokenHelperFactory::class
+            Csrf\View\Helper\CsrfTokenHelper::class => Csrf\View\Helper\Factory\CsrfTokenHelperFactory::class,
+            Translator\View\Helper\TranslateViewHelper::class => Translator\View\Helper\Factory\TranslateViewHelperFactory::class,
+            Translator\View\Helper\TranslatePluralViewHelper::class => Translator\View\Helper\Factory\TranslatePluralViewHelperFactory::class
         ]
     ],
     "console" => [

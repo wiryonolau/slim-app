@@ -1,12 +1,13 @@
 <?php
 
-namespace Itseasy\Translator\View\Helper;
+namespace Itseasy\Translator\View\Helper\Factory;
 
 use Psr\Container\ContainerInterface;
 use Laminas\I18n\View\Helper\AbstractTranslatorHelper;
-use Laminas\I18n\View\Helper\Translate;
+use Laminas\I18n\View\Helper\TranslatePlural;
+use Itseasy\Translator;
 
-class TranslateViewHelper
+class TranslatePluralViewHelperFactory
 {
     /**
      * Wrapper class for Laminas\I18n\View\Helper\Translate
@@ -22,8 +23,8 @@ class TranslateViewHelper
     {
         $translator = $container->get(Translator::class);
 
-        $translate = new Translate();
-        $translate->setTranslator($translator);
-        return $translate;
+        $translatePlural = new TranslatePlural();
+        $translatePlural->setTranslator($translator);
+        return $translatePlural;
     }
 }

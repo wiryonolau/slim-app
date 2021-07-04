@@ -20,7 +20,7 @@ return [
                 'name' => 'filesystem',
                 'options' => [
                     'namespace' => 'translation',
-                    'ttl' => 1000
+                    'ttl' => 1
                 ]
             ],
             'plugins' => [
