@@ -336,6 +336,7 @@ class Application
     private function buildContainer() : void
     {
         $this->addDefinition('Config', $this->config);
+        $this->addDefinition('config', $this->config);
 
         # Build Service
         if (!empty($this->getConfig()["service"]["factories"])) {

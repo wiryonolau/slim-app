@@ -5,7 +5,9 @@ namespace Itseasy\Asset\Factory;
 
 use Psr\Container\ContainerInterface;
 use Itseasy\Asset\AssetManager;
-use Symfony\Component\Cache\Adapter\FilesystemAdapter;
+use Laminas\Cache\Storage\Adapter\FileSystem;
+use Laminas\Cache\StorageFactory;
+use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
 
 class AssetManagerFactory
 {
@@ -19,7 +21,19 @@ class AssetManagerFactory
         $path = $asset["caching"]["path"];
 
         if (empty($asset["caching"]["class"])) {
-            $cache = new FilesystemAdapter($namespace, $ttl, $path);
+            $storage = StorageFactory::factory([
+                'adapter' => [
+                    'name' => 'filesystem',
+                    'options' => [
+                        'namespace' => $namespace,
+                        'ttl' => $ttl
+                    ]
+                ],
+                'plugins' => [
+                    'serializer'
+                ]
+            ]);
+            $cache = new SimpleCacheDecorator($storage);
         } else {
             $cache = $container->get($asset["caching"]["class"]);
         }

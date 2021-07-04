@@ -8,25 +8,32 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
+PHP_VERSION ?= "7.4"
 
 %:
 	@echo ""
 all:
 	@echo ""
+build:
+	@if [ "$$(docker images -q php:$(PHP_VERSION)-cli-ext 2>/dev/null)" = "" ]; then \
+		cd $$(pwd)/docker/php-cli-ext && docker build --build-arg PHP_VERSION=$(PHP_VERSION) -t php:$(PHP_VERSION)-cli-ext .; \
+	fi
 run:
+	$(MAKE) build
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \
 		-w /srv/$$(basename "`pwd`") \
 		--user "$$(id -u):$$(id -g)" \
         --name $$(basename "`pwd`")_cli \
-    php:7.3-cli $(filter-out $@,$(MAKECMDGOALS))
+    php:$(PHP_VERSION)-cli-ext $(filter-out $@,$(MAKECMDGOALS))
 unittest:
+	$(MAKE) build
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \
 		-w /srv/$$(basename "`pwd`") \
 		--user "$$(id -u):$$(id -g)" \
         --name $$(basename "`pwd`")_cli \
-    php:7.3-cli vendor/bin/phpunit --verbose --debug tests
+    php:$(PHP_VERSION)-cli-ext vendor/bin/phpunit --verbose --debug tests
 composer-install:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \

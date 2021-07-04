@@ -3,18 +3,18 @@ declare(strict_types = 1);
 
 namespace Itseasy\Asset;
 
-use Symfony\Component\Cache\Adapter\AdapterInterface as CacheAdapterInterface;
-use Symfony\Contracts\Cache\ItemInterface;
+use Psr\SimpleCache\CacheInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
+use Exception;
 
 class AssetManager
 {
     protected $paths = [];
     protected $cache;
 
-    public function __construct(array $paths = [], CacheAdapterInterface $cache)
+    public function __construct(array $paths = [], CacheInterface $cache)
     {
         $this->paths = array_map("realpath", $paths);
         $this->cache = $cache;
@@ -23,7 +23,6 @@ class AssetManager
     public function build() : void
     {
         $assets = [];
-
         foreach ($this->paths as $path) {
             $dir = new RecursiveDirectoryIterator($path);
             $iter = new RecursiveIteratorIterator($dir);
@@ -39,26 +38,22 @@ class AssetManager
 
         foreach ($assets as $file) {
             $name = $this->hashName($file);
-            $asset = $this->cache->getItem($name);
-            $this->setAsset($asset, $file);
+            $this->setAsset($name, $file);
         }
     }
 
     public function clear() : void
     {
-        $this->cache->prune();
+        $this->cache->clear();
     }
 
     public function getAsset(string $file_path) : ?string
     {
         $name = $this->hashName($file_path);
-
-        $asset = $this->cache->getItem($name);
-
-        if (!$asset->isHit() or $asset->get() == "") {
-            $this->setAsset($asset, $file_path);
+        if (!$this->cache->has($name)) {
+            $this->setAsset($name, $file_path);
         }
-        return $asset->get();
+        return $this->cache->get($name);
     }
 
     public function getAssetRealPath(string $file_path) : ?string
@@ -72,7 +67,7 @@ class AssetManager
         return null;
     }
 
-    protected function setAsset(ItemInterface &$asset, string $file_path) : void
+    protected function setAsset(string $name, string $file_path) : void
     {
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
         $content = file_get_contents($file_path);
@@ -91,10 +86,8 @@ class AssetManager
         if (!is_null($pattern) and preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
             $content = $this->minify($extension, $content);
         }
-
         $name = $this->hashName($file_path);
-        $asset->set($content);
-        $this->cache->save($asset);
+        $this->cache->set($name, $content);
     }
 
     protected function minify(string $extension, string $content) : string

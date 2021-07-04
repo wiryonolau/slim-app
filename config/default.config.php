@@ -5,19 +5,20 @@ namespace Itseasy;
 return [
     "service" => [
         "factories" => [
-            Session::class => Session\Factory\SessionFactory::class,
-            Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
             Asset\AssetManager::class => Asset\Factory\AssetManagerFactory::class,
             Asset\AssetMiddleware::class => Asset\Factory\AssetMiddlewareFactory::class,
+            Csrf\CsrfMiddleware::class => Csrf\Factory\CsrfMiddlewareFactory::class,
+            Csrf\CsrfTokenManager::class => Csrf\Factory\CsrfTokenManagerFactory::class,
             Guard\ArrayRoleProvider::class => Guard\Factory\ArrayRoleProviderFactory::class,
             Guard\GuardOption::class => Guard\Factory\GuardOptionFactory::class,
             Guard\RouteGuard::class => Guard\Factory\RouteGuardFactory::class,
             Guard\RouteGuardMiddleware::class => Guard\Factory\RouteGuardMiddlewareFactory::class,
-            Csrf\CsrfTokenManager::class => Csrf\Factory\CsrfTokenManagerFactory::class,
-            Csrf\CsrfMiddleware::class => Csrf\Factory\CsrfMiddlewareFactory::class,
             Http\HttpExceptionMiddleware::class => Http\Factory\HttpExceptionMiddlewareFactory::class,
             Navigation\Navigation::class => Navigation\Factory\NavigationFactory::class,
             Navigation\NavigationMiddleware::class => Navigation\Factory\NavigationMiddlewareFactory::class,
+            Session::class => Session\Factory\SessionFactory::class,
+            Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
+            Translator::class => Translator\Factory\TranslatorFactory::class,
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
         ]
     ],
@@ -30,6 +31,8 @@ return [
         ],
         'csrf_field_name' => '_csrf',
         'csrf_token_id' => 'app'
+    ],
+    "translator" => [
     ],
     "asset" => [
         "resolver_configs" => [
@@ -69,12 +72,14 @@ return [
         "aliases" => [
             "url" => View\Helper\UrlHelper::class,
             "flash" => View\Helper\FlashMessageHelper::class,
-            "csrf" => View\Helper\CsrfTokenHelper::class,
+            "csrf" => Csrf\View\Helper\CsrfTokenHelper::class,
+            "translate" => Translator\View\Helper\TranslateViewHelper::class,
+            "translatePlural" => Translator\View\Helper\TranslatePluralViewHelper::class
         ],
         "factories" => [
             View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
             View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class,
-            View\Helper\CsrfTokenHelper::class => View\Helper\Factory\CsrfTokenHelperFactory::class
+            Csrf\View\Helper\CsrfTokenHelper::class => Csrf\View\Helper\Factory\CsrfTokenHelperFactory::class
         ]
     ],
     "console" => [
