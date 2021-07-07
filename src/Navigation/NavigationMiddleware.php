@@ -20,10 +20,7 @@ class NavigationMiddleware extends BaseMiddleware
 
     public function __invoke(Request $request, RequestHandler $handler) : Response
     {
-        if ($request->getMethod() == "GET") {
-            $this->navigation->setAttribute("request", $request);
-        }
-
+        $this->navigation->setAttribute("request", $request);
         return $handler->handle($request);
     }
 }
