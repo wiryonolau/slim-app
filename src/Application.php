@@ -71,6 +71,14 @@ class Application
         return $this;
     }
 
+    public function addModule(string $class) : self
+    {
+        $module_config = call_user_func([$class, "getConfigPath"]);
+        $this->setConfigPath($module_config);
+
+        return $this;
+    }
+
     public function setContainerCachePath(string $path) : self
     {
         $this->options["container_cache_path"] = $path;
