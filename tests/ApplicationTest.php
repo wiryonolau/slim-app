@@ -14,7 +14,6 @@ final class ApplicationTest extends TestCase
 
         $app->addModule(ModuleTest\Module::class);
         $app->build();
-        print_r($app->getConfig());
 
         $entries = $app->getContainer()->getKnownEntryNames();
         foreach ($entries as $entry) {

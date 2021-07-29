@@ -7,7 +7,7 @@ use DI;
 return [
     "service" => [
         "factories" => [
-            Service\TestService::class => DI\create()
+            Service\TestService::class => DI\factory(function() {})
         ]
     ],
 ];

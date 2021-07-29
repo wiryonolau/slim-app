@@ -74,8 +74,7 @@ class Application
     public function addModule(string $class) : self
     {
         $module_config = call_user_func([$class, "getConfigPath"]);
-        $this->setConfigPath($module_config);
-
+        array_splice($this->options["config_path"], 1, 0, $module_config);
         return $this;
     }
 
