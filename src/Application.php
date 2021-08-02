@@ -6,6 +6,10 @@ namespace Itseasy;
 use DI;
 use Itseasy\Action\BaseAction;
 use Itseasy\View;
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\Log\LoggerInterface;
+use Laminas\EventManager\EventManagerAwareInterface;
+use Laminas\EventManager\EventManager;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
 use Slim\App;
@@ -22,6 +26,8 @@ class Application
 
     protected $config = null;
     protected $container = null;
+    protected $logger = null;
+    protected $eventManager = null;
     protected $application = null;
 
     protected $errorRenderer = [];
@@ -56,6 +62,15 @@ class Application
                 case "console":
                     $this->setConsoleOptions($value);
                     break;
+                case "logger":
+                    $this->setConsoleOptions($value);
+                    break;
+                case "event_manager":
+                    $this->setEventManager($value);
+                    break;
+                case "module" :
+                    $this->setModule($value);
+                    break;
                 default:
             }
         }
@@ -67,6 +82,26 @@ class Application
             $this->options["config_path"] = ArrayUtils::merge($this->options["config_path"], $path);
         } else {
             $this->options["config_path"][] = $path;
+        }
+        return $this;
+    }
+
+    public function setLogger(LoggerInterface $logger) : self
+    {
+        $this->logger = $logger;
+        return $this;
+    }
+
+    public function setEventManager(EventManager $eventManager) : self
+    {
+        $this->eventManager = $eventManager;
+        return $this;
+    }
+
+    public function setModule(array $modules = []) : self
+    {
+        foreach($modules as $module) {
+            $this->addModule($module);
         }
         return $this;
     }
@@ -345,10 +380,30 @@ class Application
         $this->addDefinition('Config', $this->config);
         $this->addDefinition('config', $this->config);
 
+        $logger = $this->logger;
+        $eventManager = $this->eventManager;
+
         # Build Service
         if (!empty($this->getConfig()["service"]["factories"])) {
             foreach ($this->getConfig()["service"]["factories"] as $service => $factory) {
-                $this->addDefinition($service, $factory);
+                $this->addDefinition($service, function (ContainerInterface $container, $args) use ($service, $factory, $logger, $eventManager) {
+                    if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
+                        $obj = new $service;
+                    } else {
+                        $obj = new $factory();
+                        $obj = $obj($container, $args);
+                    }
+
+                    if (!is_null($logger) and ($obj instanceof LoggerAwareInterface)) {
+                        $obj->setLogger($logger);
+                    }
+
+                    if (!is_null($eventManager) and ($obj instanceof EventManagerAwareInterface)) {
+                        $obj->setEventManager($eventManager);
+                    }
+
+                    return $obj;
+                });
             }
         }
 
@@ -369,12 +424,36 @@ class Application
 
     private function registerCommand($factory, $command) : void
     {
-        $this->addDefinition($command, $factory);
+        $logger = $this->logger;
+        $eventManager = $this->eventManager;
+
+        $this->addDefinition($command, function (ContainerInterface $container, $args) use ($command, $factory, $logger, $eventManager) {
+            if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
+                $obj = new $command;
+            } else {
+                $obj = new $factory();
+                $obj = $obj($container, $args);
+            }
+
+            if (!is_null($logger) and ($obj instanceof LoggerAwareInterface)) {
+                $obj->setLogger($logger);
+            }
+
+            if (!is_null($eventManager) and ($obj instanceof EventManagerAwareInterface)) {
+                $obj->setEventManager($eventManager);
+            }
+
+            return $obj;
+        });
     }
 
     private function registerHttpAction($factory, $action) : void
     {
-        $this->addDefinition($action, function (ContainerInterface $container, $args) use ($action, $factory) {
+        $logger = $this->logger;
+        $eventManager = $this->eventManager;
+
+
+        $this->addDefinition($action, function (ContainerInterface $container, $args) use ($action, $factory, $logger, $eventManager) {
             if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
                 $obj = new $action;
             } else {
@@ -392,6 +471,15 @@ class Application
                 $view->setLayout($default_layout);
                 $obj->setView($view);
             }
+
+            if (!is_null($logger) and ($obj instanceof LoggerAwareInterface)) {
+                $obj->setLogger($logger);
+            }
+
+            if (!is_null($eventManager) and ($obj instanceof EventManagerAwareInterface)) {
+                $obj->setEventManager($eventManager);
+            }
+
             return $obj;
         });
     }

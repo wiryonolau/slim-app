@@ -9,10 +9,12 @@ final class ApplicationTest extends TestCase
     public function testDI()
     {
         $app = new Application([
-            "config_path" => [__DIR__."/config/*.config.php"]
+            "config_path" => [__DIR__."/config/*.config.php"],
+            "module" => [
+                ModuleTest\Module::class
+            ]
         ]);
 
-        $app->addModule(ModuleTest\Module::class);
         $app->build();
 
         $entries = $app->getContainer()->getKnownEntryNames();
