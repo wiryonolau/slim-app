@@ -10,6 +10,7 @@ use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManager;
+use Itseasy\Guard\IdentityAwareInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
 use Slim\App;
@@ -406,9 +407,7 @@ class Application
                         $identityProvider = $this->getConfig()["guard"]["identity_provider"];
                         if ($identityProvider !== "") {
                             $identityProvider = $container->get($identityProvider);
-                            $obj->setIdentity(function() {
-                                return call_user_func($identityProvider, "getIdentity");
-                            });
+                            $obj->setIdentityProvider($identityProvider);
                         }
                     }
 
@@ -493,9 +492,7 @@ class Application
                 $identityProvider = $this->getConfig()["guard"]["identity_provider"];
                 if ($identityProvider !== "") {
                     $identityProvider = $container->get($identityProvider);
-                    $obj->setIdentity(function() {
-                        return call_user_func($identityProvider, "getIdentity");
-                    });
+                    $obj->setIdentityProvider($identityProvider);
                 }
             }
 

@@ -2,14 +2,20 @@
 
 namespace Itseasy\Guard;
 
-use IdentityInterface;
-
 trait IdentityAwareTrait
 {
-    protected $identity;
+    protected $identityProvider = null;
 
-    public function setIdentity(IdentityInterface $identity) : void
+    public function setIdentityProvider(?IdentityProviderInterface $identityProvider = null) : void
     {
-        $this->identity = $identity;
+        $this->identityProvider = $identityProvider;
+    }
+
+    public function getIdentity() : ?IdentityInterface
+    {
+        if (is_null($this->identityProvider)) {
+            return null;
+        }
+        return $this->identityProvider->getIdentity();
     }
 }

@@ -2,9 +2,8 @@
 
 namespace Itseasy\Guard;
 
-use IdentityInterface;
-
 interface IdentityAwareInterface
 {
-    public function setIdentity(IdentityInterface $identity);
+    public function setIdentityProvider(?IdentityProviderInterface $identityProvider = null);
+    public function getIdentity() : ?IdentityInterface;
 }
