@@ -402,6 +402,16 @@ class Application
                         $obj->setEventManager($eventManager);
                     }
 
+                    if ($obj instanceof IdentityAwareInterface) {
+                        $identityProvider = $this->getConfig()["guard"]["identity_provider"];
+                        if ($identityProvider !== "") {
+                            $identityProvider = $container->get($identityProvider);
+                            $obj->setIdentity(function() {
+                                return call_user_func($identityProvider, "getIdentity");
+                            });
+                        }
+                    }
+
                     return $obj;
                 });
             }
@@ -452,7 +462,6 @@ class Application
         $logger = $this->logger;
         $eventManager = $this->eventManager;
 
-
         $this->addDefinition($action, function (ContainerInterface $container, $args) use ($action, $factory, $logger, $eventManager) {
             if ($factory instanceof \Di\Definition\Helper\DefinitionHelper) {
                 $obj = new $action;
@@ -478,6 +487,16 @@ class Application
 
             if (!is_null($eventManager) and ($obj instanceof EventManagerAwareInterface)) {
                 $obj->setEventManager($eventManager);
+            }
+
+            if ($obj instanceof IdentityAwareInterface) {
+                $identityProvider = $this->getConfig()["guard"]["identity_provider"];
+                if ($identityProvider !== "") {
+                    $identityProvider = $container->get($identityProvider);
+                    $obj->setIdentity(function() {
+                        return call_user_func($identityProvider, "getIdentity");
+                    });
+                }
             }
 
             return $obj;
