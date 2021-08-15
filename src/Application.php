@@ -175,6 +175,10 @@ class Application
             $this->application = AppFactory::createFromContainer($this->container);
             $this->setRoute();
             $this->setMiddleware();
+
+            // Iterable complete route collection for http
+            $routeCollection = new RouteCollection($this->application);
+            $this->addDefinition('ApplicationRoute', $routeCollection);
         } elseif ($this->options["application_type"] == self::APP_CONSOLE) {
             $this->application = new ConsoleApplication($this->options["console"]["name"], $this->options["console"]["version"]);
             $this->setCommand();
