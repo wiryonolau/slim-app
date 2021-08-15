@@ -20,6 +20,6 @@ class Translator extends LaminasTranslator {
             return $this->translate($message, $textDomain, $fallbackLocale);
         }
 
-        return sprintf("{{%s}}", $message);
+        return sprintf("%s", $message);
     }
 }
