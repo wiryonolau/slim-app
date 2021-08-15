@@ -178,6 +178,7 @@ class Application
 
             // Iterable complete route collection for http
             $routeCollection = new RouteCollection($this->application);
+            $routeCollection->lock();
             $this->addDefinition('ApplicationRoute', $routeCollection);
         } elseif ($this->options["application_type"] == self::APP_CONSOLE) {
             $this->application = new ConsoleApplication($this->options["console"]["name"], $this->options["console"]["version"]);
