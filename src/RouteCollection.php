@@ -6,6 +6,7 @@ namespace Itseasy;
 use ArrayObject;
 use Exception;
 use Slim\App;
+use stdClass;
 
 class RouteCollection extends ArrayObject
 {
