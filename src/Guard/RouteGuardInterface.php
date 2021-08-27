@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
-use Itseasy\Guard\IdentityProviderInterface;
+use Itseasy\Identity\IdentityProviderInterface;
 
 interface RouteGuardInterface
 {

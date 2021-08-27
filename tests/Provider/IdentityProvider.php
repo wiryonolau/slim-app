@@ -2,8 +2,8 @@
 
 namespace Itseasy\Test\Provider;
 
-use Itseasy\Guard\IdentityInterface;
-use Itseasy\Guard\IdentityProviderInterface;
+use Itseasy\Identity\IdentityInterface;
+use Itseasy\Identity\IdentityProviderInterface;
 
 class Identity implements IdentityInterface
 {

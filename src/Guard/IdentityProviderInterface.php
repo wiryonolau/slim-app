@@ -3,10 +3,9 @@ declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
-use Itseasy\Guard\IdentityInterface;
-
-interface IdentityProviderInterface
+/*
+ * DEPRECATED  use Itseasy\Identity\IdentityProviderInterface
+ */
+interface IdentityProviderInterface extends \Itseasy\Identity\IdentityProviderInterface
 {
-    public function hasIdentity() : bool;
-    public function getIdentity() : IdentityInterface;
 }

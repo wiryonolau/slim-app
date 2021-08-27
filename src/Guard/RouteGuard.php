@@ -4,10 +4,10 @@ declare(strict_types = 1);
 namespace Itseasy\Guard;
 
 use Itseasy\Guard\GuardOption;
-use Itseasy\Guard\IdentityProviderInterface;
 use Itseasy\Guard\RoleProviderInterface;
 use Itseasy\Guard\RouteGuardInterface;
-use Itseasy\Guard\IdentityInterface;
+use Itseasy\Identity\IdentityInterface;
+use Itseasy\Identity\IdentityProviderInterface;
 
 class RouteGuard implements RouteGuardInterface
 {

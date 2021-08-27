@@ -2,8 +2,9 @@
 
 namespace Itseasy\Guard;
 
-interface IdentityAwareInterface
+/*
+ * DEPRECATED  use Itseasy\Identity\IdentityAwareInterface
+ */
+interface IdentityAwareInterface extends \Itseasy\Identity\IdentityAwareInterface
 {
-    public function setIdentityProvider(?IdentityProviderInterface $identityProvider = null);
-    public function getIdentity() : ?IdentityInterface;
 }

@@ -8,7 +8,7 @@ use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpForbiddenException;
 use Exception;
 
-class InvokableAction extends BaseAction
+class InvokableAction extends AbstractAction
 {
     protected $request = null;
     protected $response = null;

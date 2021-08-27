@@ -4,20 +4,19 @@ declare(strict_types = 1);
 namespace Itseasy;
 
 use DI;
-use Itseasy\Action\BaseAction;
+use Itseasy\Action\AbstractAction;
+use Itseasy\Identity\IdentityAwareInterface;
 use Itseasy\View;
+use Laminas\EventManager\EventManager;
+use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
-use Laminas\EventManager\EventManagerAwareInterface;
-use Laminas\EventManager\EventManager;
-use Itseasy\Guard\IdentityAwareInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Middleware\ErrorMiddleware;
 use Slim\Middleware\RoutingMiddleware;
-use Slim\Views\PhpRenderer;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
 class Application
@@ -386,6 +385,16 @@ class Application
         $this->addDefinition('Config', $this->config);
         $this->addDefinition('config', $this->config);
 
+        if (!is_null($this->logger)) {
+            $this->addDefinition('Logger', $this->logger);
+            $this->addDefinition('logger', $this->logger);
+        }
+
+        if (!is_null($this->eventManager)) {
+            $this->addDefinition('EventManager', $this->eventManager);
+            $this->addDefinition('eventmanager', $this->eventManager);
+        }
+
         $logger = $this->logger;
         $eventManager = $this->eventManager;
 
@@ -478,7 +487,7 @@ class Application
             $rendererClass = $this->getConfig()["view"]["renderer"];
             $default_layout = $this->getConfig()["view"]["default_layout"];
 
-            if ($obj instanceof BaseAction) {
+            if ($obj instanceof AbstractAction) {
                 $view = new $viewClass();
                 $view->setRenderer($container->get($rendererClass));
                 $view->setLayout($default_layout);

@@ -3,7 +3,9 @@ declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
-interface IdentityInterface
+/*
+ * DEPRECATED  use Itseasy\Identity\IdentityInterface
+ */
+interface IdentityInterface extends \Itseasy\Identity\IdentityInterface
 {
-    public function getRoles() : array;
 }
