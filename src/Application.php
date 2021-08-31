@@ -10,6 +10,7 @@ use Itseasy\View;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\Log\LoggerAwareInterface;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Laminas\Log\LoggerInterface;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
@@ -63,7 +64,7 @@ class Application
                     $this->setConsoleOptions($value);
                     break;
                 case "logger":
-                    $this->setConsoleOptions($value);
+                    $this->setLogger($value);
                     break;
                 case "event_manager":
                     $this->setEventManager($value);
@@ -148,7 +149,7 @@ class Application
         bool $display_error_details = true,
         bool $log_errors = true,
         bool $log_error_details = true,
-        ?LoggerInterface $logger = null
+        ?PsrLoggerInterface $logger = null
     ) : self {
         $this->error_options = [
             $display_error_details,
