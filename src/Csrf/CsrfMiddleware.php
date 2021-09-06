@@ -64,7 +64,10 @@ class CsrfMiddleware extends BaseMiddleware
             $csrf_value[] = reset($request->getHeader(self::CSRF_HEADER, []));
         }
 
+        // Get csrf value
         $csrf_value = reset(array_filter($csrf_value));
+        $csrf_value = ($csrf_value === false ? null : $csrf_value);
+
         $csrfToken = new CsrfToken($this->tokenManager->getId(), $csrf_value);
 
         if ($this->tokenManager->isTokenValid($csrfToken)) {
