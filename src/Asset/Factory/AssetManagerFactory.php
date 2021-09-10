@@ -8,6 +8,7 @@ use Itseasy\Asset\AssetManager;
 use Laminas\Cache\Storage\Adapter\FileSystem;
 use Laminas\Cache\StorageFactory;
 use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
+use ScssPhp\ScssPhp\Compiler;
 
 class AssetManagerFactory
 {
@@ -37,6 +38,10 @@ class AssetManagerFactory
         } else {
             $cache = $container->get($asset["caching"]["class"]);
         }
-        return new AssetManager($paths, $cache);
+
+        $scssCompiler = new Compiler();
+        $scssCompiler->setImportPaths($paths);
+
+        return new AssetManager($paths, $scssCompiler, $cache);
     }
 }

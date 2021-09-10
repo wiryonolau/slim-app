@@ -8,15 +8,18 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
 use Exception;
+use ScssPhp\ScssPhp\Compiler as ScssCompiler;
 
 class AssetManager
 {
     protected $paths = [];
+    protected $scssCompiler;
     protected $cache;
 
-    public function __construct(array $paths = [], CacheInterface $cache)
+    public function __construct(array $paths = [], ScssCompiler $scssCompiler, CacheInterface $cache)
     {
         $this->paths = array_map("realpath", $paths);
+        $this->scssCompiler = $scssCompiler;
         $this->cache = $cache;
     }
 
@@ -26,7 +29,7 @@ class AssetManager
         foreach ($this->paths as $path) {
             $dir = new RecursiveDirectoryIterator($path);
             $iter = new RecursiveIteratorIterator($dir);
-            $cssFiles = new RegexIterator($iter, '/.*(.css)$/', RegexIterator::GET_MATCH);
+            $cssFiles = new RegexIterator($iter, '/.*(.css|.sass|.scss)$/', RegexIterator::GET_MATCH);
             $jsFiles = new RegexIterator($iter, '/.*(.js)$/', RegexIterator::GET_MATCH);
             foreach ($cssFiles as $file) {
                 $assets = array_merge($assets, [$file[0]]);
@@ -75,10 +78,10 @@ class AssetManager
         switch ($extension) {
             case "js":
                 $pattern = "/.*(.min.js$)/";
-            break;
+                break;
             case "css":
                 $pattern = "/.*(.min.css$)/";
-            break;
+                break;
             default:
                 $pattern = null;
         }
@@ -95,10 +98,12 @@ class AssetManager
         switch ($extension) {
             case "js":
                 return Filter\JSMin::minify($content);
-            break;
             case "css":
                 return Filter\CssMin::minify($content);
-            break;
+            case "sass":
+            case "scss":
+                $css = $this->scssCompiler->compileString($content)->getCss();
+                return Filter\CssMin::minify($css);
             default:
                 return $content;
         }

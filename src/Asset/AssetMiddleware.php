@@ -19,6 +19,8 @@ class AssetMiddleware extends BaseMiddleware
         'html' => 'text/html',
         'php' => 'text/html',
         'css' => 'text/css',
+        'sass' => 'text/css',
+        'scss' => 'text/css',
         'js' => 'application/javascript',
         'json' => 'application/json',
         'xml' => 'application/xml',

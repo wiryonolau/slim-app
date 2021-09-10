@@ -21,7 +21,8 @@
         "laminas/laminas-i18n": "^2.11",
         "laminas/laminas-view": "^2.12",
         "laminas/laminas-serializer": "^2.10",
-        "laminas/laminas-log": "^2.13"
+        "laminas/laminas-log": "^2.13",
+        "scssphp/scssphp": "^1.6"
     },
     "autoload" : {
         "psr-4" : {
