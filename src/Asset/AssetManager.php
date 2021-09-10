@@ -79,6 +79,7 @@ class AssetManager implements LoggerAwareInterface
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
         $content = file_get_contents($file_path);
 
+        $pattern = null;
         switch ($extension) {
             case "js":
                 $pattern = "/.*(.min.js$)/";
@@ -87,15 +88,19 @@ class AssetManager implements LoggerAwareInterface
                 $pattern = "/.*(.min.css$)/";
                 break;
             case "scss":
-                $pattern = "/.*(.min.scss$)/";
-                break;
+                try {
+                    $content = $this->scssCompiler->compileString($content)->getCss();
+                } catch (Exception $e) {
+                    $this->logger->debug($e->getMessage());
+                    $content = "";
+                }
             default:
-                $pattern = null;
         }
 
         if (!is_null($pattern) and preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
             $content = $this->minify($extension, $content);
         }
+
         $name = $this->hashName($file_path);
         $this->cache->set($name, $content);
     }
@@ -107,14 +112,6 @@ class AssetManager implements LoggerAwareInterface
                 return Filter\JSMin::minify($content);
             case "css":
                 return Filter\CssMin::minify($content);
-            case "sass":
-            case "scss":
-                try {
-                    return $this->scssCompiler->compileString($content)->getCss();
-                } catch (Exception $e) {
-                    $this->logger->debug($e->getMessage());
-                    return "";
-                }
             default:
                 return $content;
         }
