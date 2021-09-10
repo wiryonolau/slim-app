@@ -112,7 +112,7 @@ class AssetManager implements LoggerAwareInterface
                 try {
                     return $this->scssCompiler->compileString($content)->getCss();
                 } catch (Exception $e) {
-                    $this->logger->info($e->getMessage());
+                    $this->logger->debug($e->getMessage());
                     return "";
                 }
             default:

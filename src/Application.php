@@ -301,7 +301,6 @@ class Application
                     continue;
                 }
 
-                $middleware = $this->container->get($middleware);
                 $this->application->add($this->container->get($middleware));
             }
         }
