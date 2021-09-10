@@ -3,17 +3,17 @@ declare(strict_types = 1);
 
 namespace Itseasy\Csrf;
 
-use Symfony\Component\Security\Csrf\CsrfToken;
-use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
-use Slim\Routing\RouteContext;
 use Slim\Psr7\Response;
-use Itseasy\Middleware\BaseMiddleware;
+use Slim\Routing\RouteContext;
+use Symfony\Component\HttpFoundation\Session\SessionInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
-class CsrfMiddleware extends BaseMiddleware
+class CsrfMiddleware extends AbstractMiddleware
 {
     const CSRF_HEADER = "X-CSRF-TOKEN";
 

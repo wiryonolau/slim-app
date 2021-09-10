@@ -2,13 +2,13 @@
 
 namespace Itseasy\Translator;
 
-use Itseasy\Middleware\BaseMiddleware;
+use Itseasy\Middleware\AbstractMiddleware;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Psr\Http\Message\ResponseInterface as Response;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Laminas\I18n\Translator\TranslatorInterface;
 
-class LocaleMiddleware extends BaseMiddleware
+class LocaleMiddleware extends AbstractMiddleware
 {
     const LOCALE_QUERY = "lang";
 

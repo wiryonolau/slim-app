@@ -3,13 +3,13 @@ declare(strict_types = 1);
 
 namespace Itseasy\Navigation;
 
+use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
-use Itseasy\Middleware\BaseMiddleware;
 
-class NavigationMiddleware extends BaseMiddleware
+class NavigationMiddleware extends AbstractMiddleware
 {
     protected $config;
 

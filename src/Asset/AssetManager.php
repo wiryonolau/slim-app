@@ -3,15 +3,19 @@ declare(strict_types = 1);
 
 namespace Itseasy\Asset;
 
+use Exception;
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\Log\LoggerAwareTrait;
 use Psr\SimpleCache\CacheInterface;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
-use Exception;
 use ScssPhp\ScssPhp\Compiler as ScssCompiler;
 
-class AssetManager
+class AssetManager implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
     protected $paths = [];
     protected $scssCompiler;
     protected $cache;
@@ -82,6 +86,9 @@ class AssetManager
             case "css":
                 $pattern = "/.*(.min.css$)/";
                 break;
+            case "scss":
+                $pattern = "/.*(.min.scss$)/";
+                break;
             default:
                 $pattern = null;
         }
@@ -102,8 +109,12 @@ class AssetManager
                 return Filter\CssMin::minify($content);
             case "sass":
             case "scss":
-                $css = $this->scssCompiler->compileString($content)->getCss();
-                return Filter\CssMin::minify($css);
+                try {
+                    return $this->scssCompiler->compileString($content)->getCss();
+                } catch (Exception $e) {
+                    $this->logger->info($e->getMessage());
+                    return "";
+                }
             default:
                 return $content;
         }

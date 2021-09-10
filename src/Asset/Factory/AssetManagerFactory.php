@@ -3,12 +3,13 @@ declare(strict_types = 1);
 
 namespace Itseasy\Asset\Factory;
 
-use Psr\Container\ContainerInterface;
 use Itseasy\Asset\AssetManager;
+use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
 use Laminas\Cache\Storage\Adapter\FileSystem;
 use Laminas\Cache\StorageFactory;
-use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
+use Psr\Container\ContainerInterface;
 use ScssPhp\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\OutputStyle;
 
 class AssetManagerFactory
 {
@@ -41,6 +42,7 @@ class AssetManagerFactory
 
         $scssCompiler = new Compiler();
         $scssCompiler->setImportPaths($paths);
+        $scssCompiler->setOutputStyle(OutputStyle::COMPRESSED);
 
         return new AssetManager($paths, $scssCompiler, $cache);
     }

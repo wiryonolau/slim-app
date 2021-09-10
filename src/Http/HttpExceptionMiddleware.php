@@ -3,13 +3,13 @@ declare(strict_types = 1);
 
 namespace Itseasy\Http;
 
+use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Response;
-use Itseasy\Middleware\BaseMiddleware;
 
-class HttpExceptionMiddleware extends BaseMiddleware
+class HttpExceptionMiddleware extends AbstractMiddleware
 {
     public function __construct($view)
     {

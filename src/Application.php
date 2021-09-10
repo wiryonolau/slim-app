@@ -10,10 +10,11 @@ use Itseasy\View;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Laminas\Log\LoggerInterface;
+use Laminas\Log as LaminasLog;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface as PsrLoggerInterface;
 use Slim\App;
 use Slim\Factory\AppFactory;
 use Slim\Middleware\ErrorMiddleware;
@@ -160,9 +161,56 @@ class Application
         return $this;
     }
 
+    public function buildLogger() : void
+    {
+        $logger = new LaminasLog\Logger([
+            "writers" => [
+                "stderr" => [
+                    "name" => "stream",
+                    "priority" => 1,
+                    'options' => [
+                        'stream' => "php://stderr",
+                        'formatter' => [
+                            'name' => LaminasLog\Formatter\Simple::class,
+                            'options' => [
+                                'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
+                                'dateTimeFormat' => 'c',
+                            ],
+                        ],
+                        'filters' => [
+                            'priority' => [
+                                'name' => 'priority',
+                                'options' => [
+                                    'operator' => '<=',
+                                    'priority' => LaminasLog\Logger::INFO,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'processors' => [
+                'requestid' => [
+                    'name' => LaminasLog\Processor\RequestId::class,
+                ],
+            ],
+        ]);
+
+        $this->setLogger($logger);
+
+        if (is_null($this->error_options[3])) {
+            $psrLogger = new LaminasLog\PsrLoggerAdapter($logger);
+            $this->error_options[3] = $psrLogger;
+        }
+    }
+
     public function build() : void
     {
         $this->config = new Config($this->options["config_path"]);
+
+        if (is_null($this->logger)) {
+            $this->buildLogger();
+        }
 
         $containerBuilder = new DI\ContainerBuilder();
         if (!is_null($this->options["container_cache_path"])) {
@@ -253,6 +301,7 @@ class Application
                     continue;
                 }
 
+                $middleware = $this->container->get($middleware);
                 $this->application->add($this->container->get($middleware));
             }
         }

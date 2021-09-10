@@ -3,18 +3,18 @@ declare(strict_types = 1);
 
 namespace Itseasy\Guard;
 
+use Closure;
+use Itseasy\Guard\RouteGuard;
+use Itseasy\Middleware\AbstractMiddleware;
+use Itseasy\View\Helper\UrlHelper;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
-use Slim\Exception\HttpNotFoundException;
 use Slim\Exception\HttpForbiddenException;
-use Slim\Routing\RouteContext;
+use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
-use Itseasy\Guard\RouteGuard;
-use Itseasy\View\Helper\UrlHelper;
-use Itseasy\Middleware\BaseMiddleware;
-use Closure;
+use Slim\Routing\RouteContext;
 
-class RouteGuardMiddleware extends BaseMiddleware
+class RouteGuardMiddleware extends AbstractMiddleware
 {
     protected $routeGuard;
     protected $urlHelper;
