@@ -6,6 +6,7 @@ namespace Itseasy\Asset;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpForbiddenException;
 use Slim\Psr7\Response;
 use Itseasy\Middleware\AbstractMiddleware;
 
@@ -14,16 +15,10 @@ class AssetMiddleware extends AbstractMiddleware
     protected $assetManager;
 
     protected $mimeType = [
-        'txt' => 'text/plain',
-        'htm' => 'text/html',
-        'html' => 'text/html',
-        'php' => 'text/html',
         'css' => 'text/css',
         'sass' => 'text/css',
         'scss' => 'text/css',
         'js' => 'application/javascript',
-        'json' => 'application/json',
-        'xml' => 'application/xml',
         'swf' => 'application/x-shockwave-flash',
         'flv' => 'video/x-flv',
 
@@ -40,37 +35,11 @@ class AssetMiddleware extends AbstractMiddleware
         'svg' => 'image/svg+xml',
         'svgz' => 'image/svg+xml',
 
-        // archives
-        'zip' => 'application/zip',
-        'rar' => 'application/x-rar-compressed',
-        'exe' => 'application/x-msdownload',
-        'msi' => 'application/x-msdownload',
-        'cab' => 'application/vnd.ms-cab-compressed',
-
         // audio/video
         'mp3' => 'audio/mpeg',
         'qt' => 'video/quicktime',
         'mov' => 'video/quicktime',
 
-        // adobe
-        'pdf' => 'application/pdf',
-        'psd' => 'image/vnd.adobe.photoshop',
-        'ai' => 'application/postscript',
-        'eps' => 'application/postscript',
-        'ps' => 'application/postscript',
-
-        // ms office
-        'doc' => 'application/msword',
-        'rtf' => 'application/rtf',
-        'xls' => 'application/vnd.ms-excel',
-        'ppt' => 'application/vnd.ms-powerpoint',
-        'docx' => 'application/msword',
-        'xlsx' => 'application/vnd.ms-excel',
-        'pptx' => 'application/vnd.ms-powerpoint',
-
-        // open office
-        'odt' => 'application/vnd.oasis.opendocument.text',
-        'ods' => 'application/vnd.oasis.opendocument.spreadsheet',
     ];
 
     public function __construct(AssetManager $assetManager)
@@ -98,14 +67,15 @@ class AssetMiddleware extends AbstractMiddleware
             throw new HttpNotFoundException($request);
         }
 
-        $content = $this->assetManager->getAsset($file_path);
-        $response->getBody()->write($content);
-
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
+
         if (isset($this->mimeType[$extension])) {
+            $content = $this->assetManager->getAsset($file_path);
             $response = $response->withHeader("Content-type", $this->mimeType[$extension]);
+            $response->getBody()->write($content);
+            return $response;
         }
 
-        return $response;
+        throw new HttpForbiddenException($request, "Unauthorized Access");
     }
 }
