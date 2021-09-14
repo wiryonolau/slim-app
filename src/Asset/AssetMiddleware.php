@@ -16,30 +16,38 @@ class AssetMiddleware extends AbstractMiddleware
 
     protected $mimeType = [
         'css' => 'text/css',
+        'js' => 'application/javascript',
         'sass' => 'text/css',
         'scss' => 'text/css',
-        'js' => 'application/javascript',
-        'swf' => 'application/x-shockwave-flash',
-        'flv' => 'video/x-flv',
+
+        // text
+        'eot' => 'application/vnd.ms-fontobject',
+        'otf' => 'font/otf',
+        'ttf' => 'font/ttf',
+        'woff' => 'font/woff',
+        'woff2' => 'font/woff2',
 
         // images
-        'png' => 'image/png',
-        'jpe' => 'image/jpeg',
+        'bmp' => 'image/bmp',
+        'gif' => 'image/gif',
+        'ico' => 'image/vnd.microsoft.icon',
         'jpeg' => 'image/jpeg',
         'jpg' => 'image/jpeg',
-        'gif' => 'image/gif',
-        'bmp' => 'image/bmp',
-        'ico' => 'image/vnd.microsoft.icon',
-        'tiff' => 'image/tiff',
-        'tif' => 'image/tiff',
+        'png' => 'image/png',
         'svg' => 'image/svg+xml',
         'svgz' => 'image/svg+xml',
+        'tif' => 'image/tiff',
+        'tiff' => 'image/tiff',
+        'webp' => 'image/webp',
 
         // audio/video
+        'flv' => 'video/x-flv',
+        'mov' => 'video/quicktime',
         'mp3' => 'audio/mpeg',
         'qt' => 'video/quicktime',
-        'mov' => 'video/quicktime',
-
+        'swf' => 'application/x-shockwave-flash',
+        'weba' => 'audio/webm',
+        'webm' => 'video/webm'
     ];
 
     public function __construct(AssetManager $assetManager)
