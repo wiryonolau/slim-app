@@ -19,6 +19,10 @@ class AbstractModel implements ArraySerializableInterface
     public function populate(array $data)
     {
         foreach ($data as $k => $v) {
+            if (!property_exists($this, $k)) {
+                continue;
+            }
+
             $method = $this->getPropertyClassMethod("set", $k);
             if (is_null($method)) {
                 $this->{$k} = $v;

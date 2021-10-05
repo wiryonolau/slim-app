@@ -35,6 +35,7 @@ class Application
     protected $errorRenderer = [];
     protected $errorHandlers = null;
     protected $error_options = [true, true, true , null];
+    protected $log_level = LaminasLog\Logger::INFO;
 
     protected $options = [
         "config_path" => [
@@ -121,6 +122,12 @@ class Application
         return $this;
     }
 
+    public function setLogLevel(int $log_level = LaminasLog\Logger::INFO) : self
+    {
+        $this->log_level = $log_level;
+        return $this;
+    }
+
     public function setApplicationType(string $type) : self
     {
         if (in_array($type, [self::APP_CONSOLE, self::APP_HTTP])) {
@@ -161,48 +168,7 @@ class Application
         return $this;
     }
 
-    public function buildLogger() : void
-    {
-        $logger = new LaminasLog\Logger([
-            "writers" => [
-                "stderr" => [
-                    "name" => "stream",
-                    "priority" => 1,
-                    'options' => [
-                        'stream' => "php://stderr",
-                        'formatter' => [
-                            'name' => LaminasLog\Formatter\Simple::class,
-                            'options' => [
-                                'format' => '%timestamp% %priorityName% (%priority%): %message% %extra%',
-                                'dateTimeFormat' => 'c',
-                            ],
-                        ],
-                        'filters' => [
-                            'priority' => [
-                                'name' => 'priority',
-                                'options' => [
-                                    'operator' => '<=',
-                                    'priority' => LaminasLog\Logger::INFO,
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-            'processors' => [
-                'requestid' => [
-                    'name' => LaminasLog\Processor\RequestId::class,
-                ],
-            ],
-        ]);
 
-        $this->setLogger($logger);
-
-        if (is_null($this->error_options[3])) {
-            $psrLogger = new LaminasLog\PsrLoggerAdapter($logger);
-            $this->error_options[3] = $psrLogger;
-        }
-    }
 
     public function build() : void
     {
@@ -569,6 +535,49 @@ class Application
             $this->container->set($name, $class);
         } else {
             $this->container->set($name, DI\factory($class));
+        }
+    }
+
+    private function buildLogger() : void
+    {
+        $logger = new LaminasLog\Logger([
+            "writers" => [
+                "stderr" => [
+                    "name" => "stream",
+                    "priority" => 1,
+                    'options' => [
+                        'stream' => "php://stderr",
+                        'formatter' => [
+                            'name' => LaminasLog\Formatter\Simple::class,
+                            'options' => [
+                                'format' => '%timestamp% %priorityName% (%priority%): %message%',
+                                'dateTimeFormat' => 'c',
+                            ],
+                        ],
+                        'filters' => [
+                            'priority' => [
+                                'name' => 'priority',
+                                'options' => [
+                                    'operator' => '<=',
+                                    'priority' => $this->log_level
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            'processors' => [
+                'requestid' => [
+                    'name' => LaminasLog\Processor\RequestId::class,
+                ],
+            ],
+        ]);
+
+        $this->setLogger($logger);
+
+        if (is_null($this->error_options[3])) {
+            $psrLogger = new LaminasLog\PsrLoggerAdapter($logger);
+            $this->error_options[3] = $psrLogger;
         }
     }
 }

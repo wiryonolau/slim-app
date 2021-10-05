@@ -46,6 +46,15 @@ class RouteGuardMiddleware extends AbstractMiddleware
         $has_identity = $this->routeGuard->getIdentityProvider()->hasIdentity();
 
         if ($has_identity == false and $allow_access == false) {
+            $this->logger->debug(
+                vsprintf("Forbidden access %s %s, Has Identity : %s, Has Access : %s", [
+                    $method,
+                    $request->getRequestTarget(),
+                    ($has_identity ? "true" : "false"),
+                    ($allow_access ? "true" : "false")
+                ])
+            );
+
             $query = $this->getRedirectQuery($request->getRequestTarget());
             $login_url = call_user_func_array($this->urlHelper, [$this->routeGuard->getOptions()->getLoginRoute(), $query]);
             $response = new Response();

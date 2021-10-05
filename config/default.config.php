@@ -22,6 +22,10 @@ return [
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
         ]
     ],
+    "event" => [
+        "listener_aggregate" => [
+        ]
+    ],
     "session" => [
         'class' => Session::class,
         'options' => [

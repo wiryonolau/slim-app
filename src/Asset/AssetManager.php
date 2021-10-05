@@ -58,7 +58,7 @@ class AssetManager implements LoggerAwareInterface
     {
         $name = $this->hashName($file_path);
         if (!$this->cache->has($name)) {
-            $this->setAsset($name, $file_path);
+            return $this->setAsset($name, $file_path);
         }
         return $this->cache->get($name);
     }
@@ -74,7 +74,7 @@ class AssetManager implements LoggerAwareInterface
         return null;
     }
 
-    protected function setAsset(string $name, string $file_path) : void
+    protected function setAsset(string $name, string $file_path) : ?string
     {
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
         $content = file_get_contents($file_path);
@@ -103,6 +103,7 @@ class AssetManager implements LoggerAwareInterface
 
         $name = $this->hashName($file_path);
         $this->cache->set($name, $content);
+        return $content;
     }
 
     protected function minify(string $extension, string $content) : string
