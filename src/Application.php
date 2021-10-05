@@ -35,7 +35,11 @@ class Application
     protected $errorRenderer = [];
     protected $errorHandlers = null;
     protected $error_options = [true, true, true , null];
+
     protected $log_level = LaminasLog\Logger::INFO;
+    protected $log_file = "php://stderr";
+    protected $log_format = "%timestamp% %priorityName% (%priority%): %message%";
+    protected $log_time_format = "c";
 
     protected $options = [
         "config_path" => [
@@ -71,7 +75,7 @@ class Application
                 case "event_manager":
                     $this->setEventManager($value);
                     break;
-                case "module" :
+                case "module":
                     $this->setModule($value);
                     break;
                 default:
@@ -95,6 +99,37 @@ class Application
         return $this;
     }
 
+    /**
+     * Set default log level, not applicable for custom logger class
+     **/
+    public function setLogLevel(int $log_level = LaminasLog\Logger::INFO) : self
+    {
+        $this->log_level = $log_level;
+        return $this;
+    }
+
+    /**
+     * Set default log file, not applicable for custom logger class
+     **/
+    public function setLogFile(string $log_file = "php://stderr") : self
+    {
+        $this->log_file = $log_file;
+        return $this;
+    }
+
+    /**
+     * Set default log format, not applicable for custom logger class
+     **/
+    public function setLogFormat(
+        string $log_format = "%timestamp% %message%",
+        string $log_time_format = "c"
+    ) : self {
+        $this->log_format = $log_format;
+        $this->log_time_format = $log_time_format;
+        return $this;
+    }
+
+
     public function setEventManager(EventManager $eventManager) : self
     {
         $this->eventManager = $eventManager;
@@ -103,7 +138,7 @@ class Application
 
     public function setModule(array $modules = []) : self
     {
-        foreach($modules as $module) {
+        foreach ($modules as $module) {
             $this->addModule($module);
         }
         return $this;
@@ -119,12 +154,6 @@ class Application
     public function setContainerCachePath(string $path) : self
     {
         $this->options["container_cache_path"] = $path;
-        return $this;
-    }
-
-    public function setLogLevel(int $log_level = LaminasLog\Logger::INFO) : self
-    {
-        $this->log_level = $log_level;
         return $this;
     }
 
@@ -170,7 +199,7 @@ class Application
 
 
 
-    public function build() : void
+    public function build() : self
     {
         $this->config = new Config($this->options["config_path"]);
 
@@ -198,6 +227,8 @@ class Application
             $this->application = new ConsoleApplication($this->options["console"]["name"], $this->options["console"]["version"]);
             $this->setCommand();
         }
+
+        return $this;
     }
 
     public function run() : void
@@ -324,7 +355,7 @@ class Application
         $addedRoute = $application->redirect($path, $redirect, 301);
 
         if (count($arguments)) {
-            $arguments = array_map(function($argument) {
+            $arguments = array_map(function ($argument) {
                 if (is_bool($argument) and $argument === false) {
                     return "0";
                 }
@@ -379,7 +410,7 @@ class Application
             $addedRoute->setName($namespace);
 
             if (count($arguments)) {
-                $arguments = array_map(function($argument) {
+                $arguments = array_map(function ($argument) {
                     if (is_bool($argument) and $argument === false) {
                         return "0";
                     }
@@ -546,12 +577,12 @@ class Application
                     "name" => "stream",
                     "priority" => 1,
                     'options' => [
-                        'stream' => "php://stderr",
+                        'stream' => $this->log_file,
                         'formatter' => [
                             'name' => LaminasLog\Formatter\Simple::class,
                             'options' => [
-                                'format' => '%timestamp% %priorityName% (%priority%): %message%',
-                                'dateTimeFormat' => 'c',
+                                'format' => $this->log_format,
+                                'dateTimeFormat' => $this->log_time_format,
                             ],
                         ],
                         'filters' => [
