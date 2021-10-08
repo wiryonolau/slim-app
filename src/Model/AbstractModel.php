@@ -4,6 +4,7 @@ namespace Itseasy\Model;
 
 use Laminas\Stdlib\ArraySerializableInterface;
 use ReflectionClass;
+use Exception;
 
 class AbstractModel implements ArraySerializableInterface
 {
@@ -14,6 +15,11 @@ class AbstractModel implements ArraySerializableInterface
             return $this->{$name};
         }
         return $this->{$method}();
+    }
+
+    public function __set(string $name, $value)
+    {
+        throw new Exception("Cannot add new property \$$name to instance of " . __CLASS__);
     }
 
     public function populate(array $data)
