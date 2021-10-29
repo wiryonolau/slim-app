@@ -16,7 +16,8 @@ class AssetMiddleware extends AbstractMiddleware
 
     protected $mimeType = [
         'css' => 'text/css',
-        'js' => 'application/javascript',
+        'js' => 'text/javascript',
+        'mjs' => 'text/javascript',
         'sass' => 'text/css',
         'scss' => 'text/css',
 
