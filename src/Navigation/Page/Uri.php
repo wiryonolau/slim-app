@@ -23,12 +23,12 @@ class Uri extends AbstractPage
         return $this;
     }
 
-    public function getUri() : string
+    public function getUri() : ?string
     {
         return $this->uri;
     }
 
-    public function getHref() : string
+    public function getHref() : ?string
     {
         $uri = $this->getUri();
 
