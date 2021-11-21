@@ -6,7 +6,7 @@ use Laminas\Stdlib\ArraySerializableInterface;
 use ReflectionClass;
 use Exception;
 
-class AbstractModel implements ArraySerializableInterface
+class AbstractModel
 {
     public function __get(string $name)
     {
@@ -38,17 +38,12 @@ class AbstractModel implements ArraySerializableInterface
         }
     }
 
-    public function exchangeArray(array $data)
-    {
-        $this->populate($data);
-    }
-
     public function getArrayCopy() : array
     {
         $result = [];
         $reflection = new ReflectionClass($this);
         foreach ($reflection->getProperties() as $property) {
-            if ($this->{$property->name} instanceof ArraySerializableInterface) {
+            if ($this->{$property->name} instanceof AbstractModel) {
                 $result[$property->name] = $this->{$property->name}->getArrayCopy();
             } else {
                 $method = $this->getPropertyClassMethod("get", $property->name);
