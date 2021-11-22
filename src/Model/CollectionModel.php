@@ -30,7 +30,7 @@ class CollectionModel extends ArrayObject
     {
         $result = [];
         foreach ($this as $data) {
-            if ($data instanceof AbstractModel) {
+            if (method_exists($data, "getArrayCopy") and is_callable([$data, "getArrayCopy"])) {
                 $result[] = $data->getArrayCopy();
             } else {
                 $result[] = $data;

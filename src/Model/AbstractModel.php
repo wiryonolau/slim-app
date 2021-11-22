@@ -42,7 +42,7 @@ class AbstractModel
         $result = [];
         $reflection = new ReflectionClass($this);
         foreach ($reflection->getProperties() as $property) {
-            if ($this->{$property->name} instanceof AbstractModel) {
+            if (method_exists($this->{$property->name}, "getArrayCopy") and is_callable([$this->{$property->name}, "getArrayCopy"])) { 
                 $result[$property->name] = $this->{$property->name}->getArrayCopy();
             } else {
                 $method = $this->getPropertyClassMethod("get", $property->name);
