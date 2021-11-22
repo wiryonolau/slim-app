@@ -2,11 +2,10 @@
 
 namespace Itseasy\Model;
 
-use Laminas\Stdlib\ArraySerializableInterface;
 use ArrayObject;
 use Exception;
 
-class CollectionModel extends ArrayObject implements ArraySerializableInterface
+class CollectionModel extends ArrayObject
 {
     protected $object = null;
 
@@ -31,7 +30,7 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
     {
         $result = [];
         foreach ($this as $data) {
-            if ($data instanceof ArraySerializableInterface) {
+            if ($data instanceof AbstractModel) {
                 $result[] = $data->getArrayCopy();
             } else {
                 $result[] = $data;

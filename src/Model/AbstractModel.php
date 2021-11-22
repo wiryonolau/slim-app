@@ -2,7 +2,6 @@
 
 namespace Itseasy\Model;
 
-use Laminas\Stdlib\ArraySerializableInterface;
 use ReflectionClass;
 use Exception;
 
