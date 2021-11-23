@@ -2,10 +2,11 @@
 
 namespace Itseasy\Model;
 
-use ReflectionClass;
 use Exception;
+use Laminas\Stdlib\ArraySerializableInterface;
+use ReflectionClass;
 
-class AbstractModel
+class AbstractModel implements ArraySerializableInterface
 {
     public function __get(string $name)
     {
@@ -16,12 +17,12 @@ class AbstractModel
         return $this->{$method}();
     }
 
-    public function __set(string $name, $value)
+    public function __set(string $name, $value) : void
     {
         throw new Exception("Cannot add new property \$$name to instance of " . __CLASS__);
     }
 
-    public function populate(array $data)
+    public function populate(array $data) : void
     {
         foreach ($data as $k => $v) {
             if (!property_exists($this, $k)) {
@@ -31,10 +32,17 @@ class AbstractModel
             $method = $this->getPropertyClassMethod("set", $k);
             if (is_null($method)) {
                 $this->{$k} = $v;
+            } else if ($this->{$k} instanceof ArraySerializableInterface){
+                $this->{$k}->populate($v);
             } else {
                 $this->{$method}($v);
             }
         }
+    }
+
+    public function exchangeArray(array $data) : void
+    {
+        $this->populate($data);
     }
 
     public function getArrayCopy() : array
@@ -42,7 +50,7 @@ class AbstractModel
         $result = [];
         $reflection = new ReflectionClass($this);
         foreach ($reflection->getProperties() as $property) {
-            if (method_exists($this->{$property->name}, "getArrayCopy") and is_callable([$this->{$property->name}, "getArrayCopy"])) { 
+            if ($this->{$property->name} instanceof ArraySerializableInterface) {
                 $result[$property->name] = $this->{$property->name}->getArrayCopy();
             } else {
                 $method = $this->getPropertyClassMethod("get", $property->name);
