@@ -5,6 +5,7 @@ namespace Itseasy\Model;
 use ArrayObject;
 use Exception;
 use Laminas\Stdlib\ArraySerializableInterface;
+use Traversable;
 
 class CollectionModel extends ArrayObject implements ArraySerializableInterface
 {
@@ -24,6 +25,13 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
             array_map([$this, "appendFilter"], $item);
         } else {
             $this->appendFilter($item);
+        }
+    }
+
+    public function populate(Traversable $data) : void
+    {
+        foreach($data as $item) {
+            $this->append($item);
         }
     }
 
