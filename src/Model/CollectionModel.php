@@ -9,7 +9,7 @@ use Traversable;
 
 class CollectionModel extends ArrayObject implements ArraySerializableInterface
 {
-    protected $object = null;
+    private $object = null;
 
     public function setObject(string $object)
     {
@@ -18,6 +18,12 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         }
         $this->object = $object;
     }
+
+    public function getObject() : string
+    {
+        return $this->object;
+    }
+
 
     public function append($item) : void
     {

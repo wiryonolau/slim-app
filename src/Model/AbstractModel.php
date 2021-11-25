@@ -30,12 +30,12 @@ class AbstractModel implements ArraySerializableInterface
             }
 
             $method = $this->getPropertyClassMethod("set", $k);
-            if (is_null($method)) {
-                $this->{$k} = $v;
+            if (!is_null($method)) {
+                $this->{$method}($v);
             } else if ($this->{$k} instanceof ArraySerializableInterface){
                 $this->{$k}->populate($v);
             } else {
-                $this->{$method}($v);
+                $this->{$k} = $v;
             }
         }
     }
