@@ -34,11 +34,9 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         }
     }
 
-    public function populate(Traversable $data) : void
+    public function populate(array $data) : void
     {
-        foreach($data as $item) {
-            $this->append($item);
-        }
+        $this->append($data);
     }
 
     public function getArrayCopy() : array
@@ -46,6 +44,8 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         $result = [];
         foreach ($this as $data) {
             if ($data instanceof ArraySerializableInterface) {
+                $result[] = $data->getArrayCopy();
+            } else if (method_exists($data, "getArrayCopy") and is_callable([$data, "getArrayCopy"])) {
                 $result[] = $data->getArrayCopy();
             } else {
                 $result[] = $data;
