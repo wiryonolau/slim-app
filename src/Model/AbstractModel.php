@@ -6,7 +6,7 @@ use Exception;
 use Laminas\Stdlib\ArraySerializableInterface;
 use ReflectionClass;
 
-class AbstractModel implements ArraySerializableInterface
+abstract class AbstractModel implements ArraySerializableInterface
 {
     public function __get(string $name)
     {
@@ -66,7 +66,7 @@ class AbstractModel implements ArraySerializableInterface
         return $result;
     }
 
-    private function isCallable($object, ?string $function) : bool
+    protected function isCallable($object, ?string $function) : bool
     {
         if (is_null($function)) {
             return false;

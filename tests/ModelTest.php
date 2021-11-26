@@ -19,7 +19,7 @@ final class ModelTest extends TestCase {
 
     public function testCollectionModel() {
         $collection = new Model\TestCollectionModel();
-        $collection->setObject(Model\TestModel::class);
+        $collection->setCollectionObject(Model\TestModel::class);
 
         $collection->append(new Model\TestModel());
         $collection->append(new Model\TestModel());

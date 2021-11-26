@@ -6,22 +6,40 @@ use ArrayObject;
 use Exception;
 use Laminas\Stdlib\ArraySerializableInterface;
 use Traversable;
+use ArrayIterator;
 
 class CollectionModel extends ArrayObject implements ArraySerializableInterface
 {
-    private $object = null;
+    private $collectionObject = null;
 
-    public function setObject(string $object)
+    public function __construct(
+        ?string $object = null,
+        array $data = [],
+        int $flags = 0,
+        string $iteratorClass = ArrayIterator::class
+    ) {
+        parent::__construct([], $flags, $iteratorClass);
+
+        if (!is_null($object)) {
+            $this->setCollectionObject($object);
+        }
+
+        foreach ($data as $d) {
+            $this->append($d);
+        }
+    }
+
+    public function setCollectionObject(string $object)
     {
         if (!class_exists($object)) {
             throw Exception("Class not exist");
         }
-        $this->object = $object;
+        $this->collectionObject = $object;
     }
 
     public function getObject() : string
     {
-        return $this->object;
+        return $this->collectionObject;
     }
 
 
@@ -45,7 +63,7 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         foreach ($this as $data) {
             if ($data instanceof ArraySerializableInterface) {
                 $result[] = $data->getArrayCopy();
-            } else if (method_exists($data, "getArrayCopy") and is_callable([$data, "getArrayCopy"])) {
+            } elseif (method_exists($data, "getArrayCopy") and is_callable([$data, "getArrayCopy"])) {
                 $result[] = $data->getArrayCopy();
             } else {
                 $result[] = $data;
@@ -56,16 +74,16 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
 
     private function appendFilter($item) : void
     {
-        if ($this->isValid($item)) {
+        if (is_null($this->collectionObject)) {
             parent::append($item);
+        } else {
+            if (is_array($item)) {
+                $obj = new $this->collectionObject;
+                $obj->populate($item);
+                parent::append($item);
+            } elseif (is_a($item, $this->collectionObject)) {
+                parent::append($item);
+            }
         }
-    }
-
-    private function isValid($item) : bool
-    {
-        if (is_null($this->object)) {
-            return true;
-        }
-        return is_a($item, $this->object);
     }
 }
