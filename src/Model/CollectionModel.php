@@ -28,12 +28,14 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         }
     }
 
-    public function setObjectPrototype($object)
+    public function setObjectPrototype($object) : void
     {
         if (is_string($object) and class_exists($object)) {
             $object = new $object;
-        } else {
-            throw new Exception("Class not exist");
+        }
+
+        if (!is_object($object)) {
+            throw new Exception("Object not exist");
         }
 
         $this->objectPrototype = $object;
