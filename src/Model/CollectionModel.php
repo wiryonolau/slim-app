@@ -9,10 +9,10 @@ use Laminas\Stdlib\ArraySerializableInterface;
 
 class CollectionModel extends ArrayObject implements ArraySerializableInterface
 {
-    private $collectionObject = null;
+    private $collectionObjectPrototype = null;
 
     public function __construct(
-        ?string $object = null,
+        $collectionObjectPrototype = null,
         array $data = [],
         int $flags = 0,
         string $iteratorClass = ArrayIterator::class
@@ -28,32 +28,43 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         }
     }
 
-    public function setCollectionObject(string $object)
+    public function setCollectionObjectPrototype($object)
     {
-        if (!class_exists($object)) {
+        if (is_string($object) and class_exists($object)) {
+            $object = new $object;
+        } else {
             throw new Exception("Class not exist");
         }
-        $this->collectionObject = $object;
+
+        $this->collectionObjectPrototype = $object;
     }
 
-    public function getObject() : string
+    public function getCollectionObjectPrototype() : string
     {
-        return $this->collectionObject;
+        return $this->collectionObjectPrototype;
     }
 
 
     public function append($item) : void
     {
-        if (is_array($item)) {
-            array_map([$this, "appendFilter"], $item);
+        if (is_null($this->collectionObjectPrototype)) {
+            parent::append($item);
         } else {
-            $this->appendFilter($item);
+            if (is_array($item)) {
+                $obj = clone $this->collectionObjectPrototype;
+                $obj->populate($item);
+                parent::append($obj);
+            } elseif ($item instanceof get_class($this->collectionObjectPrototype))) {
+                parent::append($item);
+            }
         }
     }
 
     public function populate(array $data) : void
     {
-        $this->append($data);
+        foreach ($data as $row) {
+            $this->append($data);
+        }
     }
 
     public function exchangeArray($data) : array
@@ -76,20 +87,5 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
             }
         }
         return $result;
-    }
-
-    private function appendFilter($item) : void
-    {
-        if (is_null($this->collectionObject)) {
-            parent::append($item);
-        } else {
-            if (is_array($item)) {
-                $obj = new $this->collectionObject;
-                $obj->populate($item);
-                parent::append($item);
-            } elseif (is_a($item, $this->collectionObject)) {
-                parent::append($item);
-            }
-        }
     }
 }
