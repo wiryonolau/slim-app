@@ -9,18 +9,18 @@ use Laminas\Stdlib\ArraySerializableInterface;
 
 class CollectionModel extends ArrayObject implements ArraySerializableInterface
 {
-    private $collectionObjectPrototype = null;
+    private $objectPrototype = null;
 
     public function __construct(
-        $collectionObjectPrototype = null,
+        $objectPrototype = null,
         array $data = [],
         int $flags = 0,
         string $iteratorClass = ArrayIterator::class
     ) {
         parent::__construct([], $flags, $iteratorClass);
 
-        if (!is_null($object)) {
-            $this->setCollectionObject($object);
+        if (!is_null($objectPrototype)) {
+            $this->setObjectPrototype($objectPrototype);
         }
 
         foreach ($data as $d) {
@@ -28,7 +28,7 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         }
     }
 
-    public function setCollectionObjectPrototype($object)
+    public function setObjectPrototype($object)
     {
         if (is_string($object) and class_exists($object)) {
             $object = new $object;
@@ -36,25 +36,29 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
             throw new Exception("Class not exist");
         }
 
-        $this->collectionObjectPrototype = $object;
+        $this->objectPrototype = $object;
     }
 
-    public function getCollectionObjectPrototype() : string
+    /*
+     * return object
+     */
+    public function getObjectPrototype()
     {
-        return $this->collectionObjectPrototype;
+        return $this->objectPrototype;
     }
 
 
     public function append($item) : void
     {
-        if (is_null($this->collectionObjectPrototype)) {
+        if (is_null($this->getObjectPrototype())) {
             parent::append($item);
+        } else if (is_array($item)) {
+            $obj = clone $this->getObjectPrototype();
+            $obj->populate($item);
+            parent::append($obj);
         } else {
-            if (is_array($item)) {
-                $obj = clone $this->collectionObjectPrototype;
-                $obj->populate($item);
-                parent::append($obj);
-            } elseif ($item instanceof get_class($this->collectionObjectPrototype))) {
+            $instance = get_class($this->getObjectPrototype());
+            if ($item instanceof $instance) {
                 parent::append($item);
             }
         }
