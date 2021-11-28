@@ -2,11 +2,10 @@
 
 namespace Itseasy\Model;
 
+use ArrayIterator;
 use ArrayObject;
 use Exception;
 use Laminas\Stdlib\ArraySerializableInterface;
-use Traversable;
-use ArrayIterator;
 
 class CollectionModel extends ArrayObject implements ArraySerializableInterface
 {
@@ -32,7 +31,7 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
     public function setCollectionObject(string $object)
     {
         if (!class_exists($object)) {
-            throw Exception("Class not exist");
+            throw new Exception("Class not exist");
         }
         $this->collectionObject = $object;
     }
@@ -55,6 +54,13 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
     public function populate(array $data) : void
     {
         $this->append($data);
+    }
+
+    public function exchangeArray($data) : array
+    {
+        $old = $this->getArrayCopy();
+        $this->populate($data);
+        return $old;
     }
 
     public function getArrayCopy() : array

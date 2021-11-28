@@ -42,9 +42,11 @@ abstract class AbstractModel implements ArraySerializableInterface
         }
     }
 
-    public function exchangeArray(array $data) : void
+    public function exchangeArray(array $data) : array
     {
+        $old = $this->getArrayCopy();
         $this->populate($data);
+        return $old;
     }
 
     public function getArrayCopy() : array
