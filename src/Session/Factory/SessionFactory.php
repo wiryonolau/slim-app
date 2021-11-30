@@ -7,6 +7,7 @@ use Psr\Container\ContainerInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\HttpFoundation\Session\Storage\NativeSessionStorage;
+use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHandler;
 
 class SessionFactory
 {
@@ -15,9 +16,11 @@ class SessionFactory
         $options = $container->get('Config')->getConfig()['session']['options'];
 
         if (PHP_SAPI === 'cli') {
-            return new Session(new MockArraySessionStorage());
+            $storage = new MockArraySessionStorage();
         } else {
-            return new Session(new NativeSessionStorage($options));
+            $storage = new NativeSessionStorage($options, new NativeFileSessionHandler());
         }
+
+        return new Session($storage);
     }
 }

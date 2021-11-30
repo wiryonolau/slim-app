@@ -29,9 +29,9 @@ return [
     "session" => [
         'class' => Session::class,
         'options' => [
-            'name' => 'App',
+            'name' => null,
             'cache_expire' => 0,
-            'cookie_samesite' => 'strict'
+            'cookie_samesite' => 'lax'
         ],
         'csrf_field_name' => '_csrf',
         'csrf_token_id' => 'app'
