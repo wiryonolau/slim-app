@@ -29,7 +29,6 @@ return [
     "session" => [
         'class' => Session::class,
         'options' => [
-            'name' => null,
             'cache_expire' => 0,
             'cookie_samesite' => 'lax'
         ],
