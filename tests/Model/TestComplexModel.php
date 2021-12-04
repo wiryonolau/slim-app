@@ -12,7 +12,6 @@ class TestComplexModel extends RecordModel {
     protected $attrs;
 
     public function __construct() {
-        $this->initTechDate();
         $this->data = new CollectionModel();
         $this->attrs = new CollectionModel(AttrModel::class);
     }

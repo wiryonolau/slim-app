@@ -7,7 +7,6 @@
     ],
     "config": {
         "platform" : {
-            "php" : "7.4.26",
             "ext-gd" : "1",
             "ext-intl" : "1",
             "ext-sockets": "1"

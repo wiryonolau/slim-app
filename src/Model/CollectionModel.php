@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace Itseasy\Model;
 
@@ -69,7 +70,7 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
     public function populate(array $data) : void
     {
         foreach ($data as $row) {
-            $this->append($data);
+            $this->append($row);
         }
     }
 
@@ -80,6 +81,13 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         return $old;
     }
 
+    // Return an array of object. Only root object is change to array.
+    public function getArray() : array
+    {
+        return $this->getIterator()->getArrayCopy();
+    }
+
+    // Return all root and nested object as an array
     public function getArrayCopy() : array
     {
         $result = [];
