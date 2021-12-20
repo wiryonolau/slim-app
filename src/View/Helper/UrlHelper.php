@@ -3,7 +3,7 @@ declare(strict_types = 1);
 
 namespace Itseasy\View\Helper;
 
-class UrlHelper
+class UrlHelper extends AbstractHelper
 {
     protected $base_url;
 

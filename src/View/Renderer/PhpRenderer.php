@@ -5,6 +5,7 @@ namespace Itseasy\View\Renderer;
 
 use Slim\Views\PhpRenderer as SlimPhpRenderer;
 use Itseasy\View\Helper\ViewHelperInterface;
+use Itseasy\View\Helper\AbstractHelper;
 use ReflectionClass;
 
 class PhpRenderer extends SlimPhpRenderer
@@ -22,6 +23,11 @@ class PhpRenderer extends SlimPhpRenderer
         }
     }
 
+    public function getViewHelper() : array
+    {
+        return $this->viewHelper;
+    }
+
     public function setTemplateSuffix(string $suffix) : void
     {
         $this->templateSuffix = $suffix;
@@ -37,6 +43,10 @@ class PhpRenderer extends SlimPhpRenderer
         if (is_null($name) or $name == "") {
             $class = new ReflectionClass($helper);
             $name = lcfirst($class->getShortName());
+        }
+
+        if ($helper instanceof AbstractHelper) {
+            $helper->setView($this);
         }
 
         $this->viewHelper[$name] = $helper;

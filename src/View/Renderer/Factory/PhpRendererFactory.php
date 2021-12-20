@@ -33,7 +33,8 @@ class PhpRendererFactory
 
         if (!empty($viewHelperConfig["aliases"])) {
             foreach ($viewHelperConfig["aliases"] as $alias => $helper) {
-                $renderer->addViewHelper($container->get($helper), $alias);
+                $helper = $container->get($helper);
+                $renderer->addViewHelper($helper, $alias);
             }
         }
 

@@ -41,7 +41,7 @@ abstract class AbstractModel implements ArraySerializableInterface
     public function populate(array $data) : void
     {
         foreach ($data as $k => $v) {
-            if (!property_exists($this, $k)) {
+            if (empty($this->getModelProperties()[$k])) {
                 continue;
             }
 
@@ -192,9 +192,11 @@ abstract class AbstractModel implements ArraySerializableInterface
         throw new Exception("Object must be an array or at least has getArrayCopy function");
     }
 
-    public function toJson() : string
+    public function toJson(int $flags = 0, int $depth = 512) : string
     {
-        return $this->formatJson($this->getArrayCopy());
+        $flags |= JSON_THROW_ON_ERROR;
+
+        return json_encode($this->getArrayCopy(), $flags, $depth);
     }
 
     public function isCallable($object, ?string $function) : bool
@@ -230,7 +232,7 @@ abstract class AbstractModel implements ArraySerializableInterface
         return $this->modelProperties;
     }
 
-    private function getPropertyClassMethod($type = "get", $property, $throw_error = true) : ?string
+    private function getPropertyClassMethod(string $type = "get", string $property, bool $throw_error = true) : ?string
     {
         $method = sprintf("%s%s", $type, implode('', array_map('ucfirst', explode('_', $property))));
         if ($this->isCallable($this, $method)) {
