@@ -102,4 +102,11 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         }
         return $result;
     }
+
+    public function toJson(int $flags = 0, int $depth = 512) : string
+    {
+        $flags |= JSON_THROW_ON_ERROR;
+
+        return json_encode($this->getArrayCopy(), $flags, $depth);
+    }
 }
