@@ -25,12 +25,12 @@
         "symfony/http-foundation" : "^5.1",
         "symfony/security-csrf" : "^5.2",
         "laminas/laminas-navigation": "^2.10",
-        "laminas/laminas-cache": "^2.11",
-        "laminas/laminas-i18n": "^2.11",
+        "laminas/laminas-i18n": "^2.13",
         "laminas/laminas-view": "^2.12",
         "laminas/laminas-serializer": "^2.10",
         "laminas/laminas-log": "^2.13",
-        "scssphp/scssphp": "^1.6"
+        "scssphp/scssphp": "^1.6",
+        "laminas/laminas-cache": "^2.13"
     },
     "autoload" : {
         "psr-4" : {

@@ -5,7 +5,6 @@ namespace Itseasy\Asset\Factory;
 
 use Itseasy\Asset\AssetManager;
 use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
-use Laminas\Cache\Storage\Adapter\FileSystem;
 use Laminas\Cache\StorageFactory;
 use Psr\Container\ContainerInterface;
 use ScssPhp\ScssPhp\Compiler;
