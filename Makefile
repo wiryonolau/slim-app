@@ -9,6 +9,7 @@ help: ## This help.
 
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
 PHP_VERSION ?= "7.4"
+COMPOSER_VERSION ?= "2.0.8"
 
 %:
 	@echo ""
@@ -40,18 +41,18 @@ composer-install:
         -w /srv/$$(basename "`pwd`") \
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
-    composer composer install -v --no-plugins --no-scripts --prefer-dist --ignore-platform-reqs
+    composer:${COMPOSER_VERSION} composer install -v --no-plugins --no-scripts --prefer-dist
 composer-update:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \
         -w /srv/$$(basename "`pwd`") \
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
-    composer composer update -v --no-plugins --no-scripts --prefer-dist --ignore-platform-reqs
+    composer:${COMPOSER_VERSION} composer update -v --no-plugins --no-scripts --prefer-dist
 composer:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \
         -w /srv/$$(basename "`pwd`") \
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
-    composer composer $(filter-out $@,$(MAKECMDGOALS))
+    composer:${COMPOSER_VERSION} composer $(filter-out $@,$(MAKECMDGOALS))
