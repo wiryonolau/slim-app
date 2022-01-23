@@ -9,9 +9,9 @@ use Itseasy\Identity\IdentityAwareInterface;
 use Itseasy\View;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
+use Laminas\Log as LaminasLog;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
-use Laminas\Log as LaminasLog;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
@@ -83,10 +83,14 @@ class Application
         }
     }
 
-    public function setConfigPath($path) : self
+    public function setConfigPath($path, $overwrite = false) : self
     {
         if (is_array($path)) {
-            $this->options["config_path"] = ArrayUtils::merge($this->options["config_path"], $path);
+            $this->options["config_path"] = ArrayUtils::merge(
+                $this->options["config_path"],
+                $path,
+                $overwrite
+            );
         } else {
             $this->options["config_path"][] = $path;
         }
@@ -224,7 +228,10 @@ class Application
             $routeCollection->lock();
             $this->addDefinition('ApplicationRoute', $routeCollection);
         } elseif ($this->options["application_type"] == self::APP_CONSOLE) {
-            $this->application = new ConsoleApplication($this->options["console"]["name"], $this->options["console"]["version"]);
+            $this->application = new ConsoleApplication(
+                $this->options["console"]["name"],
+                $this->options["console"]["version"]
+            );
             $this->setCommand();
         }
 
@@ -271,7 +278,11 @@ class Application
     private function setRoute() : void
     {
         if (!empty($this->getConfig()["routes"])) {
-            self::addRoute(null, $this->getConfig()["routes"], $this->application);
+            self::addRoute(
+                null,
+                $this->getConfig()["routes"],
+                $this->application
+            );
         }
     }
 
@@ -285,14 +296,20 @@ class Application
                 }
 
                 if ($middleware == ErrorMiddleware::class) {
-                    $errorMiddleware = call_user_func_array([$this->application, "addErrorMiddleware"], $this->error_options);
+                    $errorMiddleware = call_user_func_array(
+                        [$this->application, "addErrorMiddleware"],
+                        $this->error_options
+                    );
                     if (!is_null($this->errorHandler)) {
                         $errorMiddleware->setDefaultErrorHandler($this->errorHandler);
                     }
                     if (count($this->errorRenderer)) {
                         $errorHandler = $errorMiddleware->getDefaultErrorHandler();
                         foreach ($this->errorRenderer as $content_type => $renderer) {
-                            $errorHandler->registerErrorRenderer($content_type, $renderer);
+                            $errorHandler->registerErrorRenderer(
+                                $content_type,
+                                $renderer
+                            );
                         }
                     }
                     continue;
@@ -303,8 +320,11 @@ class Application
         }
     }
 
-    private static function addRoute(?string $namespace, array $routes, &$application) : void
-    {
+    private static function addRoute(
+        ?string $namespace,
+        array $routes,
+        &$application
+    ) : void {
         foreach ($routes as $name => $route) {
             $namespace = sprintf("%s/%s", $namespace, strval($name));
             if (!empty($route["options"]["redirect"])) {
@@ -324,8 +344,11 @@ class Application
         }
     }
 
-    private static function addGroupRoute($namespace, $route, &$application) : void
-    {
+    private static function addGroupRoute(
+        $namespace,
+        $route,
+        &$application
+    ) : void {
         $path = $route["route"];
         $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
         $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);

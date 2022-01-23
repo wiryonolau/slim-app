@@ -24,7 +24,7 @@ abstract class AbstractModel implements ArraySerializableInterface, PluginAwareI
     use PluginAwareTrait;
 
     // Model Properties
-    private $modelProperties = [];
+    private $_modelProperties = [];
 
     public function getAttachedPlugin() : array {
         return [
@@ -114,13 +114,18 @@ abstract class AbstractModel implements ArraySerializableInterface, PluginAwareI
         return (method_exists($object, $function) and is_callable([$object, $function]));
     }
 
+    public function __toString() : string
+    {
+        return $this->toJson();
+    }
+
     /**
      * Retrieve and cache all child Model property
      * Only non static public and non static protected count as model attribute
      */
     private function getModelProperties() : array
     {
-        if (!count($this->modelProperties)) {
+        if (!count($this->_modelProperties)) {
             $reflection = new ReflectionClass($this);
 
             foreach($reflection->getProperties() as $property) {
@@ -132,10 +137,10 @@ abstract class AbstractModel implements ArraySerializableInterface, PluginAwareI
                     continue;
                 }
 
-                $this->modelProperties[$property->name] = ($property->isPublic() ? "public" : "protected");
+                $this->_modelProperties[$property->name] = ($property->isPublic() ? "public" : "protected");
             }
         }
-        return $this->modelProperties;
+        return $this->_modelProperties;
     }
 
     private function getPropertyClassMethod(string $type = "get", string $property, bool $throw_error = true) : ?string
