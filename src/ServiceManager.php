@@ -13,6 +13,8 @@ use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
 
+use function DI\factory;
+
 class ServiceManager extends Container
 {
     protected $config;
@@ -132,42 +134,49 @@ class ServiceManager extends Container
         $factory,
         array $dependencies = []
     ) : void {
-        $this->set($name, function () use ($name, $factory, $dependencies) {
-            if ($factory instanceof DefinitionHelper) {
-                $obj = new $name;
-            } else {
-                $obj = new $factory();
-                // Invoke class
-                $obj = $obj($this);
-            }
+        if (is_object($factory)) {
+            $this->set($name, $factory);
+        } else {
+            $factory = function () use ($name, $factory, $dependencies) {
+                if ($factory instanceof DefinitionHelper) {
+                    $obj = new $name;
+                } else {
+                    $obj = new $factory();
+                    // Invoke class
+                    $obj = $obj($this);
+                }
 
-            foreach ($dependencies as $dependency) {
-                $obj = call_user_func_array([$this, $dependency], [$obj]);
-            }
+                foreach ($dependencies as $dependency) {
+                    $obj = call_user_func_array([$this, $dependency], [$obj]);
+                }
 
-            return $obj;
-        });
+                return $obj;
+            };
+            $this->set($name, \DI\factory($factory));
+        }
     }
 
     private function setObjectView($obj)
     {
-        $view_config = $this->config->get("view");
-        $viewClass = $view_config["class"];
-        $rendererClass = $view_config["renderer"];
-        $default_layout = $view_config["default_layout"];
+        if ($obj instanceof AbstractAction) {
+            $view_config = $this->config->get("view");
+            $viewClass = $view_config["class"];
+            $rendererClass = $view_config["renderer"];
+            $default_layout = $view_config["default_layout"];
 
-        // View require to be a unique instance for each action
-        $view = new $viewClass();
-        $view->setRenderer($this->get($rendererClass));
-        $view->setLayout($default_layout);
-
-        return $obj->setView($view);
+            // View require to be a unique instance for each action
+            $view = new $viewClass();
+            $view->setRenderer($this->get($rendererClass));
+            $view->setLayout($default_layout);
+            $obj->setView($view);
+        }
+        return $obj;
     }
 
     private function setObjectLogger($obj)
     {
         if ($obj instanceof LoggerAwareInterface) {
-            return $obj->setLogger($this->get("Logger"));
+            $obj->setLogger($this->get("Logger"));
         }
         return $obj;
     }
@@ -175,7 +184,7 @@ class ServiceManager extends Container
     private function setObjectIdentityProvider($obj)
     {
         if ($obj instanceof IdentityAwareInterface) {
-            return $obj->setIdentityProvider($this->get($this->identityProvider));
+            $obj->setIdentityProvider($this->get($this->identityProvider));
         }
         return $obj;
     }
@@ -183,7 +192,7 @@ class ServiceManager extends Container
     private function setObjectEventManager($obj)
     {
         if ($obj instanceof EventManagerAwareInterface) {
-            return $obj->setEventManager($this->get("eventManager"));
+            $obj->setEventManager($this->get("EventManager"));
         }
         return $obj;
     }

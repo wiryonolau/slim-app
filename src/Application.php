@@ -289,7 +289,7 @@ class Application
     private function setRoute() : void
     {
         if (!empty($this->getConfig()["routes"])) {
-            $this->applicaton = RouteBuilder::factory(
+            RouteBuilder::addRoute(
                 $this->application,
                 null,
                 $this->getConfig()["routes"]
