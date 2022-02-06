@@ -6,6 +6,7 @@ use DI\Container;
 use DI\ContainerBuilder;
 use Di\Definition\Helper\DefinitionHelper;
 use Itseasy\Action\AbstractAction;
+use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
