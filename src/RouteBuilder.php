@@ -5,7 +5,7 @@ namespace Itseasy;
 class RouteBuilder
 {
     public static function addRoute(
-        Application &$application,
+        ?Application &$application,
         ?string $namespace = null,
         array $routes = []
     ) : void {
@@ -29,7 +29,7 @@ class RouteBuilder
     }
 
     private static function addGroupRoute(
-        Application &$application,
+        ?Application &$application,
         ?string $namespace = null,
         array $routes = []
     ) : void {
@@ -63,7 +63,7 @@ class RouteBuilder
     }
 
     private static function addActionRedirect(
-        Application &$application,
+        ?Application &$application,
         ?string $namespace = null,
         array $routes = []
         ) : void {
@@ -113,7 +113,7 @@ class RouteBuilder
     }
 
     public static function addActionRoute(
-        Application &$application,
+        ?Application &$application,
         ?string $namespace = null,
         array $routes = []
         ) : void {
