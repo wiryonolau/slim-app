@@ -1,37 +1,74 @@
 <?php
+declare(strict_types = 1);
 
 namespace Itseasy;
 
+use Slim\App;
+
 class RouteBuilder
 {
-    public static function addRoute(
-        ?Application &$application,
+    protected $application;
+
+    public function __construct(
+        App $application,
+        ?string $namespace = null,
+        array $routes = []
+    ) {
+        $this->application = $application;
+
+        $this->addRoute(
+            $namespace,
+            $routes
+        );
+    }
+
+    public static function factory(
+        App $application,
+        ?string $namespace = null,
+        array $routes = []
+    ) : App {
+
+        $route = new RouteBuilder(
+            $application,
+            $namespace,
+            $routes
+        );
+
+        return $route->getApplication();
+    }
+
+
+    public function getApplication() : App
+    {
+        return $this->application;
+    }
+
+    private function addRoute(
         ?string $namespace = null,
         array $routes = []
     ) : void {
         foreach ($routes as $name => $route) {
             $namespace = sprintf("%s/%s", $namespace, strval($name));
             if (!empty($route["options"]["redirect"])) {
-                self::addActionRedirect($application, $namespace, $child_routes);
+                $this->addActionRedirect($namespace, $route);
                 continue;
             }
 
             if (!empty($route["options"]["action"])) {
-                self::addActionRoute($application, $namespace, $child_routes);
+                $this->addActionRoute($namespace, $route);
                 continue;
             }
 
             if (!empty($route["child_routes"])) {
-                self::addGroupRoute($application, $namespace, $child_routes);
+                $this->addGroupRoute($namespace, $route);
                 continue;
             }
         }
     }
 
-    private static function addGroupRoute(
-        ?Application &$application,
+    private function addGroupRoute(
         ?string $namespace = null,
-        array $routes = []
+        array $route = []
     ) : void {
         $path = $route["route"];
 
@@ -40,9 +77,9 @@ class RouteBuilder
             $arguments = $route["options"]["arguments"];
         }
 
-        $middleware = [];
-        if (!empty($route["options"]["middleware"])) {
-            $middleware = $route["options"]["middleware"];
+        $middlewares = [];
+        if (!empty($route["options"]["middlewares"])) {
+            $middlewares = $route["options"]["middlewares"];
         }
 
         $child_routes = [];
@@ -51,21 +88,17 @@ class RouteBuilder
         }
 
         if (count($child_routes)) {
-            $addedRoute = $application->group($path, function ($application) use ($namespace, $child_routes) {
-                self::addRoute($application, $namespace, $child_routes);
+            $addedRoute = $this->application->group($path, function () use ($namespace, $child_routes) {
+                $this->addRoute($namespace, $child_routes);
             });
-
-            if (!is_null($middleware)) {
-                $middleware = $application->getContainer()->get($middleware);
-                $addedRoute->add($middleware);
-            }
         }
+
+        $this->addMiddleware($addedRoute, $middlewares);
     }
 
-    private static function addActionRedirect(
-        ?Application &$application,
+    private function addActionRedirect(
         ?string $namespace = null,
-        array $routes = []
+        array $route = []
         ) : void {
         $path = $route["route"];
         $redirect = $route["options"]["redirect"];
@@ -75,13 +108,18 @@ class RouteBuilder
             $arguments = $route["options"]["arguments"];
         }
 
+        $middlewares = [];
+        if (!empty($route["options"]["middlewares"])) {
+            $middlewares = $route["options"]["middlewares"];
+        }
+
         $child_routes = [];
         if (!empty($route["child_routes"])) {
             $child_routes = $route["child_routes"];
         }
 
         // Same as get
-        $addedRoute = $application->redirect($path, $redirect, 301);
+        $addedRoute = $this->application->redirect($path, $redirect, 301);
 
         if (count($arguments)) {
             $arguments = array_map(function ($argument) {
@@ -93,29 +131,20 @@ class RouteBuilder
             $addedRoute->setArguments($arguments);
         }
 
-        if (!is_null($middleware)) {
-            $middleware = $application->getContainer()->get($middleware);
-            $addedRoute->add($middleware);
-        }
-
         $addedRoute->setName($namespace);
 
         if (count($child_routes)) {
-            $application->group($path, function ($application) use ($namespace, $path, $redirect, $child_routes) {
-                self::addRoute($application, $namespace, $child_routes);
+            $addedRoute = $this->application->group($path, function () use ($namespace, $child_routes) {
+                $this->addRoute($namespace, $child_routes);
             });
-
-            if (!is_null($middleware)) {
-                $middleware = $application->getContainer()->get($middleware);
-                $addedRoute->add($middleware);
-            }
         }
+
+        $this->addMiddleware($addedRoute, $middlewares);
     }
 
-    public static function addActionRoute(
-        ?Application &$application,
+    private function addActionRoute(
         ?string $namespace = null,
-        array $routes = []
+        array $route = []
         ) : void {
         $method = (empty($route["method"]) ? "GET" : $route["method"]);
 
@@ -131,12 +160,12 @@ class RouteBuilder
             $arguments = $route["options"]["arguments"];
         }
 
-        $middleware = [];
+        $middlewares = [];
         if (!empty($route["options"]["middleware"])) {
-            $middleware = $route["options"]["middleware"];
+            $middlewares = $route["options"]["middleware"];
         }
 
-        if (!$application->getContainer()->has($action)) {
+        if (!$this->application->getContainer()->has($action)) {
             throw new Exception("Action $action not exist");
         }
 
@@ -146,12 +175,12 @@ class RouteBuilder
         }
 
         if (count($child_routes)) {
-            $addedRoute = $application->group($path, function ($application) use ($namespace, $method, $path, $action, $child_routes) {
-                $application->map($method, "", $action);
-                self::addRoute($application, $namespace, $child_routes);
+            $addedRoute = $this->application->group($path, function () use ($namespace, $method, $action, $child_routes) {
+                $this->application->map($method, "", $action);
+                $this->addRoute($namespace, $child_routes);
             });
         } else {
-            $addedRoute = $application->map($method, $path, $action);
+            $addedRoute = $this->application->map($method, $path, $action);
             $addedRoute->setName($namespace);
 
             if (count($arguments)) {
@@ -165,9 +194,14 @@ class RouteBuilder
             }
         }
 
-        if (!is_null($middleware)) {
-            $middleware = $application->getContainer()->get($middleware);
-            $addedRoute->add($middleware);
+        $this->addMiddleware($addedRoute, $middlewares);
+    }
+
+    private function addMiddleware($route, array $middlewares = [])
+    {
+        foreach ($middlewares as $middleware) {
+            $middleware = $this->application->getContainer()->get($middleware);
+            $route->add($middleware);
         }
     }
 }
