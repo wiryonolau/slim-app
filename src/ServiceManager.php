@@ -95,8 +95,7 @@ class ServiceManager extends Container
         foreach ($factories as $name => $factory) {
             $this->registerFactory($name, $factory, [
                 "setObjectLogger",
-                "setObjectEventManager",
-                "setObjectIdentityProvider"
+                "setObjectEventManager"
             ]);
         }
     }
@@ -109,8 +108,7 @@ class ServiceManager extends Container
         foreach ($factories as $name => $factory) {
             $this->registerFactory($name, $factory, [
                 "setObjectLogger",
-                "setObjectEventManager",
-                "setObjectIdentityProvider"
+                "setObjectEventManager"
             ]);
         }
     }
@@ -184,7 +182,11 @@ class ServiceManager extends Container
 
     private function setObjectIdentityProvider($obj)
     {
-        if ($obj instanceof IdentityAwareInterface) {
+        // Not applicable for service factories due to circular dependency
+        // For Action only
+        if ($obj instanceof IdentityAwareInterface
+            and $obj instanceof AbstractAction
+            ) {
             $obj->setIdentityProvider($this->get($this->identityProvider));
         }
         return $obj;
