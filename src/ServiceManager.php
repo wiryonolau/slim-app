@@ -1,0 +1,190 @@
+<?php
+
+namespace Itseasy;
+
+use DI\Container;
+use DI\ContainerBuilder;
+use Di\Definition\Helper\DefinitionHelper;
+use Itseasy\Action\AbstractAction;
+use Laminas\EventManager\EventManager;
+use Laminas\EventManager\EventManagerAwareInterface;
+use Laminas\EventManager\EventManagerInterface;
+use Laminas\Log\Logger;
+use Laminas\Log\LoggerAwareInterface;
+use Laminas\Log\LoggerInterface;
+
+class ServiceManager extends Container
+{
+    protected $config;
+    protected $eventManager;
+    protected $identityProvider;
+    protected $logger;
+    protected $view;
+
+    public static function factory(
+        Config $config,
+        ?LoggerInterface $logger = null,
+        ?EventManagerInterface $em = null,
+        ?string $cache_path = null
+    ) : Container {
+        $containerBuilder = new ContainerBuilder(self::class);
+        if (!is_null($cache_path)) {
+            $containerBuilder->enableCompiliation($cache_path);
+        }
+        $container = $containerBuilder->build();
+
+        $container->setConfig($config);
+        $container->setLogger($logger);
+        $container->setEventManager($em);
+
+        $container->build();
+
+        return $container;
+    }
+
+    public function setConfig(Config $config) : void
+    {
+        $this->config = $config;
+        $this->set('Config', $this->config);
+        $this->set('config', $this->config);
+    }
+
+    public function setLogger(?LoggerInterface $logger = null) : void
+    {
+        if (is_null($logger)) {
+            $logger = new Logger();
+        }
+
+        $this->logger = $logger;
+        $this->set('Logger', $this->logger);
+        $this->set('logger', $this->logger);
+    }
+
+    public function setEventManager(?EventManagerInterface $em = null) : void
+    {
+        if (is_null($em)) {
+            $em = new EventManager();
+        }
+
+        $this->eventManager = $em;
+        $this->set('EventManager', $this->eventManager);
+        $this->set('eventmanager', $this->eventManager);
+    }
+
+    public function build() : void
+    {
+        // Identity not initiate during build, retrieve the class name only
+        $identityProvider = $this->config->get("guard");
+        if (!empty($identityProvider["identity_provider"])) {
+            $this->identityProvider = $identityProvider["identity_provider"];
+        }
+
+        $this->registerService();
+        $this->registerCommand();
+        $this->registerHttpAction();
+    }
+
+    private function registerService() : void
+    {
+        $service = $this->config->get("service", []);
+        $factories = (empty($service["factories"]) ? [] : $service["factories"]);
+
+        foreach ($factories as $name => $factory) {
+            $this->registerFactory($name, $factory, [
+                "setObjectLogger",
+                "setObjectEventManager",
+                "setObjectIdentityProvider"
+            ]);
+        }
+    }
+
+    private function registerCommand() : void
+    {
+        $console = $this->config->get("console", []);
+        $factories = (empty($console["factories"]) ? [] : $console["factories"]);
+
+        foreach ($factories as $name => $factory) {
+            $this->registerFactory($name, $factory, [
+                "setObjectLogger",
+                "setObjectEventManager",
+                "setObjectIdentityProvider"
+            ]);
+        }
+    }
+
+    private function registerHttpAction() : void
+    {
+        $action = $this->config->get("action", []);
+        $factories = (empty($action["factories"]) ? [] : $action["factories"]);
+
+        foreach ($factories as $name => $factory) {
+            $this->registerFactory($name, $factory, [
+                "setObjectView",
+                "setObjectLogger",
+                "setObjectEventManager",
+                "setObjectIdentityProvider"
+            ]);
+        }
+    }
+
+    private function registerFactory(
+        string $name,
+        $factory,
+        array $dependencies = []
+    ) : void {
+        $this->set($name, function () use ($name, $factory, $dependencies) {
+            if ($factory instanceof DefinitionHelper) {
+                $obj = new $name;
+            } else {
+                $obj = new $factory();
+                // Invoke class
+                $obj = $obj($this);
+            }
+
+            foreach ($dependencies as $dependency) {
+                $obj = call_user_func_array([$this, $dependency], [$obj]);
+            }
+
+            return $obj;
+        });
+    }
+
+    private function setObjectView($obj)
+    {
+        $view_config = $this->config->get("view");
+        $viewClass = $view_config["class"];
+        $rendererClass = $view_config["renderer"];
+        $default_layout = $view_config["default_layout"];
+
+        // View require to be a unique instance for each action
+        $view = new $viewClass();
+        $view->setRenderer($this->get($rendererClass));
+        $view->setLayout($default_layout);
+
+        return $obj->setView($view);
+    }
+
+    private function setObjectLogger($obj)
+    {
+        if ($obj instanceof LoggerAwareInterface) {
+            return $obj->setLogger($this->get("Logger"));
+        }
+        return $obj;
+    }
+
+    private function setObjectIdentityProvider($obj)
+    {
+        if ($obj instanceof IdentityAwareInterface) {
+            return $obj->setIdentityProvider($this->get($this->identityProvider));
+        }
+        return $obj;
+    }
+
+    private function setObjectEventManager($obj)
+    {
+        if ($obj instanceof EventManagerAwareInterface) {
+            return $obj->setEventManager($this->get("eventManager"));
+        }
+        return $obj;
+    }
+}
