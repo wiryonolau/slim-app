@@ -13,8 +13,7 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
-
-use function DI\factory;
+use Exception;
 
 class ServiceManager extends Container
 {
