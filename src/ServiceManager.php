@@ -153,25 +153,33 @@ class ServiceManager extends Container
 
     private function setObjectView($obj)
     {
-        if ($obj instanceof AbstractAction) {
-            $view_config = $this->config->get("view");
-            $viewClass = $view_config["class"];
-            $rendererClass = $view_config["renderer"];
-            $default_layout = $view_config["default_layout"];
+        try {
+            if ($obj instanceof AbstractAction) {
+                $view_config = $this->config->get("view");
+                $viewClass = $view_config["class"];
+                $rendererClass = $view_config["renderer"];
+                $default_layout = $view_config["default_layout"];
 
-            // View require to be a unique instance for each action
-            $view = new $viewClass();
-            $view->setRenderer($this->get($rendererClass));
-            $view->setLayout($default_layout);
-            $obj->setView($view);
+                // View require to be a unique instance for each action
+                $view = new $viewClass();
+                $view->setRenderer($this->get($rendererClass));
+                $view->setLayout($default_layout);
+                $obj->setView($view);
+            }
+        } catch (Exception $e) {
+            $this->get("Logger")->debug($e->getMessage());
         }
         return $obj;
     }
 
     private function setObjectLogger($obj)
     {
-        if ($obj instanceof LoggerAwareInterface) {
-            $obj->setLogger($this->get("Logger"));
+        try {
+            if ($obj instanceof LoggerAwareInterface) {
+                $obj->setLogger($this->get("Logger"));
+            }
+        } catch (Exception $e) {
+            $this->get("Logger")->debug($e->getMessage());
         }
         return $obj;
     }
@@ -180,18 +188,27 @@ class ServiceManager extends Container
     {
         // Not applicable for service factories due to circular dependency
         // For Action only
-        if ($obj instanceof IdentityAwareInterface
-            and $obj instanceof AbstractAction
+        try {
+            if ($obj instanceof IdentityAwareInterface
+                and $obj instanceof AbstractAction
+                and $this->has($this->identityProvider)
             ) {
-            $obj->setIdentityProvider($this->get($this->identityProvider));
+                $obj->setIdentityProvider($this->get($this->identityProvider));
+            }
+        } catch (Exception $e) {
+            $this->get("Logger")->debug($e->getMessage());
         }
         return $obj;
     }
 
     private function setObjectEventManager($obj)
     {
-        if ($obj instanceof EventManagerAwareInterface) {
-            $obj->setEventManager($this->get("EventManager"));
+        try {
+            if ($obj instanceof EventManagerAwareInterface) {
+                $obj->setEventManager($this->get("EventManager"));
+            }
+        } catch (Exception $e) {
+            $this->get("Logger")->debug($e->getMessage());
         }
         return $obj;
     }
