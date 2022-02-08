@@ -21,7 +21,7 @@ final class ApplicationTest extends TestCase
         $entries = $app->getContainer()->getKnownEntryNames();
         foreach ($entries as $entry) {
             try {
-                $object = $app->getApplication()->getContainer()->get($entry);
+                $object = $app->getContainer()->get($entry);
             } catch (Exception $e) {
                 debug(sprintf("\nService : %s\n", $entry));
                 debug(sprintf("ERROR : \n%s\n\n", $e->getMessage()));

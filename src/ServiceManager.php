@@ -133,26 +133,22 @@ class ServiceManager extends Container
         $factory,
         array $dependencies = []
     ) : void {
-        if (is_object($factory)) {
-            $this->set($name, $factory);
-        } else {
-            $factory = function () use ($name, $factory, $dependencies) {
-                if ($factory instanceof DefinitionHelper) {
-                    $obj = new $name;
-                } else {
-                    $obj = new $factory();
-                    // Invoke class
-                    $obj = $obj($this);
-                }
+        $factory = function () use ($name, $factory, $dependencies) {
+            if ($factory instanceof DefinitionHelper) {
+                $obj = new $name;
+            } else {
+                $obj = new $factory();
+                // Invoke class
+                $obj = $obj($this);
+            }
 
-                foreach ($dependencies as $dependency) {
-                    $obj = call_user_func_array([$this, $dependency], [$obj]);
-                }
+            foreach ($dependencies as $dependency) {
+                $obj = call_user_func_array([$this, $dependency], [$obj]);
+            }
 
-                return $obj;
-            };
-            $this->set($name, \DI\factory($factory));
-        }
+            return $obj;
+        };
+        $this->set($name, \DI\factory($factory));
     }
 
     private function setObjectView($obj)

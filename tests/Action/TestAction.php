@@ -1,9 +1,8 @@
 <?php
 namespace Itseasy\Test\Action;
 
-class TestAction
+use Itseasy\Action\AbstractAction;
+
+class TestAction extends AbstractAction
 {
-    public function __invoke()
-    {
-    }
 }
