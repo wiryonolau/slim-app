@@ -44,8 +44,8 @@ class RouteBuilder
         }
 
         $middlewares = [];
-        if (!empty($route["options"]["middlewares"])) {
-            $middlewares = $route["options"]["middlewares"];
+        if (!empty($route["middlewares"])) {
+            $middlewares = $route["middlewares"];
         }
 
         $child_routes = [];
@@ -80,8 +80,8 @@ class RouteBuilder
         }
 
         $middlewares = [];
-        if (!empty($route["options"]["middlewares"])) {
-            $middlewares = $route["options"]["middlewares"];
+        if (!empty($route["middlewares"])) {
+            $middlewares = $route["middlewares"];
         }
 
         $child_routes = [];
@@ -154,8 +154,8 @@ class RouteBuilder
         }
 
         $middlewares = [];
-        if (!empty($route["options"]["middleware"])) {
-            $middlewares = $route["options"]["middleware"];
+        if (!empty($route["middlewares"])) {
+            $middlewares = $route["middlewares"];
         }
 
         if (!$routeCollector->getContainer()->has($action)) {

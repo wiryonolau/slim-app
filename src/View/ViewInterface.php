@@ -11,5 +11,10 @@ interface ViewInterface
      */
     public function setRenderer($renderer);
     public function setLayout(string $layout) : void;
-    public function render(Response $response, string $template, array $variables = [], string $layout = "") : Response;
+    public function render(
+        Response $response,
+        string $template,
+        array $variables = [],
+        string $layout = ""
+    ) : Response;
 }
