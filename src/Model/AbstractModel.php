@@ -55,6 +55,16 @@ abstract class AbstractModel implements ArraySerializableInterface, PluginAwareI
         ]);
     }
 
+    public function __isset(string $name) : bool
+    {
+        return isset($this->_modelProperties[$name]);
+    }
+
+    public function __toString() : string
+    {
+        return $this->toJson();
+    }
+
     public function populate(array $data) : void
     {
         foreach ($data as $k => $v) {
@@ -112,11 +122,6 @@ abstract class AbstractModel implements ArraySerializableInterface, PluginAwareI
         }
 
         return (method_exists($object, $function) and is_callable([$object, $function]));
-    }
-
-    public function __toString() : string
-    {
-        return $this->toJson();
     }
 
     /**

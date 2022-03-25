@@ -103,6 +103,12 @@ class CollectionModel extends ArrayObject implements ArraySerializableInterface
         return $result;
     }
 
+    // Shortcut, 1 level only
+    public function getArrayColumn($column_key, $index_key = null) : array
+    {
+        return array_column($this->getArray(), $column_key, $index_key);
+    }
+
     public function toJson(int $flags = 0, int $depth = 512) : string
     {
         $flags |= JSON_THROW_ON_ERROR;

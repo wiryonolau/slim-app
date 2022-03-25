@@ -32,20 +32,29 @@ final class ModelTest extends TestCase {
         $array = $record->getArrayCopy();
         $this->assertEquals($array["tech_creation_date"], $record->getTechCreationDate());
         $this->assertEquals($array["tech_modification_date"], $record->getTechModificationDate());
-
     }
 
     public function testCollectionModel() {
         $collection = new Model\TestCollectionModel();
         $collection->setObjectPrototype(Model\TestModel::class);
 
-        $collection->append(new Model\TestModel());
-        $collection->append(new Model\TestModel());
+        $count = 3;
+        for ( $i = 0; $i < $count; $i++) {
+            $model = new Model\TestModel();
+            $model->populate([
+                "id" => $i,
+                "name" => md5($i)
+            ]);
+            $collection->append($model);
+        }
 
-        $this->assertEquals($collection->count(), 2);
+
+        $this->assertEquals($collection->count(), $count);
         foreach ($collection as $data) {
             $this->assertEquals(($data instanceof Model\TestModel), true);
         }
+
+        $this->assertEquals(count($collection->getArrayColumn("id")), $count);
     }
 
     public function testComplexModel() {
