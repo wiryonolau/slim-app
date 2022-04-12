@@ -18,6 +18,7 @@ class AssetMiddleware extends AbstractMiddleware
         'css' => 'text/css',
         'js' => 'text/javascript',
         'mjs' => 'text/javascript',
+        'map' => 'text/javascript',
         'sass' => 'text/css',
         'scss' => 'text/css',
 

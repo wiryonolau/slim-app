@@ -11,6 +11,7 @@ use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
 use ScssPhp\ScssPhp\Compiler as ScssCompiler;
+use Throwable;
 
 class AssetManager implements LoggerAwareInterface
 {
@@ -108,13 +109,16 @@ class AssetManager implements LoggerAwareInterface
 
     protected function minify(string $extension, string $content) : string
     {
-        switch ($extension) {
-            case "js":
-                return Filter\JSMin::minify($content);
-            case "css":
-                return Filter\CssMin::minify($content);
-            default:
-                return $content;
+        try {
+            switch ($extension) {
+                case "js":
+                    return Filter\JSMin::minify($content);
+                case "css":
+                    return Filter\CssMin::minify($content);
+                default:
+            }
+        } catch (Throwable $t) {
+            return $content;
         }
     }
 
