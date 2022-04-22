@@ -7,6 +7,7 @@ use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpForbiddenException;
 use Slim\Psr7\Response;
 use Slim\Routing\RouteContext;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
