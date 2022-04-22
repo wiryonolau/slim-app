@@ -34,11 +34,11 @@ class CsrfMiddleware extends AbstractMiddleware
         if (in_array($request->getMethod(), ["GET", "HEAD", "OPTIONS"])) {
             // get, head, options method is forbidden to have csrf header value
             if ($request->hasHeader(self::CSRF_HEADER)) {
-                throw new HttpForbiddenException("Invalid Request");
+                throw new HttpForbiddenException($request, "Invalid Request");
             }
             // get, head, options method is forbidden to have csrf value in query
             if (!empty($request->getQueryParams()[$this->field_name])) {
-                throw new HttpForbiddenException("Invalid Request");
+                throw new HttpForbiddenException($request, "Invalid Request");
             }
             return $handler->handle($request);
         }
