@@ -7,6 +7,7 @@ use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpNotFoundException;
+use Slim\Exception\HttpForbiddenException;
 use Slim\Psr7\Response;
 use Slim\Routing\RouteContext;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
@@ -33,11 +34,11 @@ class CsrfMiddleware extends AbstractMiddleware
         if (in_array($request->getMethod(), ["GET", "HEAD", "OPTIONS"])) {
             // get, head, options method is forbidden to have csrf header value
             if ($request->hasHeader(self::CSRF_HEADER)) {
-                throw new HttpForbiddenException("Invalid Request");
+                throw new HttpForbiddenException($request, "Invalid Request");
             }
             // get, head, options method is forbidden to have csrf value in query
             if (!empty($request->getQueryParams()[$this->field_name])) {
-                throw new HttpForbiddenException("Invalid Request");
+                throw new HttpForbiddenException($request, "Invalid Request");
             }
             return $handler->handle($request);
         }
