@@ -328,7 +328,7 @@ class Application
     {
         $path = $route["route"];
         $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
-        $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
+        $middleware = (empty($route["middleware"]) ? null : $route["middleware"]);
         $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
 
         if (count($child_routes)) {
@@ -348,7 +348,7 @@ class Application
         $path = $route["route"];
         $redirect = $route["options"]["redirect"];
         $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
-
+        $middleware = (empty($route["middleware"]) ? null : $route["middleware"]);
         $child_routes = (empty($route["child_routes"]) ? [] : $route["child_routes"]);
 
         // Same as get
@@ -393,7 +393,7 @@ class Application
         $path = $route["route"];
         $action = $route["options"]["action"];
         $arguments = (empty($route["options"]["arguments"]) ? [] : $route["options"]["arguments"]);
-        $middleware = (empty($route["options"]["middleware"]) ? null : $route["options"]["middleware"]);
+        $middleware = (empty($route["middleware"]) ? null : $route["middleware"]);
 
         if (!$application->getContainer()->has($action)) {
             throw new \Exception("Action $action  not exist");
