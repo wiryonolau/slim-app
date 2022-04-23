@@ -32,7 +32,7 @@ class Application
     protected $application = null;
 
     protected $errorRenderer = [];
-    protected $errorHandlers = null;
+    protected $errorHandler = null;
     protected $error_options = [true, true, true , null];
 
     protected $log_level = LaminasLog\Logger::INFO;
