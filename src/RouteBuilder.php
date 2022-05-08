@@ -7,7 +7,7 @@ use Slim\Interfaces\RouteCollectorInterface;
 
 class RouteBuilder
 {
-    public function addRoute(
+    public static function addRoute(
         &$routeCollector,
         ?string $namespace = null,
         array $routes = []
@@ -195,7 +195,7 @@ class RouteBuilder
         );
     }
 
-    private function addMiddleware(&$route, $container, array $middlewares = [])
+    private static function addMiddleware(&$route, $container, array $middlewares = [])
     {
         foreach ($middlewares as $middleware) {
             $middleware = $container->get($middleware);
