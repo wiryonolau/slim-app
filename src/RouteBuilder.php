@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Itseasy;
 
 use Slim\Interfaces\RouteCollectorInterface;
+use Exception;
 
 class RouteBuilder
 {

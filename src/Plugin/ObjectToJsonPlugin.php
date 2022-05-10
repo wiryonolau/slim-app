@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Itseasy\Plugin;
 
+use Exception;
+
 class ObjectToJsonPlugin implements PluginInterface
 {
     public static $name = "objectToJson";

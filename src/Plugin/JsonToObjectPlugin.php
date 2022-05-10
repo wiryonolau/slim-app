@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Itseasy\Plugin;
 
 use Laminas\Stdlib\ArraySerializableInterface;
+use Exception;
 
 class JsonToObjectPlugin implements PluginInterface
 {
