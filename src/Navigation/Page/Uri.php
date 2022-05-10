@@ -32,12 +32,16 @@ class Uri extends AbstractPage
     {
         $uri = $this->getUri();
 
+        if (!empty($this->getCustomProperties()["query"])) {
+            $uri = $uri .'?'. http_build_query($this->getCustomProperties()["query"]);
+        }
+
         $fragment = $this->getFragment();
         if (null !== $fragment) {
             if ('#' == substr($uri, -1)) {
-                return $uri . $fragment;
+                $uri = $uri . $fragment;
             } else {
-                return $uri . '#' . $fragment;
+                $uri = $uri . '#' . $fragment;
             }
         }
 
