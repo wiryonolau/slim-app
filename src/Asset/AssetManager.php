@@ -4,6 +4,7 @@ declare(strict_types = 1);
 namespace Itseasy\Asset;
 
 use Exception;
+use Throwable;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerAwareTrait;
 use Psr\SimpleCache\CacheInterface;
