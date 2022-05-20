@@ -98,7 +98,11 @@ class AssetManager implements LoggerAwareInterface
         }
 
         if (!is_null($pattern) and preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
-            $content = $this->minify($extension, $content);
+            try {
+                $content = $this->minify($extension, $content);
+            } catch (Throwable $t) {
+                $this->logger->debug(sprintf("Minify {} failed", $file_path));
+            }
         }
 
         $name = $this->hashName($file_path);
