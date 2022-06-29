@@ -48,6 +48,13 @@ composer-update:
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
     composer composer update -v --no-plugins --no-scripts --prefer-dist
+composer-require:
+	docker run --rm -it \
+        -v $$(pwd):/srv/$$(basename "`pwd`") \
+        -w /srv/$$(basename "`pwd`") \
+        -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
+        --user $$(id -u):$$(id -g) \
+    composer composer require -v --no-plugins --no-scripts --prefer-dist $(filter-out $@,$(MAKECMDGOALS))
 composer:
 	docker run --rm -it \
         -v $$(pwd):/srv/$$(basename "`pwd`") \

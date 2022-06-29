@@ -13,3 +13,5 @@ composer.lock
 *.zip
 vendor
 .phpunit*
+*.local
+*.local.*

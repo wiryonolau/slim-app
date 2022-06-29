@@ -7,7 +7,7 @@
     ],
     "config": {
         "platform" : {
-            "php": "7.4.27",
+            "php": "7.4.28",
             "ext-gd" : "1",
             "ext-intl" : "1",
             "ext-sockets": "1"
@@ -30,7 +30,8 @@
         "laminas/laminas-serializer": "^2.10",
         "laminas/laminas-log": "^2.13",
         "scssphp/scssphp": "^1.6",
-        "laminas/laminas-cache": "^2.13"
+        "laminas/laminas-cache": "^2.13",
+        "laminas/laminas-servicemanager": "^3.11"
     },
     "autoload" : {
         "psr-4" : {
