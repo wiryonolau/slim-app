@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Itseasy\Guard;
 
+use Itseasy\Identity\IdentityProvider;
+
 class GuardOption
 {
-    protected $identity_provider = '';
-    protected $role_provider = '';
+    protected $identity_provider;
+    protected $role_provider;
     protected $login_route = '/';
     protected $default_role = 'guest';
     protected $use_redirect = true;
@@ -18,6 +20,8 @@ class GuardOption
     {
         if (!empty($config['identity_provider'])) {
             $this->identity_provider = $config['identity_provider'];
+        } else {
+            $this->identity_provider = IdentityProvider::class;
         }
 
         if (!empty($config['login_route'])) {
@@ -55,12 +59,12 @@ class GuardOption
         return $this->use_redirect;
     }
 
-    public function getIdentityProvider(): string
+    public function getIdentityProvider(): ?string
     {
         return $this->identity_provider;
     }
 
-    public function getRoleProvider(): string
+    public function getRoleProvider(): ?string
     {
         return $this->role_provider;
     }

@@ -1,15 +1,16 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Guard\Factory;
 
-use Psr\Container\ContainerInterface;
 use Itseasy\Guard\GuardOption;
 use Itseasy\Guard\RouteGuard;
+use Psr\Container\ContainerInterface;
 
 class RouteGuardFactory
 {
-    public function __invoke(ContainerInterface $container) : RouteGuard
+    public function __invoke(ContainerInterface $container): RouteGuard
     {
         $guardOption = $container->get(GuardOption::class);
 
