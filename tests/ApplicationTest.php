@@ -1,19 +1,20 @@
 <?php
+
 namespace Itseasy\Test;
 
-use PHPUnit\Framework\TestCase;
-use Itseasy\Application;
 use Exception;
+use Itseasy\Application;
+use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase
 {
     public function testDI()
     {
         $app = new Application([
-            "config_path" => [__DIR__."/config/*.config.php"],
-            "module" => [
-                ModuleTest\Module::class
-            ]
+            'config_path' => [__DIR__.'/config/*.config.php'],
+            'module' => [
+                ModuleTest\Module::class,
+            ],
         ]);
 
         $app->build();
@@ -28,8 +29,13 @@ final class ApplicationTest extends TestCase
                 $object = null;
             }
 
-
             $this->assertEquals(is_object($object), true);
         }
+
+        // Test abstract factories
+        $a = $app->getContainer()->get('yoyo');
+        $b = $app->getContainer()->get('yoyo');
+
+        $this->assertEquals($a, $b);
     }
 }

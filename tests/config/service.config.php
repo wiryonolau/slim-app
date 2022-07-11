@@ -5,10 +5,13 @@ namespace Itseasy\Test;
 use DI;
 
 return [
-    "service" => [
-        "factories" => [
+    'service' => [
+        'factories' => [
             Provider\IdentityProvider::class => DI\create(),
-            ModuleTest\Service\TestService::class => DI\create()
-        ]
+            ModuleTest\Service\TestService::class => DI\create(),
+        ],
+        'abstract_factories' => [
+            Service\TestAbstractFactory::class,
+        ],
     ],
 ];

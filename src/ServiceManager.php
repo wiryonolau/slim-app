@@ -5,6 +5,8 @@ namespace Itseasy;
 use DI\Container;
 use DI\ContainerBuilder;
 use Di\Definition\Helper\DefinitionHelper;
+use DI\NotFoundException;
+use Exception;
 use Itseasy\Action\AbstractAction;
 use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
@@ -13,13 +15,13 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
-use Exception;
 
 class ServiceManager extends Container
 {
     protected $config;
     protected $eventManager;
     protected $identityProvider;
+    protected $abstractFactories;
     protected $logger;
     protected $view;
 
@@ -28,7 +30,7 @@ class ServiceManager extends Container
         ?LoggerInterface $logger = null,
         ?EventManagerInterface $em = null,
         ?string $cache_path = null
-    ) : Container {
+    ): Container {
         $containerBuilder = new ContainerBuilder(self::class);
         if (!is_null($cache_path)) {
             $containerBuilder->enableCompiliation($cache_path);
@@ -44,14 +46,48 @@ class ServiceManager extends Container
         return $container;
     }
 
-    public function setConfig(Config $config) : void
+    public function get($name)
+    {
+        try {
+            return parent::get($name);
+        } catch (NotFoundException $e) {
+            // Try resolve in abstract factories
+            $this->resolveAbstractFactories($name);
+
+            return parent::get($name);
+        }
+    }
+
+    private function resolveAbstractFactories(string $name)
+    {
+        try {
+            foreach ($this->abstractFactories as $factory) {
+                try {
+                    // Call factory invoke
+                    $obj = $factory($this, $name);
+                    foreach (['setObjectLogger', 'setObjectEventManager'] as $dependency) {
+                        $obj = call_user_func_array([$this, $dependency], [$obj]);
+                    }
+                    // Lazy Register
+                    $this->set($name, $obj);
+                    break;
+                } catch (Exception $ex) {
+                    continue;
+                }
+            }
+        } catch (Exception $e) {
+            throw new NotFoundException("No entry or class found for '$name'");
+        }
+    }
+
+    public function setConfig(Config $config): void
     {
         $this->config = $config;
         $this->set('Config', $this->config);
         $this->set('config', $this->config);
     }
 
-    public function setLogger(?LoggerInterface $logger = null) : void
+    public function setLogger(?LoggerInterface $logger = null): void
     {
         if (is_null($logger)) {
             $logger = new Logger();
@@ -62,7 +98,7 @@ class ServiceManager extends Container
         $this->set('logger', $this->logger);
     }
 
-    public function setEventManager(?EventManagerInterface $em = null) : void
+    public function setEventManager(?EventManagerInterface $em = null): void
     {
         if (is_null($em)) {
             $em = new EventManager();
@@ -73,56 +109,68 @@ class ServiceManager extends Container
         $this->set('eventmanager', $this->eventManager);
     }
 
-    public function build() : void
+    public function build(): void
     {
         // Identity not initiate during build, retrieve the class name only
-        $identityProvider = $this->config->get("guard");
-        if (!empty($identityProvider["identity_provider"])) {
-            $this->identityProvider = $identityProvider["identity_provider"];
+        $identityProvider = $this->config->get('guard');
+        if (!empty($identityProvider['identity_provider'])) {
+            $this->identityProvider = $identityProvider['identity_provider'];
         }
 
+        $this->registerAbstractFactories();
         $this->registerService();
         $this->registerCommand();
         $this->registerHttpAction();
     }
 
-    private function registerService() : void
+    private function registerService(): void
     {
-        $service = $this->config->get("service", []);
-        $factories = (empty($service["factories"]) ? [] : $service["factories"]);
+        $service = $this->config->get('service', []);
+        $factories = (empty($service['factories']) ? [] : $service['factories']);
 
         foreach ($factories as $name => $factory) {
             $this->registerFactory($name, $factory, [
-                "setObjectLogger",
-                "setObjectEventManager"
+                'setObjectLogger',
+                'setObjectEventManager',
             ]);
         }
     }
 
-    private function registerCommand() : void
+    private function registerAbstractFactories(): void
     {
-        $console = $this->config->get("console", []);
-        $factories = (empty($console["factories"]) ? [] : $console["factories"]);
+        $service = $this->config->get('service', []);
+        $factories = (empty($service['abstract_factories']) ? [] : $service['abstract_factories']);
+        foreach ($factories as $key => $factory) {
+            if (is_string($factory) && class_exists($factory)) {
+                $this->abstractFactories[] = new $factory();
+            }
+        }
+    }
+
+    private function registerCommand(): void
+    {
+        $console = $this->config->get('console', []);
+        $factories = (empty($console['factories']) ? [] : $console['factories']);
 
         foreach ($factories as $name => $factory) {
             $this->registerFactory($name, $factory, [
-                "setObjectLogger",
-                "setObjectEventManager"
+                'setObjectLogger',
+                'setObjectEventManager',
             ]);
         }
     }
 
-    private function registerHttpAction() : void
+    private function registerHttpAction(): void
     {
-        $action = $this->config->get("action", []);
-        $factories = (empty($action["factories"]) ? [] : $action["factories"]);
+        $action = $this->config->get('action', []);
+        $factories = (empty($action['factories']) ? [] : $action['factories']);
 
         foreach ($factories as $name => $factory) {
             $this->registerFactory($name, $factory, [
-                "setObjectView",
-                "setObjectLogger",
-                "setObjectEventManager",
-                "setObjectIdentityProvider"
+                'setObjectView',
+                'setObjectLogger',
+                'setObjectEventManager',
+                'setObjectIdentityProvider',
             ]);
         }
     }
@@ -131,10 +179,10 @@ class ServiceManager extends Container
         string $name,
         $factory,
         array $dependencies = []
-    ) : void {
+    ): void {
         $factory = function () use ($name, $factory, $dependencies) {
             if ($factory instanceof DefinitionHelper) {
-                $obj = new $name;
+                $obj = new $name();
             } else {
                 $obj = new $factory();
                 // Invoke class
@@ -154,10 +202,10 @@ class ServiceManager extends Container
     {
         try {
             if ($obj instanceof AbstractAction) {
-                $view_config = $this->config->get("view");
-                $viewClass = $view_config["class"];
-                $rendererClass = $view_config["renderer"];
-                $default_layout = $view_config["default_layout"];
+                $view_config = $this->config->get('view');
+                $viewClass = $view_config['class'];
+                $rendererClass = $view_config['renderer'];
+                $default_layout = $view_config['default_layout'];
 
                 // View require to be a unique instance for each action
                 $view = new $viewClass();
@@ -166,8 +214,9 @@ class ServiceManager extends Container
                 $obj->setView($view);
             }
         } catch (Exception $e) {
-            $this->get("Logger")->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
+
         return $obj;
     }
 
@@ -175,11 +224,12 @@ class ServiceManager extends Container
     {
         try {
             if ($obj instanceof LoggerAwareInterface) {
-                $obj->setLogger($this->get("Logger"));
+                $obj->setLogger($this->get('Logger'));
             }
         } catch (Exception $e) {
-            $this->get("Logger")->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
+
         return $obj;
     }
 
@@ -195,8 +245,9 @@ class ServiceManager extends Container
                 $obj->setIdentityProvider($this->get($this->identityProvider));
             }
         } catch (Exception $e) {
-            $this->get("Logger")->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
+
         return $obj;
     }
 
@@ -204,11 +255,12 @@ class ServiceManager extends Container
     {
         try {
             if ($obj instanceof EventManagerAwareInterface) {
-                $obj->setEventManager($this->get("EventManager"));
+                $obj->setEventManager($this->get('EventManager'));
             }
         } catch (Exception $e) {
-            $this->get("Logger")->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
+
         return $obj;
     }
 }
