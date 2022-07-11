@@ -5,7 +5,7 @@ namespace Itseasy\Test\Service;
 use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 use Psr\Container\ContainerInterface;
 
-class TestAbstractFactory implements AbstractFactoryInterface
+class SimpleAbstractFactory implements AbstractFactoryInterface
 {
     protected $config;
 

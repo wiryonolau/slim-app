@@ -15,6 +15,7 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
+use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
 
 class ServiceManager extends Container
 {
@@ -60,23 +61,12 @@ class ServiceManager extends Container
 
     private function resolveAbstractFactories(string $name)
     {
-        try {
-            foreach ($this->abstractFactories as $factory) {
-                try {
-                    // Call factory invoke
-                    $obj = $factory($this, $name);
-                    foreach (['setObjectLogger', 'setObjectEventManager'] as $dependency) {
-                        $obj = call_user_func_array([$this, $dependency], [$obj]);
-                    }
-                    // Lazy Register
-                    $this->set($name, $obj);
-                    break;
-                } catch (Exception $ex) {
-                    continue;
-                }
-            }
-        } catch (Exception $e) {
-            throw new NotFoundException("No entry or class found for '$name'");
+        foreach ($this->abstractFactories as $factory) {
+            $this->registerFactory($name, $factory, [
+                        'setObjectLogger',
+                        'setObjectEventManager',
+                    ]);
+            break;
         }
     }
 
@@ -121,6 +111,7 @@ class ServiceManager extends Container
         $this->registerService();
         $this->registerCommand();
         $this->registerHttpAction();
+        $this->registerAliases();
     }
 
     private function registerService(): void
@@ -136,12 +127,24 @@ class ServiceManager extends Container
         }
     }
 
+    private function registerAliases(): void
+    {
+        $service = $this->config->get('service', []);
+        $aliases = (empty($service['aliases']) ? [] : $service['aliases']);
+
+        foreach ($aliases as $alias => $factory) {
+            // print_r(\DI\get($factory));
+            $this->set($alias, $this->get($factory));
+        }
+    }
+
     private function registerAbstractFactories(): void
     {
         $service = $this->config->get('service', []);
         $factories = (empty($service['abstract_factories']) ? [] : $service['abstract_factories']);
         foreach ($factories as $key => $factory) {
             if (is_string($factory) && class_exists($factory)) {
+                // Initiate abstract factories class here
                 $this->abstractFactories[] = new $factory();
             }
         }
@@ -181,12 +184,19 @@ class ServiceManager extends Container
         array $dependencies = []
     ): void {
         $factory = function () use ($name, $factory, $dependencies) {
-            if ($factory instanceof DefinitionHelper) {
-                $obj = new $name();
-            } else {
-                $obj = new $factory();
-                // Invoke class
-                $obj = $obj($this);
+            try {
+                if ($factory instanceof DefinitionHelper) {
+                    $obj = new $name();
+                } elseif ($factory instanceof AbstractFactoryInterface) {
+                    // Factory already initiate, call __invoke directly
+                    $obj = call_user_func_array($factory, [$this, $name]);
+                } else {
+                    $obj = new $factory();
+                    // Invoke class
+                    $obj = $obj($this);
+                }
+            } catch (Exception $ex) {
+                throw new NotFoundException("No entry or class found for '$name'");
             }
 
             foreach ($dependencies as $dependency) {

@@ -11,7 +11,10 @@ return [
             ModuleTest\Service\TestService::class => DI\create(),
         ],
         'abstract_factories' => [
-            Service\TestAbstractFactory::class,
+            Service\SimpleAbstractFactory::class,
+        ],
+        'aliases' => [
+            'testalias' => Provider\IdentityProvider::class,
         ],
     ],
 ];

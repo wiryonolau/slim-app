@@ -35,7 +35,8 @@ final class ApplicationTest extends TestCase
         // Test abstract factories
         $a = $app->getContainer()->get('yoyo');
         $b = $app->getContainer()->get('yoyo');
-
         $this->assertEquals($a, $b);
+
+        $this->assertEquals($app->getContainer()->get('testalias') instanceof  Provider\IdentityProvider, true);
     }
 }
