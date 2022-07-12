@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Http;
 
@@ -11,12 +12,14 @@ use Slim\Psr7\Response;
 
 class HttpExceptionMiddleware extends AbstractMiddleware
 {
+    protected $view;
+
     public function __construct($view)
     {
         $this->view = $view;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response
+    public function __invoke(Request $request, RequestHandler $handler): Response
     {
         try {
             return $handler->handle($request);
@@ -26,11 +29,12 @@ class HttpExceptionMiddleware extends AbstractMiddleware
             $response = new Response();
 
             $code = $httpException->getCode();
-            $template = sprintf("/error/%d", $code);
+            $template = sprintf('/error/%d', $code);
 
             $variables = [
-                "code" => $httpException->getCode()
+                'code' => $httpException->getCode(),
             ];
+
             return $this->view->render($response, $template, $variables);
         }
     }

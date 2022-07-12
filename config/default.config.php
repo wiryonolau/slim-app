@@ -3,8 +3,8 @@
 namespace Itseasy;
 
 return [
-    "service" => [
-        "factories" => [
+    'service' => [
+        'factories' => [
             Asset\AssetManager::class => Asset\Factory\AssetManagerFactory::class,
             Asset\AssetMiddleware::class => Asset\Factory\AssetMiddlewareFactory::class,
             Csrf\CsrfMiddleware::class => Csrf\Factory\CsrfMiddlewareFactory::class,
@@ -20,80 +20,80 @@ return [
             Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
             Translator::class => Translator\Factory\TranslatorFactory::class,
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
-        ]
+        ],
     ],
-    "event" => [
-        "listener_aggregate" => [
-        ]
+    'event' => [
+        'listener_aggregate' => [
+        ],
     ],
-    "session" => [
+    'session' => [
         'class' => Session::class,
         'options' => [
             'cache_expire' => 0,
-            'cookie_samesite' => 'lax'
+            'cookie_samesite' => 'lax',
         ],
         'csrf_field_name' => '_csrf',
-        'csrf_token_id' => 'app'
+        'csrf_token_id' => 'app',
     ],
-    "translator" => [
+    'translator' => [
     ],
-    "asset" => [
-        "resolver_configs" => [
-            "paths" => [
-            ]
+    'asset' => [
+        'resolver_configs' => [
+            'paths' => [
+            ],
         ],
-        "caching" => [
-            "class" => "",
-            "namespace" => "asset",
-            "ttl" => 3600,
-            "path" => ""
-        ]
-    ],
-    "navigation" => [
-        "default" => []
-    ],
-    "guard" => [
-        "identity_provider" => "",
-        "login_route" => "",
-        "use_redirect" => true,
-        "authorization" => [
-            "default_role" => "guest",
-            "whitelist" => [],
-            "role_provider" => "",
-            "roles" => []
+        'caching' => [
+            'class' => '',
+            'namespace' => 'asset',
+            'ttl' => 3600,
+            'path' => '',
         ],
     ],
-    "view" => [
-        "class" => View\View::class,
-        "renderer" => View\Renderer\PhpRenderer::class,
-        "default_layout" => "layout/layout",
-        "error_layout" => "layout/error",
-        "default_template_suffix" => "phtml",
-        "template_path" => __DIR__."/../view"
+    'navigation' => [
+        'default' => [],
     ],
-    "view_helpers" => [
-        "aliases" => [
-            "url" => View\Helper\UrlHelper::class,
-            "flash" => View\Helper\FlashMessageHelper::class,
-            "csrf" => Csrf\View\Helper\CsrfTokenHelper::class,
-            "_" => Translator\View\Helper\TranslateViewHelper::class,
-            "translate" => Translator\View\Helper\TranslateViewHelper::class,
-            "translatePlural" => Translator\View\Helper\TranslatePluralViewHelper::class
+    'guard' => [
+        'identity_provider' => '',
+        'login_route' => '',
+        'use_redirect' => true,
+        'authorization' => [
+            'default_role' => 'guest',
+            'whitelist' => [],
+            'role_provider' => '',
+            'roles' => [],
         ],
-        "factories" => [
+    ],
+    'view' => [
+        'class' => View\View::class,
+        'renderer' => View\Renderer\PhpRenderer::class,
+        'default_layout' => 'layout/layout',
+        'error_layout' => 'layout/error',
+        'default_template_suffix' => 'phtml',
+        'template_path' => __DIR__.'/../view',
+    ],
+    'view_helpers' => [
+        'aliases' => [
+            'url' => View\Helper\UrlHelper::class,
+            'flash' => View\Helper\FlashMessageHelper::class,
+            'csrf' => Csrf\View\Helper\CsrfTokenHelper::class,
+            '_' => Translator\View\Helper\TranslateViewHelper::class,
+            'translate' => Translator\View\Helper\TranslateViewHelper::class,
+            'translatePlural' => Translator\View\Helper\TranslatePluralViewHelper::class,
+        ],
+        'factories' => [
             View\Helper\FlashMessageHelper::class => View\Helper\Factory\FlashMessageHelperFactory::class,
             View\Helper\UrlHelper::class => View\Helper\Factory\UrlHelperFactory::class,
             Csrf\View\Helper\CsrfTokenHelper::class => Csrf\View\Helper\Factory\CsrfTokenHelperFactory::class,
             Translator\View\Helper\TranslateViewHelper::class => Translator\View\Helper\Factory\TranslateViewHelperFactory::class,
-            Translator\View\Helper\TranslatePluralViewHelper::class => Translator\View\Helper\Factory\TranslatePluralViewHelperFactory::class
-        ]
+            Translator\View\Helper\TranslatePluralViewHelper::class => Translator\View\Helper\Factory\TranslatePluralViewHelperFactory::class,
+        ],
     ],
-    "console" => [
-        "commands" => [
+    'console' => [
+        'commands' => [
             Asset\Console\Command\AssetCommand::class,
         ],
-        "factories" => [
+        'factories' => [
             Asset\Console\Command\AssetCommand::class => Asset\Console\Command\Factory\AssetCommandFactory::class,
-        ]
-    ]
+        ],
+    ],
 ];

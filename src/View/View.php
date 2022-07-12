@@ -1,82 +1,99 @@
 <?php
-declare(strict_types = 1);
 
 namespace Itseasy\View;
 
-use Laminas\Stdlib\ArrayUtils;
+use Laminas\View\Model\ViewModel as LaminasViewModel;
+use Laminas\View\View as LaminasViewView;
+use Laminas\View\ViewEvent as LaminasViewEvent;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class View implements ViewInterface
 {
+    protected $view;
     protected $renderer;
-    protected $scripts = [];
-    protected $variables = [];
 
-    public function setRenderer($renderer) : void
+    public function __construct()
     {
-        $this->renderer = $renderer;
+        $this->view = new LaminasViewView();
     }
 
     // Call registered ViewHelper in the renderer
     public function __call($function, $args)
     {
-        return call_user_func_array([$this->renderer, $function], $args);
+        $helper = $this->renderer->getHelperPluginManager();
+        $function = $helper->get($function);
+
+        return call_user_func_array($function, $args);
     }
 
-    public function setLayout(string $layout) : void
+    public function setRenderer($renderer)
     {
-        $this->renderer->setLayout($layout);
-    }
-
-    public function setVariable($key, $value, $for_layout = false) : void
-    {
-        if ($for_layout) {
-            if (!isset($this->variables["layout"])) {
-                $this->variables["layout"] = [];
+        $this->renderer = $renderer;
+        $this->view->getEventManager()->attach(
+            LaminasViewEvent::EVENT_RENDERER,
+            static function () use ($renderer) {
+                return $renderer;
             }
-            $this->variables["layout"][$key] = $value;
-        } else {
-            $this->variables[$key] = $value;
-        }
+        );
     }
 
-    public function appendScript($type, $path, array $options = []) : void
+    public function setLayout(string $layout): void
     {
-        if (in_array($type, ["js", "css"])) {
-            $path = ltrim($path, "/");
-
-            $script = new \StdClass();
-            $script->type = $type;
-            $script->path = sprintf("/%s", $path);
-            $script->options = $options;
-            $this->scripts[] = $script;
-        }
+        $this->layout = $layout;
     }
 
-    public function appendScripts(array $scripts = []) : void
+    public function render(Response $response, string $template, array $variables = [], string $layout = ''): Response
     {
-        foreach ($scripts as $script) {
-            if (count($script) == 2) {
-                list($type, $path) = $script;
-                $options = [];
-            } elseif (count($script) == 3) {
-                list($type, $path, $options) = $script;
-            } else {
-                continue;
-            }
-            $this->appendScript($type, $path, $options);
-        }
+        $layoutvars = (empty($variables['layout']) ? [] : $variables['layout']);
+        $variables = array_diff_key($variables, ['layout' => ['header' => []]]);
+
+        $viewModel = new LaminasViewModel();
+        $viewModel->setTemplate($template);
+        $viewModel->setVariables($variables);
+
+        $layout = $layout ?: $this->layout;
+        $layoutModel = new LaminasViewModel();
+        $layoutModel->setTemplate($layout);
+        $layoutModel->setVariables($layoutvars);
+
+        $layoutModel->setOption('has_parent', true);
+        $layoutModel->addChild($viewModel);
+
+        $response->getBody()->write($this->view->render($layoutModel));
+
+        return $response;
     }
 
-    public function render(Response $response, string $template, array $variables = [], string $layout = "") : Response
+    public function renderJson(Response $response, array $variables = [], ?int $id = null): Response
     {
-        $variables = ArrayUtils::merge($this->variables, $variables);
+        $jsonModel = new LaminasViewModel();
+        $jsonModel->setTemplate('layout/json');
+        $jsonModel->setOption('has_parent', true);
 
-        if (empty($variables["layout"])) {
-            $variables["layout"] = [];
+        try {
+            $variables = [
+                'content' => json_encode([
+                    'jsonrpc' => '2.0',
+                    'id' => (is_null($id) ? time() : $id),
+                    'result' => $variables,
+                ]),
+            ];
+        } catch (Exception $e) {
+            $variables = [
+                'content' => json_encode([
+                    'jsonrpc' => '2.0',
+                    'id' => (is_null($id) ? time() : $id),
+                    'error' => [
+                        'code' => -32603,
+                        'message' => $e->getMessage(),
+                    ],
+                ]),
+            ];
         }
-        $variables["layout"]["scripts"] = $this->scripts;
 
-        return $this->renderer->render($response, $template, $variables);
+        $jsonModel->setVariables($variables);
+        $response->getBody()->write($this->view->render($jsonModel));
+
+        return $response->withHeader('Content-type', 'application/json');
     }
 }

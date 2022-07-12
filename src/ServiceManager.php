@@ -195,6 +195,7 @@ class ServiceManager extends Container
                     $obj = new $name();
                 } else {
                     $obj = new $factory();
+
                     // PHP allow to pass argument more then what is required
                     // PHP-DI only require ContainerInterface
                     // Laminas library require ContainreInterface and requestedName
@@ -202,7 +203,7 @@ class ServiceManager extends Container
                 }
             } catch (Exception $ex) {
                 debug($ex->getMessage());
-                throw new NotFoundException("No entry or class found for '$name'");
+                throw new NotFoundException("Factory No entry or class found for '$name'");
             }
 
             foreach ($dependencies as $dependency) {

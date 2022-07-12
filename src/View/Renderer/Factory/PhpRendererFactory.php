@@ -1,42 +1,44 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\View\Renderer\Factory;
 
+use Laminas\Stdlib\ArrayUtils;
+use Laminas\View\HelperPluginManager;
+use Laminas\View\Renderer\PhpRenderer;
+use Laminas\View\Resolver\TemplatePathStack;
 use Psr\Container\ContainerInterface;
-use Itseasy\View\Renderer\PhpRenderer;
-use DI;
 
 class PhpRendererFactory
 {
-    public function __invoke(ContainerInterface $container) : PhpRenderer
+    public function __invoke(ContainerInterface $container)
     {
-        $config = $container->get("Config")->getConfig();
-        $viewConfig = $config["view"];
-        $viewHelperConfig = $config["view_helpers"];
+        $config = $container->get('Config')->getConfig();
+        $viewConfig = $config['view'];
+        $viewHelperConfig = $config['view_helpers'];
 
-        $template_path = $viewConfig["template_path"];
-
-        $renderer = new PhpRenderer($template_path);
-        $renderer->setLayout($viewConfig["default_layout"]);
-        $renderer->setTemplateSuffix($viewConfig["default_template_suffix"]);
-
-        if (!empty($viewHelperConfig["factories"])) {
-            foreach ($viewHelperConfig["factories"] as $view => $factory) {
-                if (is_object($factory)) {
-                    $container->set($view, $factory);
-                } else {
-                    $container->set($view, DI\factory($factory));
-                }
-            }
+        // alias for first letter capital to overwrite laminas default helper
+        foreach ($viewHelperConfig['aliases'] as $alias => $helper) {
+            $viewHelperConfig['aliases'][ucfirst($alias)] = $helper;
         }
 
-        if (!empty($viewHelperConfig["aliases"])) {
-            foreach ($viewHelperConfig["aliases"] as $alias => $helper) {
-                $helper = $container->get($helper);
-                $renderer->addViewHelper($helper, $alias);
-            }
-        }
+        $templateResolver = new TemplatePathStack([
+            'script_paths' => [$viewConfig['template_path']],
+            'default_suffix' => $viewConfig['default_template_suffix'],
+        ]);
+
+        // Create the renderer
+        $renderer = new PhpRenderer();
+        $renderer->setResolver($templateResolver);
+
+        $helper_config = [];
+
+        // Merge laminas helper with our own helper
+        $helper_config = ArrayUtils::merge($helper_config, $viewHelperConfig);
+        $pluginManager = new HelperPluginManager($container, $helper_config);
+
+        $renderer->setHelperPluginManager($pluginManager);
 
         return $renderer;
     }
