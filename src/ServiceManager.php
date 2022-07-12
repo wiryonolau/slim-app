@@ -15,7 +15,7 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
-use Laminas\ServiceManager\Factory\AbstractFactoryInterface;
+use Psr\Container\ContainerInterface;
 
 class ServiceManager extends Container
 {
@@ -108,10 +108,10 @@ class ServiceManager extends Container
         }
 
         $this->registerAbstractFactories();
+        $this->registerAliases();
         $this->registerService();
         $this->registerCommand();
         $this->registerHttpAction();
-        $this->registerAliases();
     }
 
     private function registerService(): void
@@ -133,8 +133,7 @@ class ServiceManager extends Container
         $aliases = (empty($service['aliases']) ? [] : $service['aliases']);
 
         foreach ($aliases as $alias => $factory) {
-            // print_r(\DI\get($factory));
-            $this->set($alias, $this->get($factory));
+            $this->set($alias, \DI\get($factory));
         }
     }
 
@@ -142,11 +141,18 @@ class ServiceManager extends Container
     {
         $service = $this->config->get('service', []);
         $factories = (empty($service['abstract_factories']) ? [] : $service['abstract_factories']);
+
         foreach ($factories as $key => $factory) {
             if (is_string($factory) && class_exists($factory)) {
                 // Initiate abstract factories class here
-                $this->abstractFactories[] = new $factory();
+                $this->abstractFactories[md5($factory)] = $factory;
             }
+
+            if (!$factory instanceof AbstractFactoryInterface) {
+                continue;
+            }
+
+            $this->abstractFactories[spl_object_hash($factory)] = $factory;
         }
     }
 
@@ -183,19 +189,19 @@ class ServiceManager extends Container
         $factory,
         array $dependencies = []
     ): void {
-        $factory = function () use ($name, $factory, $dependencies) {
+        $factory = function (ContainerInterface $container) use ($name, $factory, $dependencies) {
             try {
                 if ($factory instanceof DefinitionHelper) {
                     $obj = new $name();
-                } elseif ($factory instanceof AbstractFactoryInterface) {
-                    // Factory already initiate, call __invoke directly
-                    $obj = call_user_func_array($factory, [$this, $name]);
                 } else {
                     $obj = new $factory();
-                    // Invoke class
-                    $obj = $obj($this);
+                    // PHP allow to pass argument more then what is required
+                    // PHP-DI only require ContainerInterface
+                    // Laminas library require ContainreInterface and requestedName
+                    $obj = $obj($container, $name);
                 }
             } catch (Exception $ex) {
+                debug($ex->getMessage());
                 throw new NotFoundException("No entry or class found for '$name'");
             }
 
@@ -205,6 +211,7 @@ class ServiceManager extends Container
 
             return $obj;
         };
+
         $this->set($name, \DI\factory($factory));
     }
 

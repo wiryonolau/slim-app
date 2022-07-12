@@ -14,6 +14,7 @@ final class ApplicationTest extends TestCase
             'config_path' => [__DIR__.'/config/*.config.php'],
             'module' => [
                 ModuleTest\Module::class,
+                // \Laminas\Form\Module::class,
             ],
         ]);
 
