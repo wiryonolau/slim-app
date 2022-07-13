@@ -14,6 +14,7 @@ final class ApplicationTest extends TestCase
             'module' => [
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,
+                \Laminas\Cache\Module::class,
             ],
         ]);
 

@@ -52,7 +52,7 @@ class ServiceManager extends Container
         try {
             return parent::get($name);
         } catch (NotFoundException $e) {
-            // Try resolve in abstract factories
+            // Try resolve in abstract factories once
             $this->resolveAbstractFactories($name);
 
             return parent::get($name);
