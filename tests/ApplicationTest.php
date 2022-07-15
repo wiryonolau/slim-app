@@ -10,6 +10,12 @@ use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase
 {
+    // Dont test php8 libs on php7
+    const PHP8_LIBS = [
+        'Laminas\Form\Annotation\AttributeBuilder',
+        'FormAttributeBuilder',
+    ];
+
     public function testDIContainer()
     {
         $app = new Application([
@@ -22,16 +28,11 @@ final class ApplicationTest extends TestCase
             'container_provider' => DIContainer::class,
         ]);
 
-        $skip_php8 = [
-            'Laminas\Form\Annotation\AttributeBuilder',
-            'FormAttributeBuilder',
-        ];
-
         $app->build();
 
         $entries = $app->getContainer()->getKnownEntryNames();
         foreach ($entries as $entry) {
-            if (in_array($entry, $skip_php8)) {
+            if (PHP_MAJOR_VERSION < 8 and in_array($entry, self::PHP8_LIBS)) {
                 continue;
             }
 
@@ -67,11 +68,6 @@ final class ApplicationTest extends TestCase
             'container_provider' => LaminasContainer::class,
         ]);
 
-        $skip_php8 = [
-            'Laminas\Form\Annotation\AttributeBuilder',
-            'FormAttributeBuilder',
-        ];
-
         $app->build();
 
         $entries = array_merge(
@@ -80,10 +76,8 @@ final class ApplicationTest extends TestCase
             array_keys($app->getConfig()['view_helpers']['factories']),
         );
 
-        debug($entries);
-
         foreach ($entries as $entry) {
-            if (in_array($entry, $skip_php8)) {
+            if (PHP_MAJOR_VERSION < 8 and in_array($entry, self::PHP8_LIBS)) {
                 continue;
             }
 

@@ -228,7 +228,7 @@ class DIContainer extends Container
             return $obj;
         };
 
-        $this->set($name, \DI\factory($factory));
+        $this->set($name, $factory);
     }
 
     private function setObjectView($obj)
