@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Itseasy;
 
+use DI\Container;
+use Exception;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log as LaminasLog;
 use Laminas\Log\LoggerInterface;
+use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
@@ -25,6 +28,7 @@ class Application
     protected $container = null;
     protected $logger = null;
     protected $eventManager = null;
+    protected $containerProvider = DIContainer::class;
     protected $application = null;
 
     protected $errorRenderer = [];
@@ -73,6 +77,9 @@ class Application
                 case 'module':
                     $this->setModule($value);
                     break;
+                case 'container_provider':
+                    $this->setContainerProvider($value);
+                    break;
                 default:
             }
         }
@@ -89,6 +96,16 @@ class Application
         } else {
             $this->options['config_path'][] = $path;
         }
+
+        return $this;
+    }
+
+    public function setContainerProvider(string $containerProvider = DIContainer::class)
+    {
+        if (!in_array($containerProvider, [DIContainer::class, LaminasContainer::class])) {
+            throw new Exception('Invalid container provider given');
+        }
+        $this->containerProvider = $containerProvider;
 
         return $this;
     }
@@ -233,7 +250,7 @@ class Application
         }
 
         // Migrate to laminas servicemanager later when servicemanager implement PSR-11
-        $this->container = ServiceManager::factory(
+        $this->container = $this->containerProvider::factory(
             $this->config,
             $this->logger,
             $this->eventManager,
@@ -248,8 +265,14 @@ class Application
             // Iterable complete route collection for http
             $routeCollection = new RouteCollection($this->application);
             $routeCollection->lock();
-            $this->container->set('applicationroute', $routeCollection);
-            $this->container->set('ApplicationRoute', $routeCollection);
+
+            if ($this->container instanceof Container) {
+                $this->container->set('applicationroute', $routeCollection);
+                $this->container->set('ApplicationRoute', $routeCollection);
+            } elseif ($this->container instanceof ServiceManager) {
+                $this->container->setService('applicationroute', $routeCollection);
+                $this->container->setService('ApplicationRoute', $routeCollection);
+            }
         } elseif ($this->options['application_type'] == self::APP_CONSOLE) {
             $this->application = new ConsoleApplication(
                 $this->options['console']['name'],

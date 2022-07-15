@@ -1,10 +1,10 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Guard;
 
 use Closure;
-use Itseasy\Guard\RouteGuard;
 use Itseasy\Middleware\AbstractMiddleware;
 use Itseasy\View\Helper\UrlHelper;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -12,7 +12,6 @@ use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpForbiddenException;
 use Slim\Exception\HttpNotFoundException;
 use Slim\Psr7\Response;
-use Slim\Routing\RouteContext;
 
 class RouteGuardMiddleware extends AbstractMiddleware
 {
@@ -25,7 +24,7 @@ class RouteGuardMiddleware extends AbstractMiddleware
         $this->urlHelper = $urlHelper;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response
+    public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $route = $this->getRoute($request);
 
@@ -47,44 +46,46 @@ class RouteGuardMiddleware extends AbstractMiddleware
 
         if ($has_identity == false and $allow_access == false) {
             $this->logger->debug(
-                vsprintf("Forbidden access %s %s, Has Identity : %s, Has Access : %s", [
+                vsprintf('Forbidden access %s %s, Has Identity : %s, Has Access : %s', [
                     $method,
                     $request->getRequestTarget(),
-                    ($has_identity ? "true" : "false"),
-                    ($allow_access ? "true" : "false")
+                    ($has_identity ? 'true' : 'false'),
+                    ($allow_access ? 'true' : 'false'),
                 ])
             );
 
             $query = $this->getRedirectQuery($request->getRequestTarget());
             $login_url = call_user_func_array($this->urlHelper, [$this->routeGuard->getOptions()->getLoginRoute(), $query]);
             $response = new Response();
-            return $response->withHeader("Location", $login_url);
+
+            return $response->withHeader('Location', $login_url);
         }
 
         if ($has_identity == true and $allow_access == false) {
-            throw new HttpForbiddenException($request, "Unauthorized Access");
+            throw new HttpForbiddenException($request, 'Unauthorized Access');
         }
 
         return $handler->handle($request);
     }
 
-    public function getRouteGuard() : RouteGuardInterface
+    public function getRouteGuard(): RouteGuardInterface
     {
         return $this->routeGuard;
     }
 
-    private function getRedirectQuery(string $target) : array {
+    private function getRedirectQuery(string $target): array
+    {
         $target = trim($target);
 
         if (!$this->routeGuard->getOptions()->useRedirect()) {
             return [];
         }
 
-        if ($target == "" ) {
+        if ($target == '') {
             return [];
         }
 
-        if ($target == "/") {
+        if ($target == '/') {
             return [];
         }
 
@@ -93,7 +94,7 @@ class RouteGuardMiddleware extends AbstractMiddleware
         }
 
         return [
-            "redirect" => base64_encode($target)
+            'redirect' => base64_encode($target),
         ];
     }
 }

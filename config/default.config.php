@@ -2,6 +2,8 @@
 
 namespace Itseasy;
 
+use Laminas\ServiceManager\Factory\InvokableFactory;
+
 return [
     'service' => [
         'factories' => [
@@ -20,6 +22,7 @@ return [
             Session\SessionMiddleware::class => Session\Factory\SessionMiddlewareFactory::class,
             Translator::class => Translator\Factory\TranslatorFactory::class,
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
+            Identity\Identity::class => InvokableFactory::class,
         ],
     ],
     'event' => [
@@ -53,8 +56,8 @@ return [
         'default' => [],
     ],
     'guard' => [
-        'identity_provider' => '',
-        'login_route' => '',
+        'identity_provider' => Identity\Identity::class,
+        'login_route' => Guard\ArrayRoleProvider::class,
         'use_redirect' => true,
         'authorization' => [
             'default_role' => 'guest',

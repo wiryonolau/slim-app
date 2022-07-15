@@ -17,7 +17,7 @@ use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
 use Psr\Container\ContainerInterface;
 
-class ServiceManager extends Container
+class DIContainer extends Container
 {
     protected $config;
     protected $eventManager;
@@ -31,7 +31,7 @@ class ServiceManager extends Container
         ?LoggerInterface $logger = null,
         ?EventManagerInterface $em = null,
         ?string $cache_path = null
-    ): Container {
+    ): ContainerInterface {
         $containerBuilder = new ContainerBuilder(self::class);
         if (!is_null($cache_path)) {
             $containerBuilder->enableCompiliation($cache_path);
@@ -42,7 +42,7 @@ class ServiceManager extends Container
         $container->setLogger($logger);
         $container->setEventManager($em);
 
-        $container->build();
+        $container->init();
 
         return $container;
     }
@@ -99,7 +99,7 @@ class ServiceManager extends Container
         $this->set('eventmanager', $this->eventManager);
     }
 
-    public function build(): void
+    public function init(): void
     {
         // Identity not initiate during build, retrieve the class name only
         $identityProvider = $this->config->get('guard');
@@ -111,6 +111,7 @@ class ServiceManager extends Container
         $this->registerAliases();
         $this->registerService();
         $this->registerCommand();
+        $this->registerViewHelper();
         $this->registerHttpAction();
     }
 
@@ -118,6 +119,19 @@ class ServiceManager extends Container
     {
         $service = $this->config->get('service', []);
         $factories = (empty($service['factories']) ? [] : $service['factories']);
+
+        foreach ($factories as $name => $factory) {
+            $this->registerFactory($name, $factory, [
+                'setObjectLogger',
+                'setObjectEventManager',
+            ]);
+        }
+    }
+
+    private function registerViewHelper(): void
+    {
+        $view_helpers = $this->config->get('view_helpers', []);
+        $factories = (empty($view_helpers['factories']) ? [] : $view_helpers['factories']);
 
         foreach ($factories as $name => $factory) {
             $this->registerFactory($name, $factory, [
@@ -189,7 +203,7 @@ class ServiceManager extends Container
         $factory,
         array $dependencies = []
     ): void {
-        $factory = function (ContainerInterface $container) use ($name, $factory, $dependencies) {
+        $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
             try {
                 if ($factory instanceof DefinitionHelper) {
                     $obj = new $name();
@@ -199,7 +213,8 @@ class ServiceManager extends Container
                     // PHP allow to pass argument more then what is required
                     // PHP-DI only require ContainerInterface
                     // Laminas library require ContainreInterface and requestedName
-                    $obj = $obj($container, $name);
+                    // requestedName will always be DI\Definition\FactoryDefinition use name instead
+                    $obj = $obj($container, $name, $options);
                 }
             } catch (Exception $ex) {
                 debug($ex->getMessage());
