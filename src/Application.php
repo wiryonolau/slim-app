@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace Itseasy;
 
-use DI\Container;
 use Exception;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log as LaminasLog;
 use Laminas\Log\LoggerInterface;
-use Laminas\ServiceManager\ServiceManager;
 use Laminas\Stdlib\ArrayUtils;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface as PsrLoggerInterface;
@@ -28,7 +26,7 @@ class Application
     protected $container = null;
     protected $logger = null;
     protected $eventManager = null;
-    protected $containerProvider = DIContainer::class;
+    protected $containerProvider = ServiceManager\DIServiceManager::class;
     protected $application = null;
 
     protected $errorRenderer = [];
@@ -44,7 +42,7 @@ class Application
         'config_path' => [
             __DIR__.'/../config/*.config.php',
         ],
-        'container_cache_path' => null,
+        'container_provider' => ServiceManager\DIServiceManager::class,
         'application_type' => 'http',
         'console' => [
             'name' => '',
@@ -58,9 +56,6 @@ class Application
             switch ($key) {
                 case 'config_path':
                     $this->setConfigPath($value);
-                    break;
-                case 'container_cache_path':
-                    $this->setContainerCachePath($value);
                     break;
                 case 'application_type':
                     $this->setApplicationType($value);
@@ -100,10 +95,13 @@ class Application
         return $this;
     }
 
-    public function setContainerProvider(string $containerProvider = DIContainer::class)
+    public function setContainerProvider(string $containerProvider = ServiceManager\DIServiceManager::class)
     {
-        if (!in_array($containerProvider, [DIContainer::class, LaminasContainer::class])) {
-            throw new Exception('Invalid container provider given');
+        if (!in_array($containerProvider, [
+            ServiceManager\DIServiceManager::class,
+            ServiceManager\LaminasServiceManager::class,
+            ])) {
+            throw new Exception(sprintf('%s Container provider not supported', $containerProvider));
         }
         $this->containerProvider = $containerProvider;
 
@@ -187,13 +185,6 @@ class Application
         return $this;
     }
 
-    public function setContainerCachePath(string $path): self
-    {
-        $this->options['container_cache_path'] = $path;
-
-        return $this;
-    }
-
     public function setApplicationType(string $type): self
     {
         if (in_array($type, [self::APP_CONSOLE, self::APP_HTTP])) {
@@ -249,12 +240,10 @@ class Application
             $this->buildLogger();
         }
 
-        // Migrate to laminas servicemanager later when servicemanager implement PSR-11
         $this->container = $this->containerProvider::factory(
             $this->config,
             $this->logger,
-            $this->eventManager,
-            $this->options['container_cache_path']
+            $this->eventManager
         );
 
         if ($this->options['application_type'] == self::APP_HTTP) {
@@ -266,13 +255,8 @@ class Application
             $routeCollection = new RouteCollection($this->application);
             $routeCollection->lock();
 
-            if ($this->container instanceof Container) {
-                $this->container->set('applicationroute', $routeCollection);
-                $this->container->set('ApplicationRoute', $routeCollection);
-            } elseif ($this->container instanceof ServiceManager) {
-                $this->container->setService('applicationroute', $routeCollection);
-                $this->container->setService('ApplicationRoute', $routeCollection);
-            }
+            $this->container->setService('applicationroute', $routeCollection);
+            $this->container->setService('ApplicationRoute', $routeCollection);
         } elseif ($this->options['application_type'] == self::APP_CONSOLE) {
             $this->application = new ConsoleApplication(
                 $this->options['console']['name'],

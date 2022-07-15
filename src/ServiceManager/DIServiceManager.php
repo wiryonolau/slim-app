@@ -1,9 +1,14 @@
 <?php
 
-namespace Itseasy;
+namespace Itseasy\ServiceManager;
 
+use DI\Container;
+use DI\ContainerBuilder;
+use Di\Definition\Helper\DefinitionHelper;
+use DI\NotFoundException;
 use Exception;
 use Itseasy\Action\AbstractAction;
+use Itseasy\Config;
 use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
@@ -11,71 +16,96 @@ use Laminas\EventManager\EventManagerInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
-use Laminas\ServiceManager\ServiceManager;
 use Psr\Container\ContainerInterface;
 
-class LaminasContainer
+/**
+ * For PHP-DI Container object are created first, then inject service.
+ */
+class DIServiceManager extends Container implements ServiceManagerInterface
 {
     protected $config;
-    protected $factories = [];
+    protected $eventManager;
+    protected $identityProvider;
+    protected $abstractFactories;
+    protected $logger;
+    protected $view;
 
     public static function factory(
         Config $config,
         ?LoggerInterface $logger = null,
         ?EventManagerInterface $em = null
     ): ContainerInterface {
-        $service = new LaminasContainer($config);
-        $service->build();
+        // Doesn't support createCompiler in this scenario
+        $containerBuilder = new ContainerBuilder(self::class);
+        $container = $containerBuilder->build();
 
-        $serviceConfig = $config->getConfig()['service'];
-        $serviceConfig['factories'] = $service->getFactories();
+        $container->setConfig($config);
+        $container->setLogger($logger);
+        $container->setEventManager($em);
 
-        $container = new ServiceManager($serviceConfig);
-
-        self::setConfig($container, $config);
-        self::setLogger($container, $logger);
-        self::setEventManager($container, $em);
+        $container->init();
 
         return $container;
     }
 
-    public function __construct(Config $config)
+    public function get($name)
+    {
+        try {
+            return parent::get($name);
+        } catch (NotFoundException $e) {
+            // Try resolve in abstract factories once
+            $this->resolveAbstractFactories($name);
+
+            return parent::get($name);
+        }
+    }
+
+    public function setService($name, $factory)
+    {
+        $this->set($name, $factory);
+    }
+
+    private function resolveAbstractFactories(string $name)
+    {
+        foreach ($this->abstractFactories as $factory) {
+            $this->registerFactory($name, $factory, [
+                        'setObjectLogger',
+                        'setObjectEventManager',
+                    ]);
+            break;
+        }
+    }
+
+    public function setConfig(Config $config): void
     {
         $this->config = $config;
+        $this->set('Config', $this->config);
+        $this->set('config', $this->config);
     }
 
-    public function getFactories()
-    {
-        return $this->factories;
-    }
-
-    private static function setConfig(ContainerInterface &$container, Config $config): void
-    {
-        $container->setService('Config', $config);
-        $container->setService('config', $config);
-    }
-
-    private static function setLogger(ContainerInterface &$container, ?LoggerInterface $logger = null): void
+    public function setLogger(?LoggerInterface $logger = null): void
     {
         if (is_null($logger)) {
             $logger = new Logger();
         }
 
-        $container->setService('Logger', $logger);
-        $container->setService('logger', $logger);
+        $this->logger = $logger;
+        $this->set('Logger', $this->logger);
+        $this->set('logger', $this->logger);
     }
 
-    private static function setEventManager(ContainerInterface &$container, ?EventManagerInterface $em = null): void
+    public function setEventManager(?EventManagerInterface $em = null): void
     {
         if (is_null($em)) {
             $em = new EventManager();
         }
 
-        $container->setService('EventManager', $em);
-        $container->setService('eventmanager', $em);
+        $this->eventManager = $em;
+        $this->set('EventManager', $this->eventManager);
+        $this->set('eventmanager', $this->eventManager);
     }
 
-    public function build(): void
+    public function init(): void
     {
         // Identity not initiate during build, retrieve the class name only
         $identityProvider = $this->config->get('guard');
@@ -83,6 +113,8 @@ class LaminasContainer
             $this->identityProvider = $identityProvider['identity_provider'];
         }
 
+        $this->registerAbstractFactories();
+        $this->registerAliases();
         $this->registerService();
         $this->registerCommand();
         $this->registerViewHelper();
@@ -112,6 +144,35 @@ class LaminasContainer
                 'setObjectLogger',
                 'setObjectEventManager',
             ]);
+        }
+    }
+
+    private function registerAliases(): void
+    {
+        $service = $this->config->get('service', []);
+        $aliases = (empty($service['aliases']) ? [] : $service['aliases']);
+
+        foreach ($aliases as $alias => $factory) {
+            $this->set($alias, \DI\get($factory));
+        }
+    }
+
+    private function registerAbstractFactories(): void
+    {
+        $service = $this->config->get('service', []);
+        $factories = (empty($service['abstract_factories']) ? [] : $service['abstract_factories']);
+
+        foreach ($factories as $key => $factory) {
+            if (is_string($factory) && class_exists($factory)) {
+                // Initiate abstract factories class here
+                $this->abstractFactories[md5($factory)] = $factory;
+            }
+
+            if (!$factory instanceof AbstractFactoryInterface) {
+                continue;
+            }
+
+            $this->abstractFactories[spl_object_hash($factory)] = $factory;
         }
     }
 
@@ -150,25 +211,33 @@ class LaminasContainer
     ): void {
         $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
             try {
-                $obj = new $factory();
-                // requestedName always equal name
-                $obj = $obj($container, $requestedName, $options);
+                if ($factory instanceof DefinitionHelper) {
+                    $obj = new $name();
+                } else {
+                    $obj = new $factory();
+
+                    // PHP allow to pass argument more then what is required
+                    // PHP-DI only require ContainerInterface
+                    // Laminas library require ContainreInterface and requestedName
+                    // requestedName will always be DI\Definition\FactoryDefinition use name instead
+                    $obj = $obj($container, $name, $options);
+                }
             } catch (Exception $ex) {
                 debug($ex->getMessage());
-                throw new Exception("Factory No entry or class found for '$name'");
+                throw new NotFoundException("Factory No entry or class found for '$name'");
             }
 
             foreach ($dependencies as $dependency) {
-                $obj = call_user_func_array([$this, $dependency], [$obj, $container]);
+                $obj = call_user_func_array([$this, $dependency], [$obj]);
             }
 
             return $obj;
         };
 
-        $this->factories[$name] = $factory;
+        $this->set($name, $factory);
     }
 
-    private function setObjectView($obj, ContainerInterface $container)
+    private function setObjectView($obj)
     {
         try {
             if ($obj instanceof AbstractAction) {
@@ -179,56 +248,56 @@ class LaminasContainer
 
                 // View require to be a unique instance for each action
                 $view = new $viewClass();
-                $view->setRenderer($container->get($rendererClass));
+                $view->setRenderer($this->get($rendererClass));
                 $view->setLayout($default_layout);
                 $obj->setView($view);
             }
         } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
 
         return $obj;
     }
 
-    private function setObjectLogger($obj, ContainerInterface $container)
+    private function setObjectLogger($obj)
     {
         try {
             if ($obj instanceof LoggerAwareInterface) {
-                $obj->setLogger($container->get('Logger'));
+                $obj->setLogger($this->get('Logger'));
             }
         } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
 
         return $obj;
     }
 
-    private function setObjectIdentityProvider($obj, ContainerInterface $container)
+    private function setObjectIdentityProvider($obj)
     {
         // Not applicable for service factories due to circular dependency
         // For Action only
         try {
             if ($obj instanceof IdentityAwareInterface
                 and $obj instanceof AbstractAction
-                and $container->has($this->identityProvider)
+                and $this->has($this->identityProvider)
             ) {
-                $obj->setIdentityProvider($container->get($this->identityProvider));
+                $obj->setIdentityProvider($this->get($this->identityProvider));
             }
         } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
 
         return $obj;
     }
 
-    private function setObjectEventManager($obj, ContainerInterface $container)
+    private function setObjectEventManager($obj)
     {
         try {
             if ($obj instanceof EventManagerAwareInterface) {
-                $obj->setEventManager($container->get('EventManager'));
+                $obj->setEventManager($this->get('EventManager'));
             }
         } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
+            $this->get('Logger')->debug($e->getMessage());
         }
 
         return $obj;

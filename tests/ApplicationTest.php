@@ -4,8 +4,7 @@ namespace Itseasy\Test;
 
 use Exception;
 use Itseasy\Application;
-use Itseasy\DIContainer;
-use Itseasy\LaminasContainer;
+use Itseasy\ServiceManager;
 use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase
@@ -25,7 +24,7 @@ final class ApplicationTest extends TestCase
                 \Laminas\Form\Module::class,
                 \Laminas\Cache\Module::class,
             ],
-            'container_provider' => DIContainer::class,
+            'container_provider' => ServiceManager\DIServiceManager::class,
         ]);
 
         $app->build();
@@ -65,7 +64,7 @@ final class ApplicationTest extends TestCase
                 \Laminas\Form\Module::class,
                 \Laminas\Cache\Module::class,
             ],
-            'container_provider' => LaminasContainer::class,
+            'container_provider' => ServiceManager\LaminasServiceManager::class,
         ]);
 
         $app->build();
