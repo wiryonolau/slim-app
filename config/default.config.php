@@ -23,6 +23,7 @@ return [
             Translator::class => Translator\Factory\TranslatorFactory::class,
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Identity\Identity::class => InvokableFactory::class,
+            Identity\IdentityProvider::class => Identity\Factory\IdentityProviderFactory::class,
         ],
     ],
     'event' => [
