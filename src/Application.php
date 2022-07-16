@@ -357,7 +357,17 @@ class Application
                 continue;
             }
 
-            $this->application->add($this->container->get($middleware));
+            if ($this->container->has($middleware)) {
+                $this->application->add($this->container->get($middleware));
+                continue;
+            }
+
+            if (is_string($middleware) and class_exists($middleware)) {
+                $this->application->add(new $middleware());
+                continue;
+            }
+
+            throw new Exception(sprintf('Middleware %s not found', $middleware));
         }
     }
 
