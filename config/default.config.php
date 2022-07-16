@@ -56,7 +56,7 @@ return [
         'default' => [],
     ],
     'guard' => [
-        'identity_provider' => Identity\Identity::class,
+        'identity_provider' => Identity\IdentityProvider::class,
         'login_route' => Guard\ArrayRoleProvider::class,
         'use_redirect' => true,
         'authorization' => [
