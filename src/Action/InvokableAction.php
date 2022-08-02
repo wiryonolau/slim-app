@@ -50,6 +50,11 @@ class InvokableAction extends AbstractAction
         return $this->response;
     }
 
+    /**
+     * Return json directly without rendering layout
+     * if $variables["error"] is define will render error instead of result
+     * if $variables["result"] is define variables result key will be ommited
+     */
     public function renderAsJson(array $variables = [], ?int $id = null): ResponseInterface
     {
         try {
@@ -63,7 +68,7 @@ class InvokableAction extends AbstractAction
                 $payload = [
                     'jsonrpc' => '2.0',
                     'id' => (is_null($id) ? time() : $id),
-                    'result' => $variables,
+                    'result' => (empty($variables["result"]) ? $variables : $variables["result"]),
                 ];
             }
         } catch (Exception $e) {
