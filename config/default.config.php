@@ -24,11 +24,11 @@ return [
             View\Renderer\PhpRenderer::class => View\Renderer\Factory\PhpRendererFactory::class,
             Identity\Identity::class => InvokableFactory::class,
             Identity\IdentityProvider::class => Identity\Factory\IdentityProviderFactory::class,
+            Http\JsonExceptionMiddleware::class => InvokableFactory::class
         ],
     ],
     'event' => [
-        'listener_aggregate' => [
-        ],
+        'listener_aggregate' => [],
     ],
     'session' => [
         'class' => Session::class,
@@ -39,12 +39,10 @@ return [
         'csrf_field_name' => '_csrf',
         'csrf_token_id' => 'app',
     ],
-    'translator' => [
-    ],
+    'translator' => [],
     'asset' => [
         'resolver_configs' => [
-            'paths' => [
-            ],
+            'paths' => [],
         ],
         'caching' => [
             'class' => '',
@@ -73,7 +71,7 @@ return [
         'default_layout' => 'layout/layout',
         'error_layout' => 'layout/error',
         'default_template_suffix' => 'phtml',
-        'template_path' => __DIR__.'/../view',
+        'template_path' => __DIR__ . '/../view',
     ],
     'view_helpers' => [
         'aliases' => [
