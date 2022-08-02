@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Action;
 
@@ -15,7 +16,7 @@ class InvokableAction extends AbstractAction
     protected $parsedBody = [];
     protected $arguments = [];
 
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $arguments = []) : ResponseInterface
+    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $arguments = []): ResponseInterface
     {
         $this->request = $request;
         $this->response = $response;
@@ -24,7 +25,7 @@ class InvokableAction extends AbstractAction
 
         $method = $this->request->getMethod();
 
-        if (!in_array($method, ["GET", "HEAD", "POST","PUT", "DELETE", "CONNECT","OPTIONS","TRACE","PATCH"])) {
+        if (!in_array($method, ["GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"])) {
             throw new Exception("Invalid HTTP Method");
         }
 
@@ -40,7 +41,7 @@ class InvokableAction extends AbstractAction
         return $this->response;
     }
 
-    protected function render(string $template, array $variables = [], string $layout = "") : ResponseInterface
+    protected function render(string $template, array $variables = [], string $layout = ""): ResponseInterface
     {
         if (!is_null($this->view)) {
             return $this->view->render($this->response, $template, $variables, $layout);
@@ -48,14 +49,14 @@ class InvokableAction extends AbstractAction
         return $this->response;
     }
 
-    protected function parseRequest() : void
+    protected function parseRequest(): void
     {
         // overload this function to parse request during invoke
     }
 
     /**
-      * @return string|array|null
-      */
+     * @return string|array|null
+     */
     protected function getQuery(string $key, $placeholder = null, $ignore_empty = false)
     {
         try {
@@ -74,16 +75,16 @@ class InvokableAction extends AbstractAction
     }
 
     /**
-      * @return string|array|null
-      */
+     * @return string|array|null
+     */
     protected function getPost(string $key, $placeholder = null, $ignore_empty = false)
     {
         return $this->getParsedBody($key, $placeholder, $ignore_empty);
     }
 
     /**
-      * @return string|array|null
-      */
+     * @return string|array|null
+     */
     protected function getParsedBody(string $key, $placeholder = null, $ignore_empty = false)
     {
         try {
@@ -106,8 +107,8 @@ class InvokableAction extends AbstractAction
     }
 
     /**
-      * @return string|array|null
-      */
+     * @return string|array|null
+     */
     protected function getArgument(string $key, $placeholder = null, $ignore_empty = false)
     {
         try {
@@ -125,17 +126,17 @@ class InvokableAction extends AbstractAction
         }
     }
 
-    protected function redirect(string $path, array $query = []) : ResponseInterface
+    protected function redirect(string $path, array $query = []): ResponseInterface
     {
         return $this->response->withHeader("Location", $this->view->url($path, $query));
     }
 
-    protected function forbidden(string $message = "") : void
+    protected function forbidden(string $message = ""): void
     {
         throw new HttpForbiddenException($this->request, $message);
     }
 
-    protected function asJson() : bool
+    protected function asJson(): bool
     {
         try {
             $format = $this->getQuery("format", "html");

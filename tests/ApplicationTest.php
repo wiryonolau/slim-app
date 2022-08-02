@@ -18,7 +18,7 @@ final class ApplicationTest extends TestCase
     public function testDIContainer()
     {
         $app = new Application([
-            'config_path' => [__DIR__.'/config/*.config.php'],
+            'config_path' => [__DIR__ . '/config/*.config.php'],
             'module' => [
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,
@@ -58,7 +58,7 @@ final class ApplicationTest extends TestCase
     public function testLaminasContainer()
     {
         $app = new Application([
-            'config_path' => [__DIR__.'/config/*.config.php'],
+            'config_path' => [__DIR__ . '/config/*.config.php'],
             'module' => [
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,

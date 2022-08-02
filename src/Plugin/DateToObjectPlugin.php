@@ -14,7 +14,7 @@ class DateToObjectPlugin implements PluginInterface
 {
     public static $name = "dateToObject";
 
-    public function getName() : string
+    public function getName(): string
     {
         return self::$name;
     }
@@ -22,9 +22,9 @@ class DateToObjectPlugin implements PluginInterface
     public function __invoke(
         $date = null,
         $timezone = "UTC",
-        string $format="Y-m-d H:i:s",
+        string $format = "Y-m-d H:i:s",
         bool $immutable = false
-    ) : DateTimeInterface {
+    ): DateTimeInterface {
         $dateClass = ($immutable ? DateTimeImmutable::class : DateTime::class);
 
         if (is_string($timezone)) {

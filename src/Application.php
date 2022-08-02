@@ -40,7 +40,7 @@ class Application
 
     protected $options = [
         'config_path' => [
-            __DIR__.'/../config/*.config.php',
+            __DIR__ . '/../config/*.config.php',
         ],
         'container_provider' => ServiceManager\DIServiceManager::class,
         'application_type' => 'http',
@@ -100,7 +100,7 @@ class Application
         if (!in_array($containerProvider, [
             ServiceManager\DIServiceManager::class,
             ServiceManager\LaminasServiceManager::class,
-            ])) {
+        ])) {
             throw new Exception(sprintf('%s Container provider not supported', $containerProvider));
         }
         $this->containerProvider = $containerProvider;
@@ -270,7 +270,8 @@ class Application
 
     public function run(): void
     {
-        if (is_null($this->config)
+        if (
+            is_null($this->config)
             or is_null($this->container)
             or is_null($this->application)
         ) {
@@ -362,6 +363,8 @@ class Application
                 continue;
             }
 
+            // Allow special middleware without factory
+            // Some slim middleware doesn't use factory
             if (is_string($middleware) and class_exists($middleware)) {
                 $this->application->add(new $middleware());
                 continue;

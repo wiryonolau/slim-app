@@ -71,13 +71,23 @@ class View implements ViewInterface
         $jsonModel->setOption('has_parent', true);
 
         try {
-            $variables = [
-                'content' => json_encode([
-                    'jsonrpc' => '2.0',
-                    'id' => (is_null($id) ? time() : $id),
-                    'result' => $variables,
-                ]),
-            ];
+            if (!empty($variables["error"])) {
+                $variables =  [
+                    'content' => json_encode([
+                        'jsonrpc' => '2.0',
+                        'id' => (is_null($id) ? time() : $id),
+                        'error' => $variables["error"]
+                    ])
+                ];
+            } else {
+                $variables = [
+                    'content' => json_encode([
+                        'jsonrpc' => '2.0',
+                        'id' => (is_null($id) ? time() : $id),
+                        'result' => $variables,
+                    ]),
+                ];
+            }
         } catch (Exception $e) {
             $variables = [
                 'content' => json_encode([
