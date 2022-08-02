@@ -7,6 +7,7 @@ namespace Itseasy\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpForbiddenException;
+use Slim\Psr7\Response;
 use Exception;
 
 class InvokableAction extends AbstractAction
@@ -47,6 +48,40 @@ class InvokableAction extends AbstractAction
             return $this->view->render($this->response, $template, $variables, $layout);
         }
         return $this->response;
+    }
+
+    public function renderAsJson(array $variables = [], ?int $id = null): ResponseInterface
+    {
+        try {
+            if (!empty($variables["error"])) {
+                $payload =  [
+                    'jsonrpc' => '2.0',
+                    'id' => (is_null($id) ? time() : $id),
+                    'error' => $variables["error"]
+                ];
+            } else {
+                $payload = [
+                    'jsonrpc' => '2.0',
+                    'id' => (is_null($id) ? time() : $id),
+                    'result' => $variables,
+                ];
+            }
+        } catch (Exception $e) {
+            $payload = json_encode([
+                'jsonrpc' => '2.0',
+                'id' => (is_null($id) ? time() : $id),
+                'error' => [
+                    'code' => -32603,
+                    'message' => $e->getMessage(),
+                ],
+            ]);
+        }
+
+        $response = new Response();
+        $response->getBody()->write(json_encode($payload));
+        return $response
+            ->withHeader('Content-Type', 'application/json')
+            ->withStatus(200);
     }
 
     protected function parseRequest(): void
