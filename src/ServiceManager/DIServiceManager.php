@@ -29,6 +29,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     protected $abstractFactories;
     protected $logger;
     protected $view;
+    protected $allowOverride = true;
 
     public static function factory(
         Config $config,
@@ -48,6 +49,26 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         return $container;
     }
 
+    /**
+     * Indicate whether or not the instance is immutable.
+     *
+     * @param bool $flag
+     */
+    public function setAllowOverride(bool $flag)
+    {
+        $this->allowOverride = $flag;
+    }
+
+    /**
+     * Retrieve the flag indicating immutability status.
+     *
+     * @return bool
+     */
+    public function getAllowOverride()
+    {
+        return $this->allowOverride;
+    }
+
     public function get($name)
     {
         try {
@@ -60,6 +81,19 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         }
     }
 
+    public function set($name, $factory)
+    {
+        if ($this->has($name) && !$this->allowOverride) {
+            throw new Exception(sprintf(
+                'The container does not allow replacing or updating a service'
+                    . ' with existing instances; the following service'
+                    . ' already exists in the container: %s',
+                $name
+            ));
+        }
+        parent::set($name, $factory);
+    }
+
     public function setService($name, $factory)
     {
         $this->set($name, $factory);
@@ -69,9 +103,9 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     {
         foreach ($this->abstractFactories as $factory) {
             $this->registerFactory($name, $factory, [
-                        'setObjectLogger',
-                        'setObjectEventManager',
-                    ]);
+                'setObjectLogger',
+                'setObjectEventManager',
+            ]);
             break;
         }
     }
@@ -277,7 +311,8 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         // Not applicable for service factories due to circular dependency
         // For Action only
         try {
-            if ($obj instanceof IdentityAwareInterface
+            if (
+                $obj instanceof IdentityAwareInterface
                 and $obj instanceof AbstractAction
                 and $this->has($this->identityProvider)
             ) {

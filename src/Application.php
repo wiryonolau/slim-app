@@ -264,7 +264,6 @@ class Application
             );
             $this->setCommand();
         }
-
         return $this;
     }
 
@@ -277,6 +276,8 @@ class Application
         ) {
             $this->build();
         }
+        // Lock container before handling request
+        $this->container->setAllowOverride(false);
         $this->application->run();
     }
 
