@@ -6,24 +6,24 @@
         "slim"
     ],
     "config": {
-        "platform" : {
+        "platform": {
             "php": "7.4.30",
-            "ext-gd" : "1",
-            "ext-intl" : "1",
+            "ext-gd": "1",
+            "ext-intl": "1",
             "ext-sockets": "1"
         }
     },
     "require": {
-        "php" : "^7.4",
+        "php": "^7.4",
         "psr/cache": "^1.0",
         "slim/slim": "^4.0",
         "slim/psr7": "^1.2",
         "php-di/php-di": "^6.3",
         "slim/php-view": "^3.0",
         "laminas/laminas-config-aggregator": "^1.4",
-        "symfony/console" : "^5.2",
-        "symfony/http-foundation" : "^5.1",
-        "symfony/security-csrf" : "^5.2",
+        "symfony/console": "^5.2",
+        "symfony/http-foundation": "^5.1",
+        "symfony/security-csrf": "^5.2",
         "laminas/laminas-navigation": "^2.10",
         "laminas/laminas-i18n": "^2.13",
         "laminas/laminas-view": "^2.12",
@@ -31,16 +31,17 @@
         "laminas/laminas-log": "^2.13",
         "scssphp/scssphp": "^1.6",
         "laminas/laminas-cache": "^2.13",
-        "laminas/laminas-servicemanager": "^3.11"
+        "laminas/laminas-servicemanager": "^3.11",
+        "itseasy/util": "dev-main"
     },
-    "autoload" : {
-        "psr-4" : {
+    "autoload": {
+        "psr-4": {
             "Itseasy\\": "src/"
         }
     },
-    "autoload-dev" : {
-        "psr-4" : {
-            "Itseasy\\Test\\" : "tests/"
+    "autoload-dev": {
+        "psr-4": {
+            "Itseasy\\Test\\": "tests/"
         }
     },
     "license": "MIT",
