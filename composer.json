@@ -32,7 +32,7 @@
         "scssphp/scssphp": "^1.6",
         "laminas/laminas-cache": "^2.13",
         "laminas/laminas-servicemanager": "^3.11",
-        "itseasy/util": "dev-main"
+        "itseasy/util": "^1"
     },
     "autoload": {
         "psr-4": {
