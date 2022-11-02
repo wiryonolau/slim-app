@@ -20,6 +20,21 @@ class Config implements ArrayAccess
         $this->config = ArrayUtils::merge($this->config, $config_array, false);
     }
 
+    public function merge(
+        array $config,
+        bool $preserveNumericKeys = false,
+        string $key = "app"
+    ): void {
+        if (empty($this->config[$key])) {
+            $this->config[$key] = [];
+        }
+        $this->config[$key] = ArrayUtils::merge(
+            $this->config[$key],
+            $config,
+            $preserveNumericKeys
+        );
+    }
+
     /**
      * @return mixed|null
      */
