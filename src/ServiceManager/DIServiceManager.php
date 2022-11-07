@@ -27,6 +27,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     protected $eventManager;
     protected $identityProvider;
     protected $abstractFactories;
+    protected $delegators;
     protected $logger;
     protected $view;
     protected $allowOverride = true;
@@ -71,12 +72,17 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 
     public function get($name)
     {
-        try {
-            return parent::get($name);
-        } catch (NotFoundException $e) {
-            // Try resolve in abstract factories once
-            $this->resolveAbstractFactories($name);
+        if ($this->has($name)) {
+            if (empty($this->delegators[$name])) {
+                return parent::get($name);
+            }
 
+            return $this->resolveDelegators($name);
+        }
+
+        $this->resolveAbstractFactories($name);
+
+        if ($this->has($name)) {
             return parent::get($name);
         }
     }
@@ -148,6 +154,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         }
 
         $this->registerAbstractFactories();
+        $this->registerDelegators();
         $this->registerAliases();
         $this->registerService();
         $this->registerCommand();
@@ -207,6 +214,37 @@ class DIServiceManager extends Container implements ServiceManagerInterface
             }
 
             $this->abstractFactories[spl_object_hash($factory)] = $factory;
+        }
+    }
+
+    private function resolveDelegators(string $name)
+    {
+        // Laminas Delegators
+        // check Laminas\ServiceManager\ServiceManager createDelegatorFromName(string $name, ?array $options = null)
+        $factory = parent::get($name);
+        $creationCallback = function ()  use ($name, $factory) {
+            if ($factory instanceof DefinitionHelper) {
+                $obj = new $name($this);
+            } else {
+                $obj = new $factory($this);
+            }
+            return $obj;
+        };
+
+        foreach ($this->delegators[$name] as $delegator) {
+            $delegatorFactory = new $delegator();
+            $creationCallback = $delegatorFactory($this, $name, $creationCallback);
+        }
+        return $creationCallback;
+    }
+
+    private function registerDelegators(): void
+    {
+        $service = $this->config->get('service', []);
+        $factories = (empty($service['delegators']) ? [] : $service['delegators']);
+
+        foreach ($factories as $name => $delegators) {
+            $this->delegators[$name] = $delegators;
         }
     }
 

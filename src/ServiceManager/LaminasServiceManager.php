@@ -39,7 +39,7 @@ class LaminasServiceManager implements ServiceManagerInterface
         self::setConfig($container, $config);
         self::setLogger($container, $logger);
         self::setEventManager($container, $em);
-
+        
         return $container;
     }
 

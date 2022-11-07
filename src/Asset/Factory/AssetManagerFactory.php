@@ -22,32 +22,27 @@ class AssetManagerFactory
         $ttl = $asset['caching']['ttl'];
         $path = $asset['caching']['path'];
 
-        // $storageFactory = $container->get(\Laminas\Cache\Service\StoragePluginFactoryInterface::class);
-
         if (empty($asset['caching']['class'])) {
-            // $storage = $storageFactory->createFromArrayConfiguration([
-            //     'name' => 'filesystem',
-            //     'options' => [
-            //         'namespace' => $namespace,
-            //         'ttl' => $ttl,
-            //     ],
-            //     'plugins' => [
-            //         'serializer',
-            //     ],
-            // ]);
-
-            $storage = StorageFactory::factory([
-                'adapter' => [
-                    'name' => 'filesystem',
-                    'options' => [
-                        'namespace' => $namespace,
-                        'ttl' => $ttl,
-                    ],
+            $storageFactory = $container->get(\Laminas\Cache\Service\StorageAdapterFactoryInterface::class);
+            $storage = $storageFactory->createFromArrayConfiguration([
+                'adapter' => 'filesystem',
+                'options' => [
+                    'namespace' => $namespace,
+                    'ttl' => $ttl,
                 ],
                 'plugins' => [
-                    'serializer',
+                    [
+                        'name' => 'serializer',
+                    ],
+                    [
+                        'name' => 'exception_handler',
+                        'options' => [
+                            'throw_exceptions' => false,
+                        ],
+                    ],
                 ],
             ]);
+
             $cache = new SimpleCacheDecorator($storage);
         } else {
             $cache = $container->get($asset['caching']['class']);

@@ -16,16 +16,22 @@ return [
             ]
         ],
         "cache" => [
-           'adapter' => [
-                'name' => 'filesystem',
-                'options' => [
-                    'namespace' => 'translation',
-                    'ttl' => 1
-                ]
+            'adapter' => 'filesystem',
+            'options' => [
+                'namespace' => 'translation',
+                'ttl' => 1,
             ],
             'plugins' => [
-                'serializer'
-            ]
+                [
+                    'name' => 'serializer',
+                ],
+                [
+                    'name' => 'exception_handler',
+                    'options' => [
+                        'throw_exceptions' => false,
+                     ],
+                ],
+            ],
         ]
     ]
 ];

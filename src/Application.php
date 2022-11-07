@@ -176,6 +176,7 @@ class Application
             $module = new $class();
             $module_config = $module->getConfig();
 
+
             $this->config_array = ArrayUtils::merge($this->config_array, [
                 'service' => isset($module_config['service_manager']) ? $module_config['service_manager'] : [],
                 'view_helpers' => isset($module_config['view_helpers']) ? $module_config['view_helpers'] : [],

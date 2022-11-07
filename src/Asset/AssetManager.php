@@ -21,7 +21,7 @@ class AssetManager implements LoggerAwareInterface
     protected $scssCompiler;
     protected $cache;
 
-    public function __construct(array $paths = [], ScssCompiler $scssCompiler, CacheInterface $cache)
+    public function __construct(array $paths, ScssCompiler $scssCompiler, CacheInterface $cache)
     {
         $this->paths = array_map("realpath", $paths);
         $this->scssCompiler = $scssCompiler;

@@ -23,6 +23,7 @@ final class ApplicationTest extends TestCase
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,
                 \Laminas\Cache\Module::class,
+                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class
             ],
             'container_provider' => ServiceManager\DIServiceManager::class,
         ]);
@@ -63,6 +64,7 @@ final class ApplicationTest extends TestCase
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,
                 \Laminas\Cache\Module::class,
+                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class
             ],
             'container_provider' => ServiceManager\LaminasServiceManager::class,
         ]);

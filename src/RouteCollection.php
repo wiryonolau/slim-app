@@ -56,6 +56,7 @@ class RouteCollection extends ArrayObject
         return null;
     }
 
+    #[\ReturnTypeWillChange]
     public function append($value)
     {
         if ($this->lock) {
@@ -64,6 +65,7 @@ class RouteCollection extends ArrayObject
         parent::append($value);
     }
 
+    #[\ReturnTypeWillChange]
     public function offsetSet($key, $value)
     {
         if ($this->lock) {

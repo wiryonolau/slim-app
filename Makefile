@@ -8,7 +8,8 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-PHP_VERSION ?= "7.4"
+PHP_VERSION ?= "8.1"
+MEMCACHED_VERSION ?= "3.2.0"
 
 %:
 	@echo ""
@@ -16,7 +17,7 @@ all:
 	@echo ""
 build:
 	@if [ "$$(docker images -q php:$(PHP_VERSION)-cli-ext 2>/dev/null)" = "" ]; then \
-		cd $$(pwd)/docker/php-cli-ext && docker build --build-arg PHP_VERSION=$(PHP_VERSION) -t php:$(PHP_VERSION)-cli-ext .; \
+		cd $$(pwd)/docker/php-cli-ext && docker build --build-arg PHP_VERSION=$(PHP_VERSION) --build-arg MEMCACHED_VERSION=$(MEMCACHED_VERSION) -t php:$(PHP_VERSION)-cli-ext .; \
 	fi
 run:
 	$(MAKE) build
