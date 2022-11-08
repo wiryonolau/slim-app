@@ -30,7 +30,7 @@
         "laminas/laminas-log": "^2.13",
         "scssphp/scssphp": "^1.6",
         "laminas/laminas-servicemanager": "^3.11",
-        "itseasy/util": "dev-main",
+        "itseasy/util": "^1.1",
         "laminas/laminas-cache-storage-adapter-filesystem": "^2.3",
         "laminas/laminas-cache": "^3.6",
         "laminas/laminas-cache-storage-deprecated-factory": "^1.0",
