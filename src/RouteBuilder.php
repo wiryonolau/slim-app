@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy;
 
@@ -12,7 +13,7 @@ class RouteBuilder
         &$routeCollector,
         ?string $namespace = null,
         array $routes = []
-    ) : void {
+    ): void {
         foreach ($routes as $name => $route) {
             $namespace = sprintf("%s/%s", $namespace, strval($name));
             if (!empty($route["options"]["redirect"])) {
@@ -36,7 +37,7 @@ class RouteBuilder
         &$routeCollector,
         ?string $namespace = null,
         array $route = []
-    ) : void {
+    ): void {
         $path = $route["route"];
 
         $arguments = [];
@@ -71,7 +72,7 @@ class RouteBuilder
         &$routeCollector,
         ?string $namespace = null,
         array $route = []
-        ) : void {
+    ): void {
         $path = $route["route"];
         $redirect = $route["options"]["redirect"];
 
@@ -139,7 +140,7 @@ class RouteBuilder
         &$routeCollector,
         ?string $namespace = null,
         array $route = []
-        ) : void {
+    ): void {
         $method = (empty($route["method"]) ? "GET" : $route["method"]);
 
         if (!is_array($method)) {
@@ -170,7 +171,7 @@ class RouteBuilder
 
 
         if (count($child_routes)) {
-            $addedRoute = $routeCollector->group($path, function ($routeCollector) use ($addRoute, $namespace, $method, $action, $child_routes) {
+            $addedRoute = $routeCollector->group($path, function ($routeCollector) use ($namespace, $method, $action, $child_routes) {
                 $routeCollector->map($method, "", $action);
                 self::addRoute($routeCollector, $namespace, $child_routes);
             });

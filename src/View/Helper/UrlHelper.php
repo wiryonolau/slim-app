@@ -43,7 +43,7 @@ class UrlHelper extends AbstractHelper
         $host     = ($use_forwarded_host && isset($s['HTTP_X_FORWARDED_HOST'])) ? $s['HTTP_X_FORWARDED_HOST'] : (isset($s['HTTP_HOST']) ? $s['HTTP_HOST'] : null);
         $host     = isset($host) ? $host : $s['SERVER_NAME'] . $port;
 
-        return $protocol . '://' . $host . ($s['SERVER_SUBDIRECTORY'] ? $s['SERVER_SUBDIRECTORY'] : "");
+        return $protocol . '://' . $host . (isset($s['SERVER_SUBDIRECTORY']) ? $s['SERVER_SUBDIRECTORY'] : "");
     }
 
     public static function getFullUrl($s = null, $use_forwarded_host = false): string
