@@ -56,12 +56,12 @@ return [
     ],
     'guard' => [
         'identity_provider' => Identity\IdentityProvider::class,
-        'login_route' => Guard\ArrayRoleProvider::class,
+        'login_route' => '/',
         'use_redirect' => true,
         'authorization' => [
             'default_role' => 'guest',
             'whitelist' => [],
-            'role_provider' => '',
+            'role_provider' => Guard\ArrayRoleProvider::class,
             'roles' => [],
         ],
     ],
