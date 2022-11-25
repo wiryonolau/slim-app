@@ -20,6 +20,21 @@ class Config implements ArrayAccess
         $this->config = ArrayUtils::merge($this->config, $config_array, false);
     }
 
+    public function merge(
+        array $config,
+        bool $preserveNumericKeys = false,
+        string $key = "app"
+    ): void {
+        if (empty($this->config[$key])) {
+            $this->config[$key] = [];
+        }
+        $this->config[$key] = ArrayUtils::merge(
+            $this->config[$key],
+            $config,
+            $preserveNumericKeys
+        );
+    }
+
     /**
      * @return mixed|null
      */
@@ -70,5 +85,38 @@ class Config implements ArrayAccess
     public function offsetUnset($offset)
     {
         throw new Exception('Cannot set config programmatically');
+    }
+
+    // Group route by action, useful for permission list
+    public function listRouteMethods(): array
+    {
+        $routes = [];
+        foreach ($this as $route) {
+            $addedRoute = new stdClass();
+            $addedRoute = $route;
+
+            if (isset($routes[$addedRoute->action])) {
+                $routes[$addedRoute->action]->methods = array_values(
+                    array_unique(
+                        array_merge(
+                            $routes[$addedRoute->action]->methods,
+                            $route->methods
+                        )
+                    )
+                );
+                continue;
+            }
+            $routes[$addedRoute->action] = $addedRoute;
+        }
+
+        return $routes;
+    }
+
+    public function append($value)
+    {
+        if ($this->lock) {
+            throw new Exception("Readonly object");
+        }
+        $this->config[] = $value;
     }
 }

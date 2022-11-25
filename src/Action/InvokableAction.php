@@ -100,15 +100,20 @@ class InvokableAction extends AbstractAction
     protected function getQuery(string $key, $placeholder = null, $ignore_empty = false)
     {
         try {
-            $value = $this->request->getQueryParams()[$key];
-            if ($ignore_empty) {
-                return $value;
+            $params = $this->request->getQueryParams();
+
+            if (!isset($params[$key])) {
+                throw new Exception("Invalid Key");
             }
 
-            if (empty($value)) {
+            if ($ignore_empty) {
+                return $params[$key];
+            }
+
+            if (empty($params[$key])) {
                 throw new Exception("Empty Value");
             }
-            return $value;
+            return $params[$key];
         } catch (Exception $e) {
             return $placeholder;
         }
@@ -131,16 +136,19 @@ class InvokableAction extends AbstractAction
             if (!in_array($this->request->getMethod(), ["POST", "PUT"])) {
                 throw new Exception("Request is not a POST or PUT");
             }
-            $value = $this->parsedBody[$key];
+
+            if (!isset($this->parsedBody[$key])) {
+                throw new Exception("Invalid Key");
+            }
 
             if ($ignore_empty) {
-                return $value;
+                return $this->parsedBody[$key];
             }
 
-            if (empty($value)) {
+            if (empty($this->parsedBody[$key])) {
                 throw new Exception("Empty Value");
             }
-            return $value;
+            return $this->parsedBody[$key];
         } catch (Exception $e) {
             return $placeholder;
         }
@@ -152,15 +160,17 @@ class InvokableAction extends AbstractAction
     protected function getArgument(string $key, $placeholder = null, $ignore_empty = false)
     {
         try {
-            $value = $this->arguments[$key];
+            if (!isset($this->arguments[$key])) {
+                throw new Exception("Invalid Key");
+            }
             if ($ignore_empty) {
-                return $value;
+                return $this->arguments[$key];
             }
 
-            if (empty($value)) {
+            if (empty($this->arguments[$key])) {
                 throw new Exception("Empty Value");
             }
-            return $value;
+            return $this->arguments[$key];
         } catch (Exception $e) {
             return $placeholder;
         }
