@@ -1,11 +1,12 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Asset\Filter;
 
 class CssMin
 {
-    public static function minify(string $css) : string
+    public static function minify(string $css): string
     {
         $css = preg_replace('/\s+/', ' ', $css);
 

@@ -24,7 +24,9 @@ class HttpExceptionMiddleware extends AbstractMiddleware
         try {
             return $handler->handle($request);
         } catch (HttpException $httpException) {
-            $this->logger->debug([$httpException->getCode(), $httpException->getMessage()]);
+            $this->logger->debug([
+                $httpException->getCode(), $httpException->getMessage()
+            ]);
 
             $response = new Response();
 

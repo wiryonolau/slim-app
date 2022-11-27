@@ -17,8 +17,11 @@ class InvokableAction extends AbstractAction
     protected $parsedBody = [];
     protected $arguments = [];
 
-    public function __invoke(ServerRequestInterface $request, ResponseInterface $response, array $arguments = []): ResponseInterface
-    {
+    public function __invoke(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        array $arguments = []
+    ): ResponseInterface {
         $this->request = $request;
         $this->response = $response;
         $this->arguments = $arguments;
@@ -26,7 +29,9 @@ class InvokableAction extends AbstractAction
 
         $method = $this->request->getMethod();
 
-        if (!in_array($method, ["GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"])) {
+        if (!in_array($method, [
+            "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+        ])) {
             throw new Exception("Invalid HTTP Method");
         }
 
@@ -42,10 +47,18 @@ class InvokableAction extends AbstractAction
         return $this->response;
     }
 
-    protected function render(string $template, array $variables = [], string $layout = ""): ResponseInterface
-    {
+    protected function render(
+        string $template,
+        array $variables = [],
+        string $layout = ""
+    ): ResponseInterface {
         if (!is_null($this->view)) {
-            return $this->view->render($this->response, $template, $variables, $layout);
+            return $this->view->render(
+                $this->response,
+                $template,
+                $variables,
+                $layout
+            );
         }
         return $this->response;
     }
@@ -55,8 +68,10 @@ class InvokableAction extends AbstractAction
      * if $variables["error"] is define will render error instead of result
      * if $variables["result"] is define variables result key will be ommited
      */
-    public function renderAsJson(array $variables = [], ?int $id = null): ResponseInterface
-    {
+    public function renderAsJson(
+        array $variables = [],
+        ?int $id = null
+    ): ResponseInterface {
         try {
             if (!empty($variables["error"])) {
                 $payload =  [
@@ -97,8 +112,11 @@ class InvokableAction extends AbstractAction
     /**
      * @return string|array|null
      */
-    protected function getQuery(string $key, $placeholder = null, $ignore_empty = false)
-    {
+    protected function getQuery(
+        string $key,
+        $placeholder = null,
+        $ignore_empty = false
+    ) {
         try {
             $params = $this->request->getQueryParams();
 
@@ -122,16 +140,22 @@ class InvokableAction extends AbstractAction
     /**
      * @return string|array|null
      */
-    protected function getPost(string $key, $placeholder = null, $ignore_empty = false)
-    {
+    protected function getPost(
+        string $key,
+        $placeholder = null,
+        $ignore_empty = false
+    ) {
         return $this->getParsedBody($key, $placeholder, $ignore_empty);
     }
 
     /**
      * @return string|array|null
      */
-    protected function getParsedBody(string $key, $placeholder = null, $ignore_empty = false)
-    {
+    protected function getParsedBody(
+        string $key,
+        $placeholder = null,
+        $ignore_empty = false
+    ) {
         try {
             if (!in_array($this->request->getMethod(), ["POST", "PUT"])) {
                 throw new Exception("Request is not a POST or PUT");
@@ -157,8 +181,11 @@ class InvokableAction extends AbstractAction
     /**
      * @return string|array|null
      */
-    protected function getArgument(string $key, $placeholder = null, $ignore_empty = false)
-    {
+    protected function getArgument(
+        string $key,
+        $placeholder = null,
+        $ignore_empty = false
+    ) {
         try {
             if (!isset($this->arguments[$key])) {
                 throw new Exception("Invalid Key");
@@ -176,8 +203,10 @@ class InvokableAction extends AbstractAction
         }
     }
 
-    protected function redirect(string $path, array $query = []): ResponseInterface
-    {
+    protected function redirect(
+        string $path,
+        array $query = []
+    ): ResponseInterface {
         return $this->response->withHeader("Location", $this->view->url($path, $query));
     }
 

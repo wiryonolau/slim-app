@@ -1,9 +1,10 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Identity;
 
 interface IdentityInterface
 {
-    public function getRoles() : array;
+    public function getRoles(): array;
 }

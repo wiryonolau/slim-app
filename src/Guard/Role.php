@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Guard;
 
@@ -17,12 +18,12 @@ class Role implements RoleInterface
         $this->permissions = new ArrayIterator();
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function can(string $method, string $action) : bool
+    public function can(string $method, string $action): bool
     {
         foreach ($this->permissions as $permission) {
             if ($permission->can($method, $action)) {
@@ -32,7 +33,7 @@ class Role implements RoleInterface
         return false;
     }
 
-    public function addPermission(PermissionInterface $permission) : void
+    public function addPermission(PermissionInterface $permission): void
     {
         $this->permissions->append($permission);
     }

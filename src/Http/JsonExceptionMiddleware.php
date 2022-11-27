@@ -17,14 +17,20 @@ class JsonExceptionMiddleware extends AbstractMiddleware
         try {
             return $handler->handle($request);
         } catch (HttpException $httpException) {
-            $this->logger->debug([$httpException->getCode(), $httpException->getMessage()]);
+            $this->logger->debug([
+                $httpException->getCode(), $httpException->getMessage()
+            ]);
 
             $payload = [
                 'jsonrpc' => '2.0',
                 'id' => time(),
                 'error' => [
                     'code' => -32603,
-                    'message' => sprintf("%s %s", $httpException->getCode(), $httpException->getMessage())
+                    'message' => sprintf(
+                        "%s %s",
+                        $httpException->getCode(),
+                        $httpException->getMessage()
+                    )
                 ],
             ];
 

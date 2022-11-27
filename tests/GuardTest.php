@@ -11,7 +11,7 @@ final class GuardTest extends TestCase
     public function testGuardWithConfig()
     {
         $app = new Application([
-            'config_path' => __DIR__.'/config/*.config.php',
+            'config_path' => __DIR__ . '/config/*.config.php',
         ]);
         $app->build();
 

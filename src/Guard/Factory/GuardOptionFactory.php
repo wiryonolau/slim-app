@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Guard\Factory;
 
@@ -8,7 +9,7 @@ use Itseasy\Guard\GuardOption;
 
 class GuardOptionFactory
 {
-    public function __invoke(ContainerInterface $container) : GuardOption
+    public function __invoke(ContainerInterface $container): GuardOption
     {
         $config = $container->get("Config")->getConfig();
         return new GuardOption($config["guard"]);

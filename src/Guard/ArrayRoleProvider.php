@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Guard;
 
@@ -17,7 +18,10 @@ class ArrayRoleProvider implements RoleProviderInterface
             $role = new Role($role_config["name"]);
 
             foreach ($role_config["permissions"] as $permission) {
-                $permission = new Permission($permission["method"], $permission["action"]);
+                $permission = new Permission(
+                    $permission["method"],
+                    $permission["action"]
+                );
                 $role->addPermission($permission);
             }
 
@@ -25,7 +29,7 @@ class ArrayRoleProvider implements RoleProviderInterface
         }
     }
 
-    public function getRole(string $role_name) : RoleInterface
+    public function getRole(string $role_name): RoleInterface
     {
         return $this->roles[$role_name];
     }

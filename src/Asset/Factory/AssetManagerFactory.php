@@ -23,7 +23,9 @@ class AssetManagerFactory
         $path = $asset['caching']['path'];
 
         if (empty($asset['caching']['class'])) {
-            $storageFactory = $container->get(\Laminas\Cache\Service\StorageAdapterFactoryInterface::class);
+            $storageFactory = $container->get(
+                \Laminas\Cache\Service\StorageAdapterFactoryInterface::class
+            );
             $storage = $storageFactory->createFromArrayConfiguration([
                 'adapter' => 'filesystem',
                 'options' => [

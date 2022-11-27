@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy;
 
@@ -14,13 +15,13 @@ class RouteCollection extends ArrayObject
     public function __construct(App $application)
     {
         $routes = [];
-        foreach($application->getRouteCollector()->getRoutes() as $route) {
+        foreach ($application->getRouteCollector()->getRoutes() as $route) {
             $addedRoute = new stdClass();
             $addedRoute->identifier = $route->getIdentifier();
             $addedRoute->methods = $route->getMethods();
             $addedRoute->pattern = $route->getPattern();
             $addedRoute->name = $route->getName();
-            if(is_string($route->getCallable())) {
+            if (is_string($route->getCallable())) {
                 $addedRoute->action = $route->getCallable();
             } else {
                 $addedRoute->action = "closure";
@@ -31,24 +32,24 @@ class RouteCollection extends ArrayObject
         parent::__construct($routes);
     }
 
-    public function lock() : void
+    public function lock(): void
     {
         $this->lock = true;
     }
 
-    public function getRouteByPath(string $path) : ?stdClass
+    public function getRouteByPath(string $path): ?stdClass
     {
-        foreach($this as $route) {
+        foreach ($this as $route) {
             $pattern = addcslashes($route->pattern, "/");
 
-            $pattern = preg_replace_callback('/{(.*?)}/', function($matches) {
+            $pattern = preg_replace_callback('/{(.*?)}/', function ($matches) {
                 if (count($matches)) {
                     $regex = explode(":", $matches[1]);
                     return $regex[1];
                 }
             }, $pattern);
 
-            preg_match('/^'.$pattern.'$/i', $path, $matches);
+            preg_match('/^' . $pattern . '$/i', $path, $matches);
             if (count($matches)) {
                 return $route;
             }

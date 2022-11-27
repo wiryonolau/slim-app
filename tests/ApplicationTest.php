@@ -53,7 +53,10 @@ final class ApplicationTest extends TestCase
         $b = $app->getContainer()->get('yoyo');
         $this->assertEquals($a, $b);
 
-        $this->assertEquals($app->getContainer()->get('testalias') instanceof  Provider\IdentityProvider, true);
+        $this->assertEquals(
+            $app->getContainer()->get('testalias') instanceof  Provider\IdentityProvider,
+            true
+        );
     }
 
     public function testLaminasContainer()

@@ -15,7 +15,8 @@ class Translator extends LaminasTranslator
             return $translation;
         }
 
-        if (null !== ($fallbackLocale = $this->getFallbackLocale())
+        if (
+            null !== ($fallbackLocale = $this->getFallbackLocale())
             && $locale !== $fallbackLocale
         ) {
             return $this->translate($message, $textDomain, $fallbackLocale);

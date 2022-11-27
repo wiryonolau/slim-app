@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Asset\Console\Command;
 
@@ -21,7 +22,7 @@ class AssetCommand extends Command
         $this->assetManager = $assetManager;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : int
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption("clear") or $input->getOption("build")) {
             try {
@@ -46,7 +47,7 @@ class AssetCommand extends Command
         return Command::SUCCESS;
     }
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->addOption(
             "clear",

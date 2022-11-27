@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Csrf\Factory;
 
@@ -10,7 +11,7 @@ use Itseasy\View\Helper\FlashMessageHelper;
 
 class CsrfMiddlewareFactory
 {
-    public function __invoke(ContainerInterface $container) : CsrfMiddleware
+    public function __invoke(ContainerInterface $container): CsrfMiddleware
     {
         $config = $container->get("Config")->getConfig();
         $field_name = $config["session"]["csrf_field_name"];

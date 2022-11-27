@@ -95,8 +95,9 @@ class Application
         return $this;
     }
 
-    public function setContainerProvider(string $containerProvider = ServiceManager\DIServiceManager::class)
-    {
+    public function setContainerProvider(
+        string $containerProvider = ServiceManager\DIServiceManager::class
+    ) {
         if (!in_array($containerProvider, [
             ServiceManager\DIServiceManager::class,
             ServiceManager\LaminasServiceManager::class,
@@ -203,8 +204,10 @@ class Application
         );
     }
 
-    public function setErrorRenderer(string $contentType, string $errorRenderer): self
-    {
+    public function setErrorRenderer(
+        string $contentType,
+        string $errorRenderer
+    ): self {
         $this->errorRenderer[$contentType] = $errorRenderer;
 
         return $this;

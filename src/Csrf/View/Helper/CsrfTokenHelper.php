@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Csrf\View\Helper;
 
@@ -11,15 +12,17 @@ class CsrfTokenHelper
     protected $field_name;
     protected $tokenManager;
 
-    public function __construct(string $field_name, CsrfTokenManagerInterface $tokenManager)
-    {
+    public function __construct(
+        string $field_name,
+        CsrfTokenManagerInterface $tokenManager
+    ) {
         $this->field_name = $field_name;
         $this->tokenManager = $tokenManager;
     }
 
-    public function __invoke($debug = false) : string
+    public function __invoke($debug = false): string
     {
-        $csrfToken = $this->tokenManager->getToken();
+        $csrfToken = $this->tokenManager->getToken("");
         if ($debug) {
             $element = "<input type=\"text\" readonly=\"readonly\" name=\"%s\" value=\"%s\" />";
         } else {

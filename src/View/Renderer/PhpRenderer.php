@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Itseasy\View\Renderer;
@@ -23,17 +24,17 @@ class PhpRenderer extends SlimPhpRenderer
         }
     }
 
-    public function getViewHelper() : array
+    public function getViewHelper(): array
     {
         return $this->viewHelper;
     }
 
-    public function setTemplateSuffix(string $suffix) : void
+    public function setTemplateSuffix(string $suffix): void
     {
         $this->templateSuffix = $suffix;
     }
 
-    public function getTemplateSuffix() : string
+    public function getTemplateSuffix(): string
     {
         return $this->templateSuffix;
     }
@@ -52,8 +53,11 @@ class PhpRenderer extends SlimPhpRenderer
         $this->viewHelper[$name] = $helper;
     }
 
-    public function fetch(string $template, array $data = [], bool $useLayout = false): string
-    {
+    public function fetch(
+        string $template,
+        array $data = [],
+        bool $useLayout = false
+    ): string {
         $layoutdata = (empty($data["layout"]) ? [] : $data["layout"]);
         $data = array_diff_key($data, ["layout" => []]);
 

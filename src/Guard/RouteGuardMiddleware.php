@@ -55,7 +55,10 @@ class RouteGuardMiddleware extends AbstractMiddleware
             );
 
             $query = $this->getRedirectQuery($request->getRequestTarget());
-            $login_url = call_user_func_array($this->urlHelper, [$this->routeGuard->getOptions()->getLoginRoute(), $query]);
+            $login_url = call_user_func_array(
+                $this->urlHelper,
+                [$this->routeGuard->getOptions()->getLoginRoute(), $query]
+            );
             $response = new Response();
 
             return $response->withHeader('Location', $login_url);

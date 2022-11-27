@@ -39,7 +39,7 @@ class LaminasServiceManager implements ServiceManagerInterface
         self::setConfig($container, $config);
         self::setLogger($container, $logger);
         self::setEventManager($container, $em);
-        
+
         return $container;
     }
 
@@ -53,14 +53,18 @@ class LaminasServiceManager implements ServiceManagerInterface
         return $this->factories;
     }
 
-    private static function setConfig(ContainerInterface &$container, Config $config): void
-    {
+    private static function setConfig(
+        ContainerInterface &$container,
+        Config $config
+    ): void {
         $container->setService('Config', $config);
         $container->setService('config', $config);
     }
 
-    private static function setLogger(ContainerInterface &$container, ?LoggerInterface $logger = null): void
-    {
+    private static function setLogger(
+        ContainerInterface &$container,
+        ?LoggerInterface $logger = null
+    ): void {
         if (is_null($logger)) {
             $logger = new Logger();
         }
@@ -69,8 +73,10 @@ class LaminasServiceManager implements ServiceManagerInterface
         $container->setService('logger', $logger);
     }
 
-    private static function setEventManager(ContainerInterface &$container, ?EventManagerInterface $em = null): void
-    {
+    private static function setEventManager(
+        ContainerInterface &$container,
+        ?EventManagerInterface $em = null
+    ): void {
         if (is_null($em)) {
             $em = new EventManager();
         }
@@ -152,7 +158,11 @@ class LaminasServiceManager implements ServiceManagerInterface
         $factory,
         array $dependencies = []
     ): void {
-        $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
+        $factory = function (
+            ContainerInterface $container,
+            $requestedName,
+            ?array $options = null
+        ) use ($name, $factory, $dependencies) {
             try {
                 $obj = new $factory();
                 // requestedName always equal name
@@ -212,7 +222,8 @@ class LaminasServiceManager implements ServiceManagerInterface
         // Not applicable for service factories due to circular dependency
         // For Action only
         try {
-            if ($obj instanceof IdentityAwareInterface
+            if (
+                $obj instanceof IdentityAwareInterface
                 and $obj instanceof AbstractAction
                 and $container->has($this->identityProvider)
             ) {

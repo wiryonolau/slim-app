@@ -56,9 +56,12 @@ class RouteBuilder
         }
 
         if (count($child_routes)) {
-            $addedRoute = $routeCollector->group($path, function ($routeCollector) use ($namespace, $child_routes) {
-                self::addRoute($routeCollector, $namespace, $child_routes);
-            });
+            $addedRoute = $routeCollector->group(
+                $path,
+                function ($routeCollector) use ($namespace, $child_routes) {
+                    self::addRoute($routeCollector, $namespace, $child_routes);
+                }
+            );
 
             self::addMiddleware(
                 $addedRoute,
@@ -114,9 +117,12 @@ class RouteBuilder
         );
 
         if (count($child_routes)) {
-            $addedRoute = $routeCollector->group($path, function ($routeCollector) use ($namespace, $child_routes) {
-                self::addRoute($routeCollector, $namespace, $child_routes);
-            });
+            $addedRoute = $routeCollector->group(
+                $path,
+                function ($routeCollector) use ($namespace, $child_routes) {
+                    self::addRoute($routeCollector, $namespace, $child_routes);
+                }
+            );
 
             if (count($arguments)) {
                 $arguments = array_map(function ($argument) {
@@ -171,10 +177,13 @@ class RouteBuilder
 
 
         if (count($child_routes)) {
-            $addedRoute = $routeCollector->group($path, function ($routeCollector) use ($namespace, $method, $action, $child_routes) {
-                $routeCollector->map($method, "", $action);
-                self::addRoute($routeCollector, $namespace, $child_routes);
-            });
+            $addedRoute = $routeCollector->group(
+                $path,
+                function ($routeCollector) use ($namespace, $method, $action, $child_routes) {
+                    $routeCollector->map($method, "", $action);
+                    self::addRoute($routeCollector, $namespace, $child_routes);
+                }
+            );
         } else {
             $addedRoute = $routeCollector->map($method, $path, $action);
             $addedRoute->setName($namespace);
@@ -197,8 +206,11 @@ class RouteBuilder
         );
     }
 
-    private static function addMiddleware(&$route, $container, array $middlewares = [])
-    {
+    private static function addMiddleware(
+        &$route,
+        $container,
+        array $middlewares = []
+    ) {
         foreach ($middlewares as $middleware) {
             $middleware = $container->get($middleware);
             $route->add($middleware);

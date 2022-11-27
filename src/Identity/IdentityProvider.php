@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Placeholder class
  * DO NOT USE THIS FOR IDENTITY PROVIDER.

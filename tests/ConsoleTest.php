@@ -1,4 +1,5 @@
 <?php
+
 namespace Itseasy\Test;
 
 use PHPUnit\Framework\TestCase;
@@ -15,9 +16,9 @@ final class ConsoleTest extends TestCase
             'config_path' => [__DIR__ . '/config/*.config.php'],
             'module' => [
                 \Laminas\Cache\Module::class,
-                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class, 
+                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class,
             ],
-            'container_provider' => ServiceManager\LaminasServiceManager::class,                                                                                                              
+            'container_provider' => ServiceManager\LaminasServiceManager::class,
         ]);
         $app->setApplicationType(Application::APP_CONSOLE)->build();
 
@@ -37,7 +38,7 @@ final class ConsoleTest extends TestCase
                 \Laminas\Cache\Module::class,
                 \Laminas\Cache\Storage\Adapter\Filesystem\Module::class,
             ],
-            'container_provider' => ServiceManager\LaminasServiceManager::class,                                                                                                              
+            'container_provider' => ServiceManager\LaminasServiceManager::class,
         ]);
 
         $app->setApplicationType(Application::APP_CONSOLE)->build();

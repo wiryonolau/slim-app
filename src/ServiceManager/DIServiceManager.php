@@ -281,7 +281,11 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $factory,
         array $dependencies = []
     ): void {
-        $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
+        $factory = function (
+            ContainerInterface $container,
+            $requestedName,
+            ?array $options = null
+        ) use ($name, $factory, $dependencies) {
             try {
                 if ($factory instanceof DefinitionHelper) {
                     $obj = new $name();
