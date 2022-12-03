@@ -1,4 +1,5 @@
 <?php
+
 namespace Itseasy\Test;
 
 return [

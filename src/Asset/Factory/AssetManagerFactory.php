@@ -6,7 +6,6 @@ namespace Itseasy\Asset\Factory;
 
 use Itseasy\Asset\AssetManager;
 use Laminas\Cache\Psr\SimpleCache\SimpleCacheDecorator;
-use Laminas\Cache\StorageFactory;
 use Psr\Container\ContainerInterface;
 use ScssPhp\ScssPhp\Compiler;
 use ScssPhp\ScssPhp\OutputStyle;
@@ -26,6 +25,7 @@ class AssetManagerFactory
             $storageFactory = $container->get(
                 \Laminas\Cache\Service\StorageAdapterFactoryInterface::class
             );
+
             $storage = $storageFactory->createFromArrayConfiguration([
                 'adapter' => 'filesystem',
                 'options' => [

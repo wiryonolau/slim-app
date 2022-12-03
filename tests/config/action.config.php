@@ -7,7 +7,7 @@ use DI;
 return [
     "action" => [
         "factories" => [
-            TestAction::class => DI\create()
+            TestAction::class => DI\create(),
         ]
     ],
 ];

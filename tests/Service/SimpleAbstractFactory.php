@@ -21,11 +21,8 @@ class SimpleAbstractFactory implements AbstractFactoryInterface
         return isset($config[$requestedName]) && is_array($config[$requestedName]);
     }
 
-    public function __invoke(
-        ContainerInterface $container,
-        $requestedName,
-        ?array $options = null
-    ) {
+    public function __invoke(ContainerInterface $container, $requestedName, ?array $options = null)
+    {
         $config = $this->getConfig($container);
 
         return new TestService($requestedName, $config[$requestedName]);

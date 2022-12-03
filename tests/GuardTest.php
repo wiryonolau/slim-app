@@ -2,20 +2,34 @@
 
 namespace Itseasy\Test;
 
+use Itseasy\ServiceManager;
 use Itseasy\Application;
 use Itseasy\Guard\RouteGuardMiddleware;
 use PHPUnit\Framework\TestCase;
 
 final class GuardTest extends TestCase
 {
+    private $app;
+
+    public function setUp(): void
+    {
+        $this->app = new Application([
+            "config_path" => [__DIR__ . '/config/*.config.php', __DIR__ . '/../config/*.config.php'],
+            'module' => [
+                ModuleTest\Module::class,
+                \Laminas\Form\Module::class,
+                \Laminas\Cache\Module::class,
+                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class
+            ],
+            'container_provider' => ServiceManager\LaminasServiceManager::class,
+        ]);
+        $this->app->build();
+    }
+
+
     public function testGuardWithConfig()
     {
-        $app = new Application([
-            'config_path' => __DIR__ . '/config/*.config.php',
-        ]);
-        $app->build();
-
-        $routeGuardMiddleware = $app->getContainer()->get(RouteGuardMiddleware::class);
+        $routeGuardMiddleware = $this->app->getContainer()->get(RouteGuardMiddleware::class);
 
         $routeGuard = $routeGuardMiddleware->getRouteGuard();
 

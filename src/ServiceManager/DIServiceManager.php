@@ -4,8 +4,8 @@ namespace Itseasy\ServiceManager;
 
 use DI\Container;
 use DI\ContainerBuilder;
-use Di\Definition\Helper\DefinitionHelper;
 use DI\NotFoundException;
+use Di\Definition\Helper\DefinitionHelper;
 use Exception;
 use Itseasy\Action\AbstractAction;
 use Itseasy\Config;
@@ -13,6 +13,7 @@ use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
@@ -221,6 +222,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     {
         // Laminas Delegators
         // check Laminas\ServiceManager\ServiceManager createDelegatorFromName(string $name, ?array $options = null)
+
         $factory = parent::get($name);
         $creationCallback = function ()  use ($name, $factory) {
             if ($factory instanceof DefinitionHelper) {
@@ -297,6 +299,10 @@ class DIServiceManager extends Container implements ServiceManagerInterface
                     // Laminas library require ContainreInterface and requestedName
                     // requestedName will always be DI\Definition\FactoryDefinition use name instead
                     $obj = $obj($container, $name, $options);
+                }
+
+                if ($obj instanceof ListenerAggregateInterface) {
+                    $obj->attach($container->get('EventManager'));
                 }
             } catch (Exception $ex) {
                 debug($ex->getMessage());

@@ -9,6 +9,7 @@ use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
@@ -167,6 +168,10 @@ class LaminasServiceManager implements ServiceManagerInterface
                 $obj = new $factory();
                 // requestedName always equal name
                 $obj = $obj($container, $requestedName, $options);
+
+                if ($obj instanceof ListenerAggregateInterface) {
+                    $obj->attach($container->get('EventManager'));
+                }
             } catch (Exception $ex) {
                 debug($ex->getMessage());
                 throw new Exception("Factory No entry or class found for '$name'");

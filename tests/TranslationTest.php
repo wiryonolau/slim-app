@@ -2,26 +2,34 @@
 
 namespace Itseasy\Test;
 
+use Itseasy\ServiceManager;
 use PHPUnit\Framework\TestCase;
 use Itseasy\Application;
 use Itseasy\Translator;
-use Itseasy\ServiceManager;
 
 final class TranslationTest extends TestCase
 {
-    public function testTranslation()
+    private $app;
+
+    public function setUp(): void
     {
-        $app = new Application([
-            'config_path' => [__DIR__ . '/config/*.config.php'],
+        $this->app = new Application([
+            "config_path" => [__DIR__ . '/config/*.config.php', __DIR__ . '/../config/*.config.php'],
             'module' => [
+                ModuleTest\Module::class,
+                \Laminas\Form\Module::class,
                 \Laminas\Cache\Module::class,
-                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class,
+                \Laminas\Cache\Storage\Adapter\Filesystem\Module::class
             ],
             'container_provider' => ServiceManager\LaminasServiceManager::class,
         ]);
-        $app->build();
+        $this->app->build();
+    }
 
-        $translator = $app->getApplication()->getContainer()->get(Translator::class);
+
+    public function testTranslation()
+    {
+        $translator = $this->app->getApplication()->getContainer()->get(Translator::class);
 
         $this->assertEquals($translator->translate("project", "default", "id_ID"), "proyek");
         $this->assertEquals($translator->translate("notexist", "default", "id_ID"), "notexist");

@@ -11,27 +11,21 @@ return [
         "translation_file_patterns" => [
             [
                 "type" => Gettext::class,
-                "base_dir" => __DIR__.'/../lang',
+                "base_dir" => __DIR__ . '/../lang',
                 "pattern" => "%s.mo"
             ]
         ],
         "cache" => [
-            'adapter' => 'filesystem',
-            'options' => [
-                'namespace' => 'translation',
-                'ttl' => 1,
+            'adapter' => [
+                'name' => 'filesystem',
+                'options' => [
+                    'namespace' => 'translation',
+                    'ttl' => 1
+                ]
             ],
             'plugins' => [
-                [
-                    'name' => 'serializer',
-                ],
-                [
-                    'name' => 'exception_handler',
-                    'options' => [
-                        'throw_exceptions' => false,
-                     ],
-                ],
-            ],
+                'serializer'
+            ]
         ]
     ]
 ];
