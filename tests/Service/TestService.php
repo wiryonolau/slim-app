@@ -2,14 +2,15 @@
 
 namespace Itseasy\Test\Service;
 
-class TestService
-{
-    protected $name;
-    protected $options;
+use Laminas\EventManager\EventManagerAwareInterface;
+use Laminas\EventManager\EventManagerAwareTrait;
 
-    public function __construct($name, $options)
+class TestService implements EventManagerAwareInterface
+{
+    use EventManagerAwareTrait;
+
+    public function run()
     {
-        $this->name = $name;
-        $this->options = $options;
+        $this->getEventManager()->trigger('do', null, ["call by event"]);
     }
 }

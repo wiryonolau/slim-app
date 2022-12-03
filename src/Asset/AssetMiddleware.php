@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Asset;
 
@@ -57,7 +58,7 @@ class AssetMiddleware extends AbstractMiddleware
         $this->assetManager = $assetManager;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response
+    public function __invoke(Request $request, RequestHandler $handler): Response
     {
         try {
             return $handler->handle($request);
@@ -66,7 +67,7 @@ class AssetMiddleware extends AbstractMiddleware
         }
     }
 
-    private function findAsset(Request $request) : Response
+    private function findAsset(Request $request): Response
     {
         $response = new Response();
 

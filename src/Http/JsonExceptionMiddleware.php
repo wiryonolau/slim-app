@@ -12,19 +12,27 @@ use Slim\Psr7\Response;
 
 class JsonExceptionMiddleware extends AbstractMiddleware
 {
-    public function __invoke(Request $request, RequestHandler $handler): Response
-    {
+    public function __invoke(
+        Request $request,
+        RequestHandler $handler
+    ): Response {
         try {
             return $handler->handle($request);
         } catch (HttpException $httpException) {
-            $this->logger->debug([$httpException->getCode(), $httpException->getMessage()]);
+            $this->logger->debug([
+                $httpException->getCode(), $httpException->getMessage()
+            ]);
 
             $payload = [
                 'jsonrpc' => '2.0',
                 'id' => time(),
                 'error' => [
                     'code' => -32603,
-                    'message' => sprintf("%s %s", $httpException->getCode(), $httpException->getMessage())
+                    'message' => sprintf(
+                        "%s %s",
+                        $httpException->getCode(),
+                        $httpException->getMessage()
+                    )
                 ],
             ];
 

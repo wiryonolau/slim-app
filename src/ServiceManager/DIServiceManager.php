@@ -13,6 +13,8 @@ use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\SharedEventManager;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
@@ -131,7 +133,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     public function setEventManager(?EventManagerInterface $em = null): void
     {
         if (is_null($em)) {
-            $em = new EventManager();
+            $em = new EventManager(new SharedEventManager());
         }
 
         $this->eventManager = $em;
@@ -255,6 +257,11 @@ class DIServiceManager extends Container implements ServiceManagerInterface
                     // Laminas library require ContainreInterface and requestedName
                     // requestedName will always be DI\Definition\FactoryDefinition use name instead
                     $obj = $obj($container, $name, $options);
+                }
+
+                // Register listener
+                if ($obj instanceof ListenerAggregateInterface) {
+                    $obj->attach($container->get('EventManager'));
                 }
             } catch (Exception $ex) {
                 debug($ex->getMessage());

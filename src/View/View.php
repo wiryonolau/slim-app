@@ -42,8 +42,12 @@ class View implements ViewInterface
         $this->layout = $layout;
     }
 
-    public function render(Response $response, string $template, array $variables = [], string $layout = ''): Response
-    {
+    public function render(
+        Response $response,
+        string $template,
+        array $variables = [],
+        string $layout = ''
+    ): Response {
         $layoutvars = (empty($variables['layout']) ? [] : $variables['layout']);
         $variables = array_diff_key($variables, ['layout' => ['header' => []]]);
 
@@ -64,8 +68,11 @@ class View implements ViewInterface
         return $response;
     }
 
-    public function renderJson(Response $response, array $variables = [], ?int $id = null): Response
-    {
+    public function renderJson(
+        Response $response,
+        array $variables = [],
+        ?int $id = null
+    ): Response {
         $jsonModel = new LaminasViewModel();
         $jsonModel->setTemplate('layout/json');
         $jsonModel->setOption('has_parent', true);

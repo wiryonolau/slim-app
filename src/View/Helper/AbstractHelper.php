@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace Itseasy\View\Helper;
+
 use Itseasy\View\Renderer\PhpRenderer;
 
 abstract class AbstractHelper

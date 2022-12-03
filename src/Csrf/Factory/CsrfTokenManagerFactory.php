@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Csrf\Factory;
 
@@ -11,7 +12,7 @@ use Symfony\Component\Security\Csrf\TokenStorage\SessionTokenStorage;
 
 class CsrfTokenManagerFactory
 {
-    public function __invoke(ContainerInterface $container) : CsrfTokenManager
+    public function __invoke(ContainerInterface $container): CsrfTokenManager
     {
         $config = $container->get("Config")->getConfig();
         $token_id = $config["session"]["csrf_token_id"];

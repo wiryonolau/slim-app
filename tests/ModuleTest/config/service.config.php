@@ -2,12 +2,13 @@
 
 namespace Itseasy\Test\ModuleTest;
 
-use DI;
+use Itseasy\Test\ModuleTest\Service\ModuleTestService;
+use Laminas\ServiceManager\Factory\InvokableFactory;
 
 return [
     "service" => [
         "factories" => [
-            Service\TestService::class => DI\factory(function() {})
+            ModuleTestService::class => InvokableFactory::class
         ]
     ],
 ];

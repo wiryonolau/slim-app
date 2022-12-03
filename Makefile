@@ -62,3 +62,13 @@ composer:
         -e COMPOSER_HOME="/srv/$$(basename "`pwd`")/.composer" \
         --user $$(id -u):$$(id -g) \
     composer composer $(filter-out $@,$(MAKECMDGOALS))
+security-check:
+	$(MAKE) -s build
+	docker run --rm -it \
+		-v $$(pwd):/app \
+	phpstan:${PHP_VERSION} analyse || true
+	docker run --rm -it \
+		-v $$(pwd):/app \
+		 -w /app \
+	symfonycorp/cli security:check || true
+

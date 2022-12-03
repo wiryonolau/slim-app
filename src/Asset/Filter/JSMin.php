@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Asset\Filter;
 
@@ -83,7 +84,7 @@ class JSMin
      *
      * @return string
      */
-    public static function minify(string $js) : string
+    public static function minify(string $js): string
     {
         $jsmin = new JSMin($js);
         return $jsmin->min();
@@ -102,7 +103,7 @@ class JSMin
      *
      * @return string
      */
-    public function min() : string
+    public function min(): string
     {
         if ($this->output !== '') { // min already run
             return $this->output;
@@ -123,27 +124,32 @@ class JSMin
             $command = self::ACTION_KEEP_A; // default
             if ($this->a === ' ') {
                 if (($this->lastByteOut === '+' || $this->lastByteOut === '-')
-                        && ($this->b === $this->lastByteOut)) {
+                    && ($this->b === $this->lastByteOut)
+                ) {
                     // Don't delete this space. If we do, the addition/subtraction
                     // could be parsed as a post-increment
-                } elseif (! $this->isAlphaNum($this->b)) {
+                } elseif (!$this->isAlphaNum($this->b)) {
                     $command = self::ACTION_DELETE_A;
                 }
             } elseif ($this->a === "\n") {
                 if ($this->b === ' ') {
                     $command = self::ACTION_DELETE_A_B;
 
-                // in case of mbstring.func_overload & 2, must check for null b,
+                    // in case of mbstring.func_overload & 2, must check for null b,
                     // otherwise mb_strpos will give WARNING
-                } elseif ($this->b === null
-                          || (false === strpos('{[(+-!~', $this->b)
-                              && ! $this->isAlphaNum($this->b))) {
+                } elseif (
+                    $this->b === null
+                    || (false === strpos('{[(+-!~', $this->b)
+                        && !$this->isAlphaNum($this->b))
+                ) {
                     $command = self::ACTION_DELETE_A;
                 }
-            } elseif (! $this->isAlphaNum($this->a)) {
-                if ($this->b === ' '
+            } elseif (!$this->isAlphaNum($this->a)) {
+                if (
+                    $this->b === ' '
                     || ($this->b === "\n"
-                        && (false === strpos('}])+-"\'', $this->a)))) {
+                        && (false === strpos('}])+-"\'', $this->a)))
+                ) {
                     $command = self::ACTION_DELETE_A_B;
                 }
             }
@@ -165,12 +171,14 @@ class JSMin
      * @param int $command
      * @throws JSMinUnterminatedRegExpException|JSMinUnterminatedStringException
      */
-    protected function action($command) : void
+    protected function action($command): void
     {
         // make sure we don't compress "a + ++b" to "a+++b", etc.
-        if ($command === self::ACTION_DELETE_A_B
+        if (
+            $command === self::ACTION_DELETE_A_B
             && $this->b === ' '
-            && ($this->a === '+' || $this->a === '-')) {
+            && ($this->a === '+' || $this->a === '-')
+        ) {
             // Note: we're at an addition/substraction operator; the inputIndex
             // will certainly be a valid index
             if ($this->input[$this->inputIndex] === $this->a) {
@@ -248,7 +256,7 @@ class JSMin
                                 if ($this->isEOF($this->a)) {
                                     throw new JSMinUnterminatedRegExpException(
                                         "JSMin: Unterminated set in RegExp at byte "
-                                            . $this->inputIndex .": {$pattern}"
+                                            . $this->inputIndex . ": {$pattern}"
                                     );
                                 }
                             }
@@ -271,14 +279,14 @@ class JSMin
                     }
                     $this->b = $this->next();
                 }
-            // end case ACTION_DELETE_A_B
+                // end case ACTION_DELETE_A_B
         }
     }
 
     /**
      * @return bool
      */
-    protected function isRegexpLiteral() : bool
+    protected function isRegexpLiteral(): bool
     {
         if (false !== strpos("(,=:[!&|?+-~*{;", $this->a)) {
             // we obviously aren't dividing
@@ -348,7 +356,7 @@ class JSMin
      * @param string $a
      * @return bool
      */
-    protected function isEOF($a) : bool
+    protected function isEOF($a): bool
     {
         return ord($a) <= self::ORD_LF;
     }
@@ -358,7 +366,7 @@ class JSMin
      *
      * @return string
      */
-    protected function peek() : string
+    protected function peek(): string
     {
         $this->lookAhead = $this->get();
         return $this->lookAhead;
@@ -371,7 +379,7 @@ class JSMin
      *
      * @return bool
      */
-    protected function isAlphaNum($c) : bool
+    protected function isAlphaNum($c): bool
     {
         return (preg_match('/^[a-z0-9A-Z_\\$\\\\]$/', $c) || ord($c) > 126);
     }
@@ -379,7 +387,7 @@ class JSMin
     /**
      * Consume a single line comment from input (possibly retaining it)
      */
-    protected function consumeSingleLineComment() : void
+    protected function consumeSingleLineComment(): void
     {
         $comment = '';
         while (true) {
@@ -400,7 +408,7 @@ class JSMin
      *
      * @throws JSMinUnterminatedCommentException
      */
-    protected function consumeMultipleLineComment() : void
+    protected function consumeMultipleLineComment(): void
     {
         $this->get();
         $comment = '';

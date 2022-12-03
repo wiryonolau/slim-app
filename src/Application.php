@@ -95,8 +95,9 @@ class Application
         return $this;
     }
 
-    public function setContainerProvider(string $containerProvider = ServiceManager\DIServiceManager::class)
-    {
+    public function setContainerProvider(
+        string $containerProvider = ServiceManager\DIServiceManager::class
+    ) {
         if (!in_array($containerProvider, [
             ServiceManager\DIServiceManager::class,
             ServiceManager\LaminasServiceManager::class,
@@ -234,7 +235,10 @@ class Application
 
     public function build(): self
     {
-        $this->config = new Config($this->options['config_path'], $this->config_array);
+        $this->config = new Config(
+            $this->options['config_path'],
+            $this->config_array
+        );
 
         if (is_null($this->logger)) {
             $this->buildLogger();

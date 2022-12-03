@@ -7,7 +7,7 @@ use Itseasy\Identity\IdentityProviderInterface;
 
 class Identity implements IdentityInterface
 {
-    public function getRoles() : array
+    public function getRoles(): array
     {
         return [];
     }
@@ -15,12 +15,12 @@ class Identity implements IdentityInterface
 
 class IdentityProvider implements IdentityProviderInterface
 {
-    public function hasIdentity() : bool
+    public function hasIdentity(): bool
     {
         return true;
     }
 
-    public function getIdentity() : IdentityInterface
+    public function getIdentity(): IdentityInterface
     {
         return new Identity();
     }

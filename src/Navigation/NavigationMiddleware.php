@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Navigation;
 
@@ -18,7 +19,7 @@ class NavigationMiddleware extends AbstractMiddleware
         $this->navigation = $navigation;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response
+    public function __invoke(Request $request, RequestHandler $handler): Response
     {
         $this->navigation->setAttribute("request", $request);
         return $handler->handle($request);

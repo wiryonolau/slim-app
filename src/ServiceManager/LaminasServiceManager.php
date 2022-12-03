@@ -14,6 +14,8 @@ use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
 use Laminas\ServiceManager\ServiceManager;
 use Psr\Container\ContainerInterface;
+use Laminas\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\SharedEventManager;
 
 /**
  * For Laminas service is configured first then created the container.
@@ -53,14 +55,18 @@ class LaminasServiceManager implements ServiceManagerInterface
         return $this->factories;
     }
 
-    private static function setConfig(ContainerInterface &$container, Config $config): void
-    {
+    private static function setConfig(
+        ContainerInterface &$container,
+        Config $config
+    ): void {
         $container->setService('Config', $config);
         $container->setService('config', $config);
     }
 
-    private static function setLogger(ContainerInterface &$container, ?LoggerInterface $logger = null): void
-    {
+    private static function setLogger(
+        ContainerInterface &$container,
+        ?LoggerInterface $logger = null
+    ): void {
         if (is_null($logger)) {
             $logger = new Logger();
         }
@@ -69,10 +75,12 @@ class LaminasServiceManager implements ServiceManagerInterface
         $container->setService('logger', $logger);
     }
 
-    private static function setEventManager(ContainerInterface &$container, ?EventManagerInterface $em = null): void
-    {
+    private static function setEventManager(
+        ContainerInterface &$container,
+        ?EventManagerInterface $em = null
+    ): void {
         if (is_null($em)) {
-            $em = new EventManager();
+            $em = new EventManager(new SharedEventManager());
         }
 
         $container->setService('EventManager', $em);
@@ -152,11 +160,24 @@ class LaminasServiceManager implements ServiceManagerInterface
         $factory,
         array $dependencies = []
     ): void {
-        $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
+        $factory = function (
+            ContainerInterface $container,
+            $requestedName,
+            ?array $options = null
+        ) use (
+            $name,
+            $factory,
+            $dependencies
+        ) {
             try {
                 $obj = new $factory();
                 // requestedName always equal name
                 $obj = $obj($container, $requestedName, $options);
+
+                // Register listener
+                if ($obj instanceof ListenerAggregateInterface) {
+                    $obj->attach($container->get('EventManager'));
+                }
             } catch (Exception $ex) {
                 debug($ex->getMessage());
                 throw new Exception("Factory No entry or class found for '$name'");
@@ -212,7 +233,8 @@ class LaminasServiceManager implements ServiceManagerInterface
         // Not applicable for service factories due to circular dependency
         // For Action only
         try {
-            if ($obj instanceof IdentityAwareInterface
+            if (
+                $obj instanceof IdentityAwareInterface
                 and $obj instanceof AbstractAction
                 and $container->has($this->identityProvider)
             ) {

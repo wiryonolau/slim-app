@@ -22,20 +22,8 @@ class AssetManagerFactory
         $ttl = $asset['caching']['ttl'];
         $path = $asset['caching']['path'];
 
-        // $storageFactory = $container->get(\Laminas\Cache\Service\StoragePluginFactoryInterface::class);
 
         if (empty($asset['caching']['class'])) {
-            // $storage = $storageFactory->createFromArrayConfiguration([
-            //     'name' => 'filesystem',
-            //     'options' => [
-            //         'namespace' => $namespace,
-            //         'ttl' => $ttl,
-            //     ],
-            //     'plugins' => [
-            //         'serializer',
-            //     ],
-            // ]);
-
             $storage = StorageFactory::factory([
                 'adapter' => [
                     'name' => 'filesystem',

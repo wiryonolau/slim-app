@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Asset\Console\Command\Factory;
 
@@ -9,7 +10,7 @@ use Itseasy\Asset\AssetManager;
 
 class AssetCommandFactory
 {
-    public function __invoke(ContainerInterface $container) : AssetCommand
+    public function __invoke(ContainerInterface $container): AssetCommand
     {
         $assetManager = $container->get(AssetManager::class);
         return new AssetCommand($assetManager);

@@ -12,8 +12,11 @@ class RouteGuard implements RouteGuardInterface
     protected $roleProvider;
     protected $options;
 
-    public function __construct(IdentityProviderInterface $identityProvider, RoleProviderInterface $roleProvider, GuardOption $options)
-    {
+    public function __construct(
+        IdentityProviderInterface $identityProvider,
+        RoleProviderInterface $roleProvider,
+        GuardOption $options
+    ) {
         $this->identityProvider = $identityProvider;
         $this->roleProvider = $roleProvider;
         $this->options = $options;

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Session\Factory;
 
@@ -9,7 +10,7 @@ use Itseasy\Session;
 
 class SessionMiddlewareFactory
 {
-    public function __invoke(ContainerInterface $container) : SessionMiddleware
+    public function __invoke(ContainerInterface $container): SessionMiddleware
     {
         $sessionClass = $container->get("Config")->getConfig()["session"]["class"];
         $session = $container->get($sessionClass);

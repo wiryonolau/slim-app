@@ -1,4 +1,5 @@
 <?php
+
 namespace Itseasy\Test;
 
 use PHPUnit\Framework\TestCase;
@@ -10,7 +11,7 @@ final class TranslationTest extends TestCase
     public function testDI()
     {
         $app = new Application([
-            "config_path" => [__DIR__."/config/*.config.php"]
+            "config_path" => [__DIR__ . "/config/*.config.php"]
         ]);
         $app->build();
 

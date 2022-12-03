@@ -19,7 +19,7 @@ class TranslateViewHelperFactory
      * it must be call from Renderer and have Translate set for each helper
      * that extends Laminas\I18n\View\Helper\AbstractTranslatorHelper
      */
-    public function __invoke(ContainerInterface $container) : AbstractTranslatorHelper
+    public function __invoke(ContainerInterface $container): AbstractTranslatorHelper
     {
         $translator = $container->get(Translator::class);
 

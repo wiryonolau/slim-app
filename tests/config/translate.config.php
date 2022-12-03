@@ -11,12 +11,12 @@ return [
         "translation_file_patterns" => [
             [
                 "type" => Gettext::class,
-                "base_dir" => __DIR__.'/../lang',
+                "base_dir" => __DIR__ . '/../lang',
                 "pattern" => "%s.mo"
             ]
         ],
         "cache" => [
-           'adapter' => [
+            'adapter' => [
                 'name' => 'filesystem',
                 'options' => [
                     'namespace' => 'translation',

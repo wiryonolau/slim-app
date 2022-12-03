@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Csrf;
 
@@ -22,14 +23,17 @@ class CsrfMiddleware extends AbstractMiddleware
     protected $tokenManager;
     protected $session;
 
-    public function __construct(string $field_name, CsrfTokenManagerInterface $tokenManager, SessionInterface $session)
-    {
+    public function __construct(
+        string $field_name,
+        CsrfTokenManagerInterface $tokenManager,
+        SessionInterface $session
+    ) {
         $this->field_name = $field_name;
         $this->tokenManager = $tokenManager;
         $this->session = $session;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler) : Response
+    public function __invoke(Request $request, RequestHandler $handler): Response
     {
         if (in_array($request->getMethod(), ["GET", "HEAD", "OPTIONS"])) {
             // get, head, options method is forbidden to have csrf header value

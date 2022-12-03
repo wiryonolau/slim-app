@@ -5,6 +5,7 @@ namespace Itseasy\Test;
 use Exception;
 use Itseasy\Application;
 use Itseasy\ServiceManager;
+use Itseasy\Test\Service\TestService;
 use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase
@@ -14,6 +15,7 @@ final class ApplicationTest extends TestCase
         'Laminas\Form\Annotation\AttributeBuilder',
         'FormAttributeBuilder',
     ];
+
 
     public function testDIContainer()
     {
@@ -53,6 +55,9 @@ final class ApplicationTest extends TestCase
         $this->assertEquals($a, $b);
 
         $this->assertEquals($app->getContainer()->get('testalias') instanceof  Provider\IdentityProvider, true);
+
+        $testEvent = $app->getContainer()->get(TestService::class);
+        $testEvent->run();
     }
 
     public function testLaminasContainer()
@@ -91,5 +96,8 @@ final class ApplicationTest extends TestCase
             }
             $this->assertEquals(is_object($object), true);
         }
+
+        $testEvent = $app->getContainer()->get(TestService::class);
+        $testEvent->run();
     }
 }

@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Asset;
 
@@ -21,14 +22,17 @@ class AssetManager implements LoggerAwareInterface
     protected $scssCompiler;
     protected $cache;
 
-    public function __construct(array $paths = [], ScssCompiler $scssCompiler, CacheInterface $cache)
-    {
+    public function __construct(
+        array $paths = [],
+        ScssCompiler $scssCompiler,
+        CacheInterface $cache
+    ) {
         $this->paths = array_map("realpath", $paths);
         $this->scssCompiler = $scssCompiler;
         $this->cache = $cache;
     }
 
-    public function build() : void
+    public function build(): void
     {
         $assets = [];
         foreach ($this->paths as $path) {
@@ -50,12 +54,12 @@ class AssetManager implements LoggerAwareInterface
         }
     }
 
-    public function clear() : void
+    public function clear(): void
     {
         $this->cache->clear();
     }
 
-    public function getAsset(string $file_path) : ?string
+    public function getAsset(string $file_path): ?string
     {
         $name = $this->hashName($file_path);
         if (!$this->cache->has($name)) {
@@ -64,7 +68,7 @@ class AssetManager implements LoggerAwareInterface
         return $this->cache->get($name);
     }
 
-    public function getAssetRealPath(string $file_path) : ?string
+    public function getAssetRealPath(string $file_path): ?string
     {
         foreach ($this->paths as $path) {
             $real_path = sprintf("%s%s", $path, $file_path);
@@ -75,7 +79,7 @@ class AssetManager implements LoggerAwareInterface
         return null;
     }
 
-    protected function setAsset(string $name, string $file_path) : ?string
+    protected function setAsset(string $name, string $file_path): ?string
     {
         $extension = pathinfo($file_path, PATHINFO_EXTENSION);
         $content = file_get_contents($file_path);
@@ -98,7 +102,10 @@ class AssetManager implements LoggerAwareInterface
             default:
         }
 
-        if (!is_null($pattern) and preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1) {
+        if (
+            !is_null($pattern)
+            and preg_match($pattern, pathinfo($file_path, PATHINFO_BASENAME)) !== 1
+        ) {
             $content = $this->minify($extension, $content);
         }
 
@@ -107,7 +114,7 @@ class AssetManager implements LoggerAwareInterface
         return $content;
     }
 
-    protected function minify(string $extension, string $content) : string
+    protected function minify(string $extension, string $content): string
     {
         try {
             switch ($extension) {
@@ -122,7 +129,7 @@ class AssetManager implements LoggerAwareInterface
         }
     }
 
-    protected function hashName(string $file_path) : string
+    protected function hashName(string $file_path): string
     {
         return md5($file_path);
     }

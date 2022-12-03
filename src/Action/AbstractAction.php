@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Action;
 
@@ -11,7 +12,10 @@ use Laminas\EventManager\EventManagerAwareInterface;
 use Itseasy\Identity\IdentityAwareTrait;
 use Itseasy\Identity\IdentityAwareInterface;
 
-abstract class AbstractAction implements LoggerAwareInterface, EventManagerAwareInterface, IdentityAwareInterface
+abstract class AbstractAction implements
+    LoggerAwareInterface,
+    EventManagerAwareInterface,
+    IdentityAwareInterface
 {
     use LoggerAwareTrait;
     use EventManagerAwareTrait;
@@ -21,7 +25,7 @@ abstract class AbstractAction implements LoggerAwareInterface, EventManagerAware
     protected $logger = null;
     protected $eventManager = null;
 
-    public function setView(ViewInterface $view) : void
+    public function setView(ViewInterface $view): void
     {
         $this->view = $view;
     }

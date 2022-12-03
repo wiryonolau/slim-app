@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Session\Factory;
 
@@ -11,7 +12,7 @@ use Symfony\Component\HttpFoundation\Session\Storage\Handler\NativeFileSessionHa
 
 class SessionFactory
 {
-    public function __invoke(ContainerInterface $container) : Session
+    public function __invoke(ContainerInterface $container): Session
     {
         $options = $container->get('Config')->getConfig()['session']['options'];
 

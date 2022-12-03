@@ -2,7 +2,6 @@
 
 namespace Itseasy\Test\ModuleTest\Service;
 
-class TestService
+class ModuleTestService
 {
-
 }

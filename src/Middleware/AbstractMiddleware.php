@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Middleware;
 
@@ -13,7 +14,7 @@ abstract class AbstractMiddleware implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
-    protected function getRoute(ServerRequestInterface $request) : ?RouteInterface
+    protected function getRoute(ServerRequestInterface $request): ?RouteInterface
     {
         $routeContext = RouteContext::fromRequest($request);
         return $routeContext->getRoute();

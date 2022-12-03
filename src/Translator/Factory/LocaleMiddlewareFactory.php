@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace Itseasy\Translator\Factory;
 
@@ -9,9 +10,9 @@ use Itseasy\Translator\Translator;
 
 class LocaleMiddlewareFactory
 {
-    public function __invoke(ContainerInterface $container) : LocaleMiddleware
+    public function __invoke(ContainerInterface $container): LocaleMiddleware
     {
         $translator = $container->get(Translator::class);
-        return new LocaleMiddleware($translator);
+        return new LocaleMiddleware($translator, "en-US");
     }
 }
