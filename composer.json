@@ -21,7 +21,7 @@
         "php-di/php-di": "^6.3",
         "slim/php-view": "^3.0",
         "laminas/laminas-config-aggregator": "^1.4",
-        "symfony/console": "^5.2",
+        "symfony/console": "^6.2",
         "symfony/http-foundation": "^5.1",
         "symfony/security-csrf": "^5.2",
         "laminas/laminas-navigation": "^2.10",
