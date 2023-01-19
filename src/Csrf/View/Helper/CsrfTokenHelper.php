@@ -20,9 +20,14 @@ class CsrfTokenHelper
         $this->tokenManager = $tokenManager;
     }
 
-    public function __invoke($debug = false): string
+    public function __invoke(bool $as_meta = false, bool $debug = false): string
     {
         $csrfToken = $this->tokenManager->getToken("");
+
+        if ($as_meta) {
+            return sprintf("<meta name=\"csrf-token\" content=\"%s\" />", $csrfToken);
+        }
+
         if ($debug) {
             $element = "<input type=\"text\" readonly=\"readonly\" name=\"%s\" value=\"%s\" />";
         } else {
@@ -32,3 +37,4 @@ class CsrfTokenHelper
         return sprintf($element, $this->field_name, $csrfToken);
     }
 }
+

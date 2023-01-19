@@ -14,6 +14,8 @@ final class ApplicationTest extends TestCase
     const PHP8_LIBS = [
         'Laminas\Form\Annotation\AttributeBuilder',
         'FormAttributeBuilder',
+        'Laminas\Form\Annotation\AnnotationBuilder',
+        'FormAnnotationBuilder'
     ];
 
 
