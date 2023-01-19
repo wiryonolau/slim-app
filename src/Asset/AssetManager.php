@@ -23,7 +23,7 @@ class AssetManager implements LoggerAwareInterface
     protected $cache;
 
     public function __construct(
-        array $paths = [],
+        array $paths,
         ScssCompiler $scssCompiler,
         CacheInterface $cache
     ) {
