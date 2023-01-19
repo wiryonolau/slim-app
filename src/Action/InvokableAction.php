@@ -118,20 +118,15 @@ class InvokableAction extends AbstractAction
         $ignore_empty = false
     ) {
         try {
-            $params = $this->request->getQueryParams();
-
-            if (!isset($params[$key])) {
-                throw new Exception("Invalid Key");
-            }
-
+            $value = $this->request->getQueryParams()[$key];
             if ($ignore_empty) {
-                return $params[$key];
+                return $value;
             }
 
-            if (empty($params[$key])) {
+            if (empty($value)) {
                 throw new Exception("Empty Value");
             }
-            return $params[$key];
+            return $value;
         } catch (Exception $e) {
             return $placeholder;
         }
@@ -160,19 +155,16 @@ class InvokableAction extends AbstractAction
             if (!in_array($this->request->getMethod(), ["POST", "PUT"])) {
                 throw new Exception("Request is not a POST or PUT");
             }
-
-            if (!isset($this->parsedBody[$key])) {
-                throw new Exception("Invalid Key");
-            }
+            $value = $this->parsedBody[$key];
 
             if ($ignore_empty) {
-                return $this->parsedBody[$key];
+                return $value;
             }
 
-            if (empty($this->parsedBody[$key])) {
+            if (empty($value)) {
                 throw new Exception("Empty Value");
             }
-            return $this->parsedBody[$key];
+            return $value;
         } catch (Exception $e) {
             return $placeholder;
         }
@@ -187,27 +179,26 @@ class InvokableAction extends AbstractAction
         $ignore_empty = false
     ) {
         try {
-            if (!isset($this->arguments[$key])) {
-                throw new Exception("Invalid Key");
-            }
+            $value = $this->arguments[$key];
             if ($ignore_empty) {
-                return $this->arguments[$key];
+                return $value;
             }
 
-            if (empty($this->arguments[$key])) {
+            if (empty($value)) {
                 throw new Exception("Empty Value");
             }
-            return $this->arguments[$key];
+            return $value;
         } catch (Exception $e) {
             return $placeholder;
         }
     }
 
-    protected function redirect(
-        string $path,
-        array $query = []
-    ): ResponseInterface {
-        return $this->response->withHeader("Location", $this->view->url($path, $query));
+    protected function redirect(string $path, array $query = []): ResponseInterface
+    {
+        return $this->response->withHeader(
+            "Location",
+            $this->view->url($path, $query)
+        );
     }
 
     protected function forbidden(string $message = ""): void

@@ -38,16 +38,8 @@ class AssetManager implements LoggerAwareInterface
         foreach ($this->paths as $path) {
             $dir = new RecursiveDirectoryIterator($path);
             $iter = new RecursiveIteratorIterator($dir);
-            $cssFiles = new RegexIterator(
-                $iter,
-                '/.*(.css|.sass|.scss)$/',
-                RegexIterator::GET_MATCH
-            );
-            $jsFiles = new RegexIterator(
-                $iter,
-                '/.*(.js|.mjs)$/',
-                RegexIterator::GET_MATCH
-            );
+            $cssFiles = new RegexIterator($iter, '/.*(.css|.sass|.scss)$/', RegexIterator::GET_MATCH);
+            $jsFiles = new RegexIterator($iter, '/.*(.js|.mjs)$/', RegexIterator::GET_MATCH);
             foreach ($cssFiles as $file) {
                 $assets = array_merge($assets, [$file[0]]);
             }
