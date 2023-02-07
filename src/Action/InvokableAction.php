@@ -220,6 +220,7 @@ class InvokableAction extends AbstractAction
             if ($this->request->getHeaderLine("X-Requested-With") == "XMLHttpRequest") {
                 return true;
             }
+            return false;
         } catch (Exception $e) {
             return false;
         }
