@@ -118,7 +118,7 @@ class InvokableAction extends AbstractAction
         $ignore_empty = false
     ) {
         try {
-            $value = $this->request->getQueryParams()[$key];
+            $value = $this->request->getQueryParams()[$key] ?? null;
             if ($ignore_empty) {
                 return $value;
             }
@@ -155,7 +155,7 @@ class InvokableAction extends AbstractAction
             if (!in_array($this->request->getMethod(), ["POST", "PUT"])) {
                 throw new Exception("Request is not a POST or PUT");
             }
-            $value = $this->parsedBody[$key];
+            $value = $this->parsedBody[$key] ?? null;
 
             if ($ignore_empty) {
                 return $value;
@@ -179,7 +179,7 @@ class InvokableAction extends AbstractAction
         $ignore_empty = false
     ) {
         try {
-            $value = $this->arguments[$key];
+            $value = $this->arguments[$key] ?? null;
             if ($ignore_empty) {
                 return $value;
             }
@@ -209,8 +209,17 @@ class InvokableAction extends AbstractAction
     protected function asJson(): bool
     {
         try {
-            $format = $this->getQuery("format", "html");
-            return ($format == "json");
+            if ($this->getQuery("format", "html") == "json") {
+                return true;
+            }
+
+            if ($this->getQuery("output", "html") == "json") {
+                return true;
+            }
+
+            if ($this->request->getHeaderLine("X-Requested-With") == "XMLHttpRequest") {
+                return true;
+            }
         } catch (Exception $e) {
             return false;
         }
