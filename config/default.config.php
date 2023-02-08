@@ -33,8 +33,13 @@ return [
     'session' => [
         'class' => Session::class,
         'options' => [
+            'name' => 'user_session',
+            'sid_length' => 64,
+            'sid_bits_per_character' => 6,
             'cache_expire' => 0,
-            'cookie_samesite' => 'lax',
+            'cookie_secure' => true,
+            'cookie_httponly' => true,
+            'cookie_samesite' => 'strict'
         ],
         'csrf_field_name' => '_csrf',
         'csrf_token_id' => 'app',
