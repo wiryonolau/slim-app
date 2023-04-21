@@ -35,7 +35,7 @@ class Application
 
     protected $log_level = LaminasLog\Logger::INFO;
     protected $log_file = 'php://stderr';
-    protected $log_format = '%timestamp% %priorityName% (%priority%): %message%';
+    protected $log_format = '%timestamp% %priorityName% (%priority%): %message% %extra%';
     protected $log_time_format = 'c';
 
     protected $options = [
@@ -411,6 +411,9 @@ class Application
                 'requestid' => [
                     'name' => LaminasLog\Processor\RequestId::class,
                 ],
+                'backtrace' => [
+                    'name' => LaminasLog\Processor\Backtrace::class
+                ]
             ],
         ]);
 
