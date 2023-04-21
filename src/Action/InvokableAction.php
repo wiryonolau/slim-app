@@ -37,11 +37,34 @@ class InvokableAction extends AbstractAction
 
         $this->parseRequest();
 
-        $function_name = sprintf("%s%s", "http", ucfirst(strtolower($method)));
+        $method = strtolower($method);
+        $function_name = sprintf("%s%s", "http", ucfirst($method));
 
         // call function base on http method e.g httpGet, httpPost, etc
         if (method_exists($this, $function_name)) {
-            return call_user_func_array([$this, $function_name], []);
+            $this->getEventManager()->trigger(
+                sprintf('action.%s.pre', $method),
+                null,
+                [
+                    "request" => $this->request,
+                    "arguments" => $this->arguments,
+                    "parsedBody" => $this->parsedBody
+                ]
+            );
+
+            $actionResponse = call_user_func_array([$this, $function_name], []);
+
+            $this->getEventManager()->trigger(
+                sprintf('action.%s.post', $method),
+                null,
+                [
+                    "request" => $this->request,
+                    "arguments" => $this->arguments,
+                    "parsedBody" => $this->parsedBody
+                ]
+            );
+
+            return $actionResponse;
         }
 
         return $this->response;
