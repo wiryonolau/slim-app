@@ -180,6 +180,8 @@ class Application
             $this->config_array = ArrayUtils::merge($this->config_array, [
                 'service' => isset($module_config['service_manager']) ? $module_config['service_manager'] : [],
                 'view_helpers' => isset($module_config['view_helpers']) ? $module_config['view_helpers'] : [],
+                'console' => isset($module_config['console']) ? $module_config['console'] : [],
+                'action' => isset($module_config['action']) ? $module_config['action'] : [],
             ]);
         }
 
