@@ -76,12 +76,7 @@ class RouteBuilder
 
         $arguments = [];
         if (!empty($route["options"]["arguments"])) {
-            $arguments = array_map(function ($argument) {
-                if (is_bool($argument) and $argument === false) {
-                    return "0";
-                }
-                return strval($argument);
-            }, $route["options"]["arguments"]);
+            $arguments = $route["options"]["arguments"];
         }
 
         $middlewares = [];
@@ -138,12 +133,7 @@ class RouteBuilder
 
         $arguments = [];
         if (!empty($route["options"]["arguments"])) {
-            $arguments = array_map(function ($argument) {
-                if (is_bool($argument) and $argument === false) {
-                    return "0";
-                }
-                return strval($argument);
-            }, $route["options"]["arguments"]);
+            $arguments = $route["options"]["arguments"];
         }
 
         $middlewares = [];
