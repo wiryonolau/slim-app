@@ -12,6 +12,7 @@ use stdClass;
 class RouteCollection extends ArrayObject
 {
     protected $lock = false;
+
     public function __construct(App $application)
     {
         $routes = [];
@@ -21,6 +22,10 @@ class RouteCollection extends ArrayObject
             $addedRoute->methods = $route->getMethods();
             $addedRoute->pattern = $route->getPattern();
             $addedRoute->name = $route->getName();
+
+            // Only for predefine arguments in the config
+            $addedRoute->arguments = $route->getArguments();
+
             if (is_string($route->getCallable())) {
                 $addedRoute->action = $route->getCallable();
             } else {
@@ -55,6 +60,31 @@ class RouteCollection extends ArrayObject
             }
         }
         return null;
+    }
+
+    // Group route by action, useful for permission list
+    public function listRouteMethods(): array
+    {
+        $routes = [];
+        foreach ($this as $route) {
+            $addedRoute = new stdClass();
+            $addedRoute = $route;
+
+            if (isset($routes[$addedRoute->action])) {
+                $routes[$addedRoute->action]->methods = array_values(
+                    array_unique(
+                        array_merge(
+                            $routes[$addedRoute->action]->methods,
+                            $route->methods
+                        )
+                    )
+                );
+                continue;
+            }
+            $routes[$addedRoute->action] = $addedRoute;
+        }
+
+        return $routes;
     }
 
     #[\ReturnTypeWillChange]
