@@ -255,7 +255,6 @@ class Application
         if ($this->options['application_type'] == self::APP_HTTP) {
             $this->application = AppFactory::createFromContainer($this->container);
             $this->setRoute();
-            $this->setMiddleware();
 
             // Iterable complete route collection for http
             $routeCollection = new RouteCollection($this->application);
@@ -263,6 +262,9 @@ class Application
 
             $this->container->setService('applicationroute', $routeCollection);
             $this->container->setService('ApplicationRoute', $routeCollection);
+
+            // Middleware might require ApplicationRoute, set after all service set
+            $this->setMiddleware();
         } elseif ($this->options['application_type'] == self::APP_CONSOLE) {
             $this->application = new ConsoleApplication(
                 $this->options['console']['name'],

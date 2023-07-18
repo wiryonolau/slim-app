@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Itseasy;
 
-use Slim\Interfaces\RouteCollectorInterface;
 use Exception;
+use Slim\Routing\Route;
 
 class RouteBuilder
 {
@@ -39,11 +39,6 @@ class RouteBuilder
         array $route = []
     ): void {
         $path = $route["route"];
-
-        $arguments = [];
-        if (!empty($route["options"]["arguments"])) {
-            $arguments = $route["options"]["arguments"];
-        }
 
         $middlewares = [];
         if (!empty($route["middlewares"])) {
@@ -81,7 +76,12 @@ class RouteBuilder
 
         $arguments = [];
         if (!empty($route["options"]["arguments"])) {
-            $arguments = $route["options"]["arguments"];
+            $arguments = array_map(function ($argument) {
+                if (is_bool($argument) and $argument === false) {
+                    return "0";
+                }
+                return strval($argument);
+            }, $route["options"]["arguments"]);
         }
 
         $middlewares = [];
@@ -97,17 +97,7 @@ class RouteBuilder
 
         // Same as get
         $addedRoute = $routeCollector->redirect($path, $redirect, 301);
-
-        if (count($arguments)) {
-            $arguments = array_map(function ($argument) {
-                if (is_bool($argument) and $argument === false) {
-                    return "0";
-                }
-                return strval($argument);
-            }, $arguments);
-            $addedRoute->setArguments($arguments);
-        }
-
+        $addedRoute->setArguments($arguments);
         $addedRoute->setName($namespace);
 
         self::addMiddleware(
@@ -123,16 +113,6 @@ class RouteBuilder
                     self::addRoute($routeCollector, $namespace, $child_routes);
                 }
             );
-
-            if (count($arguments)) {
-                $arguments = array_map(function ($argument) {
-                    if (is_bool($argument) and $argument === false) {
-                        return "0";
-                    }
-                    return strval($argument);
-                }, $arguments);
-                $addedRoute->setArguments($arguments);
-            }
 
             self::addMiddleware(
                 $addedRoute,
@@ -158,7 +138,12 @@ class RouteBuilder
 
         $arguments = [];
         if (!empty($route["options"]["arguments"])) {
-            $arguments = $route["options"]["arguments"];
+            $arguments = array_map(function ($argument) {
+                if (is_bool($argument) and $argument === false) {
+                    return "0";
+                }
+                return strval($argument);
+            }, $route["options"]["arguments"]);
         }
 
         $middlewares = [];
@@ -183,26 +168,21 @@ class RouteBuilder
                     $namespace,
                     $method,
                     $action,
+                    $arguments,
                     $child_routes
                 ) {
-                    $routeCollector->map($method, "", $action);
+                    $childRoute = $routeCollector->map($method, "", $action);
+                    $childRoute->setArguments($arguments);
+
                     self::addRoute($routeCollector, $namespace, $child_routes);
                 }
             );
         } else {
             $addedRoute = $routeCollector->map($method, $path, $action);
             $addedRoute->setName($namespace);
-
-            if (count($arguments)) {
-                $arguments = array_map(function ($argument) {
-                    if (is_bool($argument) and $argument === false) {
-                        return "0";
-                    }
-                    return strval($argument);
-                }, $arguments);
-                $addedRoute->setArguments($arguments);
-            }
+            $addedRoute->setArguments($arguments);
         }
+
 
         self::addMiddleware(
             $addedRoute,

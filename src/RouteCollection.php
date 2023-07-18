@@ -22,6 +22,10 @@ class RouteCollection extends ArrayObject
             $addedRoute->methods = $route->getMethods();
             $addedRoute->pattern = $route->getPattern();
             $addedRoute->name = $route->getName();
+
+            // Only for predefine arguments in the config
+            $addedRoute->arguments = $route->getArguments();
+
             if (is_string($route->getCallable())) {
                 $addedRoute->action = $route->getCallable();
             } else {
