@@ -30,19 +30,19 @@ class CsrfTokenManager extends SymfonyCsrfTokenManager
         return $this->token_id;
     }
 
-    public function getToken(string $token_id = ""): CsrfToken
+    public function getToken(?string $token_id = ""): CsrfToken
     {
         $token_id = (!empty($token_id) ?: $this->token_id);
         return parent::getToken($token_id);
     }
 
-    public function refreshToken(string $token_id = ""): CsrfToken
+    public function refreshToken(?string $token_id = ""): CsrfToken
     {
         $token_id = (!empty($token_id) ?: $this->token_id);
         return parent::refreshToken($token_id);
     }
 
-    public function removeToken(string $token_id = ""): ?string
+    public function removeToken(?string $token_id = ""): ?string
     {
         $token_id = (!empty($token_id) ?: $this->token_id);
         return parent::removeToken($token_id);

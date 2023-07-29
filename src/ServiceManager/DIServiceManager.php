@@ -4,8 +4,8 @@ namespace Itseasy\ServiceManager;
 
 use DI\Container;
 use DI\ContainerBuilder;
-use DI\NotFoundException;
 use Di\Definition\Helper\DefinitionHelper;
+use DI\NotFoundException;
 use Exception;
 use Itseasy\Action\AbstractAction;
 use Itseasy\Config;
@@ -14,6 +14,7 @@ use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
+use Laminas\EventManager\SharedEventManager;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
@@ -28,9 +29,9 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     protected $eventManager;
     protected $identityProvider;
     protected $abstractFactories;
-    protected $delegators;
     protected $logger;
     protected $view;
+    protected $listeners = [];
     protected $allowOverride = true;
 
     public static function factory(
@@ -38,6 +39,14 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         ?LoggerInterface $logger = null,
         ?EventManagerInterface $em = null
     ): ContainerInterface {
+        if (is_null($logger)) {
+            $logger = new Logger();
+        }
+
+        if (is_null($em)) {
+            $em = new EventManager(new SharedEventManager());
+        }
+
         // Doesn't support createCompiler in this scenario
         $containerBuilder = new ContainerBuilder(self::class);
         $container = $containerBuilder->build();
@@ -47,6 +56,12 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $container->setEventManager($em);
 
         $container->init();
+
+        // Listener can only be add to EventManager after container done
+        foreach ($container->getListeners() as $listener) {
+            $listener = $container->get($listener);
+            $listener->attach($em);
+        }
 
         return $container;
     }
@@ -73,17 +88,12 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 
     public function get($name)
     {
-        if ($this->has($name)) {
-            if (empty($this->delegators[$name])) {
-                return parent::get($name);
-            }
+        try {
+            return parent::get($name);
+        } catch (NotFoundException $e) {
+            // Try resolve in abstract factories once
+            $this->resolveAbstractFactories($name);
 
-            return $this->resolveDelegators($name);
-        }
-
-        $this->resolveAbstractFactories($name);
-
-        if ($this->has($name)) {
             return parent::get($name);
         }
     }
@@ -106,6 +116,11 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $this->set($name, $factory);
     }
 
+    public function getListeners(): array
+    {
+        return $this->listeners;
+    }
+
     private function resolveAbstractFactories(string $name)
     {
         foreach ($this->abstractFactories as $factory) {
@@ -126,10 +141,6 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 
     public function setLogger(?LoggerInterface $logger = null): void
     {
-        if (is_null($logger)) {
-            $logger = new Logger();
-        }
-
         $this->logger = $logger;
         $this->set('Logger', $this->logger);
         $this->set('logger', $this->logger);
@@ -137,10 +148,6 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 
     public function setEventManager(?EventManagerInterface $em = null): void
     {
-        if (is_null($em)) {
-            $em = new EventManager();
-        }
-
         $this->eventManager = $em;
         $this->set('EventManager', $this->eventManager);
         $this->set('eventmanager', $this->eventManager);
@@ -155,7 +162,6 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         }
 
         $this->registerAbstractFactories();
-        $this->registerDelegators();
         $this->registerAliases();
         $this->registerService();
         $this->registerCommand();
@@ -218,38 +224,6 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         }
     }
 
-    private function resolveDelegators(string $name)
-    {
-        // Laminas Delegators
-        // check Laminas\ServiceManager\ServiceManager createDelegatorFromName(string $name, ?array $options = null)
-
-        $factory = parent::get($name);
-        $creationCallback = function ()  use ($name, $factory) {
-            if ($factory instanceof DefinitionHelper) {
-                $obj = new $name($this);
-            } else {
-                $obj = new $factory($this);
-            }
-            return $obj;
-        };
-
-        foreach ($this->delegators[$name] as $delegator) {
-            $delegatorFactory = new $delegator();
-            $creationCallback = $delegatorFactory($this, $name, $creationCallback);
-        }
-        return $creationCallback;
-    }
-
-    private function registerDelegators(): void
-    {
-        $service = $this->config->get('service', []);
-        $factories = (empty($service['delegators']) ? [] : $service['delegators']);
-
-        foreach ($factories as $name => $delegators) {
-            $this->delegators[$name] = $delegators;
-        }
-    }
-
     private function registerCommand(): void
     {
         $console = $this->config->get('console', []);
@@ -283,11 +257,12 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $factory,
         array $dependencies = []
     ): void {
-        $factory = function (
-            ContainerInterface $container,
-            $requestedName,
-            ?array $options = null
-        ) use ($name, $factory, $dependencies) {
+        // Check if obj is listener without construct, added to EventManager on later process
+        if (is_subclass_of($name, ListenerAggregateInterface::class, true)) {
+            $this->listeners[] = $name;
+        }
+
+        $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
             try {
                 if ($factory instanceof DefinitionHelper) {
                     $obj = new $name();
@@ -301,6 +276,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
                     $obj = $obj($container, $name, $options);
                 }
 
+                // Register listener
                 if ($obj instanceof ListenerAggregateInterface) {
                     $obj->attach($container->get('EventManager'));
                 }

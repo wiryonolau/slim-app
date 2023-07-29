@@ -12,8 +12,10 @@ use Slim\Psr7\Response;
 
 class JsonExceptionMiddleware extends AbstractMiddleware
 {
-    public function __invoke(Request $request, RequestHandler $handler): Response
-    {
+    public function __invoke(
+        Request $request,
+        RequestHandler $handler
+    ): Response {
         try {
             return $handler->handle($request);
         } catch (HttpException $httpException) {

@@ -23,8 +23,10 @@ class LocaleMiddleware extends AbstractMiddleware
         $this->default_locale = $default_locale;
     }
 
-    public function __invoke(Request $request, RequestHandler $handler): Response
-    {
+    public function __invoke(
+        Request $request,
+        RequestHandler $handler
+    ): Response {
         $locale = $this->getLocale($request);
         $this->translator->setLocale($locale);
 

@@ -54,10 +54,7 @@ class CsrfMiddleware extends AbstractMiddleware
 
         // Disable csrf check from route.config.php by setting csrf equal false in options.arguments
         // Slim route arguments only use string or null
-        if (
-            !is_null($route->getArgument("csrf"))
-            and $route->getArgument("csrf") === "0"
-        ) {
+        if (!is_null($route->getArgument("csrf")) and $route->getArgument("csrf") === "0") {
             return $handler->handle($request);
         }
 
