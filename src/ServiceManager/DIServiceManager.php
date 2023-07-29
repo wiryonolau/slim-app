@@ -31,6 +31,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     protected $abstractFactories;
     protected $logger;
     protected $view;
+    protected $listeners = [];
     protected $allowOverride = true;
 
     public static function factory(
@@ -38,6 +39,14 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         ?LoggerInterface $logger = null,
         ?EventManagerInterface $em = null
     ): ContainerInterface {
+        if (is_null($logger)) {
+            $logger = new Logger();
+        }
+
+        if (is_null($em)) {
+            $em = new EventManager(new SharedEventManager());
+        }
+
         // Doesn't support createCompiler in this scenario
         $containerBuilder = new ContainerBuilder(self::class);
         $container = $containerBuilder->build();
@@ -47,6 +56,12 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $container->setEventManager($em);
 
         $container->init();
+
+        // Listener can only be add to EventManager after container done
+        foreach ($container->getListeners() as $listener) {
+            $listener = $container->get($listener);
+            $listener->attach($em);
+        }
 
         return $container;
     }
@@ -101,6 +116,11 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $this->set($name, $factory);
     }
 
+    public function getListeners(): array
+    {
+        return $this->listeners;
+    }
+
     private function resolveAbstractFactories(string $name)
     {
         foreach ($this->abstractFactories as $factory) {
@@ -121,10 +141,6 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 
     public function setLogger(?LoggerInterface $logger = null): void
     {
-        if (is_null($logger)) {
-            $logger = new Logger();
-        }
-
         $this->logger = $logger;
         $this->set('Logger', $this->logger);
         $this->set('logger', $this->logger);
@@ -132,10 +148,6 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 
     public function setEventManager(?EventManagerInterface $em = null): void
     {
-        if (is_null($em)) {
-            $em = new EventManager(new SharedEventManager());
-        }
-
         $this->eventManager = $em;
         $this->set('EventManager', $this->eventManager);
         $this->set('eventmanager', $this->eventManager);
@@ -245,6 +257,11 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $factory,
         array $dependencies = []
     ): void {
+        // Check if obj is listener without construct, added to EventManager on later process
+        if (is_subclass_of($name, ListenerAggregateInterface::class, true)) {
+            $this->listeners[] = $name;
+        }
+
         $factory = function (ContainerInterface $container, $requestedName, ?array $options = null) use ($name, $factory, $dependencies) {
             try {
                 if ($factory instanceof DefinitionHelper) {

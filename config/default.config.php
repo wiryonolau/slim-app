@@ -27,9 +27,6 @@ return [
             Http\JsonExceptionMiddleware::class => InvokableFactory::class
         ],
     ],
-    'event' => [
-        'listener_aggregate' => [],
-    ],
     'session' => [
         'class' => Session::class,
         'options' => [

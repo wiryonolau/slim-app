@@ -22,7 +22,10 @@ final class ApplicationTest extends TestCase
     public function testDIContainer()
     {
         $app = new Application([
-            'config_path' => [__DIR__ . '/config/*.config.php'],
+            'config_path' => [
+                __DIR__ . '/config/*.config.php',
+                __DIR__ . '/../config/*.config.php'
+            ],
             'module' => [
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,
@@ -56,8 +59,12 @@ final class ApplicationTest extends TestCase
         $b = $app->getContainer()->get('yoyo');
         $this->assertEquals($a, $b);
 
-        $this->assertEquals($app->getContainer()->get('testalias') instanceof  Provider\IdentityProvider, true);
+        $this->assertEquals(
+            $app->getContainer()->get('testalias') instanceof  Provider\IdentityProvider,
+            true
+        );
 
+        $this->expectException(Exception::class);
         $testEvent = $app->getContainer()->get(TestService::class);
         $testEvent->run();
     }
@@ -65,7 +72,10 @@ final class ApplicationTest extends TestCase
     public function testLaminasContainer()
     {
         $app = new Application([
-            'config_path' => [__DIR__ . '/config/*.config.php'],
+            'config_path' => [
+                __DIR__ . '/config/*.config.php',
+                __DIR__ . '/../config/*.config.php'
+            ],
             'module' => [
                 ModuleTest\Module::class,
                 \Laminas\Form\Module::class,
@@ -90,7 +100,7 @@ final class ApplicationTest extends TestCase
             $object = null;
             try {
                 $object = $app->getContainer()->get($entry);
-            } catch (\DI\NotFoundException $e) {
+            } catch (\Laminas\ServiceManager\Exception\ServiceNotFoundException $e) {
                 debug(sprintf("\nService : %s\n", $entry));
                 debug(sprintf("ERROR : \n%s\n", $e->getMessage()));
             } catch (Exception $ex) {
@@ -99,6 +109,7 @@ final class ApplicationTest extends TestCase
             $this->assertEquals(is_object($object), true);
         }
 
+        $this->expectException(Exception::class);
         $testEvent = $app->getContainer()->get(TestService::class);
         $testEvent->run();
     }

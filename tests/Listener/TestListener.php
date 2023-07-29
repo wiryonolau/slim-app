@@ -2,6 +2,7 @@
 
 namespace Itseasy\Test\Listener;
 
+use Exception;
 use Laminas\EventManager\EventInterface;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
@@ -25,5 +26,7 @@ class TestListener implements ListenerAggregateInterface, LoggerAwareInterface
         $event  = $e->getName();
         $params = $e->getParams();
         $this->logger->info(sprintf('%s: %s', $event, json_encode($params)));
+
+        throw new Exception("I can throw error");
     }
 }

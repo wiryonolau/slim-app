@@ -12,7 +12,10 @@ final class ConsoleTest extends TestCase
     public function testConsole()
     {
         $app = new Application([
-            "config_path" => __DIR__ . "/config/*.config.php"
+            "config_path" => [
+                __DIR__ . '/config/*.config.php',
+                __DIR__ . '/../config/*.config.php'
+            ],
         ]);
         $app->setApplicationType(Application::APP_CONSOLE)->build();
 
@@ -27,7 +30,10 @@ final class ConsoleTest extends TestCase
     public function testAssetConsole()
     {
         $app = new Application([
-            "config_path" => __DIR__ . "/config/*.config.php"
+            "config_path" => [
+                __DIR__ . '/config/*.config.php',
+                __DIR__ . '/../config/*.config.php'
+            ],
         ]);
         $app->setApplicationType(Application::APP_CONSOLE)->build();
         $command = $app->getApplication()->find('asset');

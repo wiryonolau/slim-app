@@ -9,6 +9,8 @@ class TestService implements EventManagerAwareInterface
 {
     use EventManagerAwareTrait;
 
+    protected $object = "Test";
+
     public function run()
     {
         $this->getEventManager()->trigger('do', null, ["call by event"]);

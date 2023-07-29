@@ -24,12 +24,21 @@ class LaminasServiceManager implements ServiceManagerInterface
 {
     protected $config;
     protected $factories = [];
+    protected $listeners = [];
 
     public static function factory(
         Config $config,
         ?LoggerInterface $logger = null,
         ?EventManagerInterface $em = null
     ): ContainerInterface {
+        if (is_null($logger)) {
+            $logger = new Logger();
+        }
+
+        if (is_null($em)) {
+            $em = new EventManager(new SharedEventManager());
+        }
+
         $service = new LaminasServiceManager($config);
         $service->build();
 
@@ -42,6 +51,12 @@ class LaminasServiceManager implements ServiceManagerInterface
         self::setLogger($container, $logger);
         self::setEventManager($container, $em);
 
+        // Listener can only be add to EventManager after container done
+        foreach ($service->getListeners() as $listener) {
+            $listener = $container->get($listener);
+            $listener->attach($em);
+        }
+
         return $container;
     }
 
@@ -50,9 +65,14 @@ class LaminasServiceManager implements ServiceManagerInterface
         $this->config = $config;
     }
 
-    public function getFactories()
+    public function getFactories(): array
     {
         return $this->factories;
+    }
+
+    public function getListeners(): array
+    {
+        return $this->listeners;
     }
 
     private static function setConfig(
@@ -65,26 +85,16 @@ class LaminasServiceManager implements ServiceManagerInterface
 
     private static function setLogger(
         ContainerInterface &$container,
-        ?LoggerInterface $logger = null
+        LoggerInterface $logger
     ): void {
-        if (is_null($logger)) {
-            $logger = new Logger();
-        }
-
         $container->setService('Logger', $logger);
-        $container->setService('logger', $logger);
     }
 
     private static function setEventManager(
         ContainerInterface &$container,
-        ?EventManagerInterface $em = null
+        EventManagerInterface $em
     ): void {
-        if (is_null($em)) {
-            $em = new EventManager(new SharedEventManager());
-        }
-
         $container->setService('EventManager', $em);
-        $container->setService('eventmanager', $em);
     }
 
     public function build(): void
@@ -155,29 +165,32 @@ class LaminasServiceManager implements ServiceManagerInterface
         }
     }
 
+    /**
+     * Wrap actualFactory with another layer for injection
+     */
     private function registerFactory(
         string $name,
-        $factory,
+        $actualFactory,
         array $dependencies = []
     ): void {
+        // Check if obj is listener without construct, added to EventManager on later process
+        if (is_subclass_of($name, ListenerAggregateInterface::class, true)) {
+            $this->listeners[] = $name;
+        }
+
         $factory = function (
             ContainerInterface $container,
             $requestedName,
             ?array $options = null
         ) use (
             $name,
-            $factory,
+            $actualFactory,
             $dependencies
         ) {
             try {
-                $obj = new $factory();
+                $obj = new $actualFactory();
                 // requestedName always equal name
                 $obj = $obj($container, $requestedName, $options);
-
-                // Register listener
-                if ($obj instanceof ListenerAggregateInterface) {
-                    $obj->attach($container->get('EventManager'));
-                }
             } catch (Exception $ex) {
                 debug($ex->getMessage());
                 throw new Exception("Factory No entry or class found for '$name'");
