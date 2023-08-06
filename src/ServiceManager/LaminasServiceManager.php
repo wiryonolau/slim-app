@@ -2,9 +2,9 @@
 
 namespace Itseasy\ServiceManager;
 
-use Exception;
 use Itseasy\Action\AbstractAction;
 use Itseasy\Config;
+use Itseasy\Guard\GuardOption;
 use Itseasy\Identity\IdentityAwareInterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\EventManagerAwareInterface;
@@ -44,9 +44,50 @@ class LaminasServiceManager implements ServiceManagerInterface
 
         $serviceConfig = $config->getConfig()['service'];
         $serviceConfig['factories'] = $service->getFactories();
+        $serviceConfig['initializers'] = [
+            // This function is called last when using get / build
+            function (ContainerInterface $container, $instance) {
+                if ($instance instanceof LoggerAwareInterface) {
+                    $instance->setLogger($container->get('Logger'));
+                }
+
+                if (
+                    $instance instanceof AbstractAction
+                ) {
+                    $config = $container->get("Config");
+
+                    $view_config = $config->get('view');
+                    $viewClass = $view_config['class'];
+                    $rendererClass = $view_config['renderer'];
+                    $default_layout = $view_config['default_layout'];
+
+                    // View require to be a unique instance for each action
+                    $view = new $viewClass();
+                    $view->setRenderer($container->get($rendererClass));
+                    $view->setLayout($default_layout);
+                    $instance->setView($view);
+
+                    if (
+                        $instance instanceof IdentityAwareInterface
+                        and $container->has(GuardOption::class)
+                    ) {
+                        $guardOptions = $container->get(GuardOption::class);
+
+                        $instance->setIdentityProvider(
+                            $container->get($guardOptions->getIdentityProvider())
+                        );
+                    }
+                }
+
+                if ($instance instanceof EventManagerAwareInterface) {
+                    $instance->setEventManager($container->get('EventManager'));
+                }
+            }
+        ];
 
         $container = new ServiceManager($serviceConfig);
 
+        // Add config, logger, eventmanager after action and service registered
         self::setConfig($container, $config);
         self::setLogger($container, $logger);
         self::setEventManager($container, $em);
@@ -99,177 +140,68 @@ class LaminasServiceManager implements ServiceManagerInterface
 
     public function build(): void
     {
-        // Identity not initiate during build, retrieve the class name only
-        $identityProvider = $this->config->get('guard');
-        if (!empty($identityProvider['identity_provider'])) {
-            $this->identityProvider = $identityProvider['identity_provider'];
-        }
-
         $this->registerService();
         $this->registerCommand();
         $this->registerViewHelper();
         $this->registerHttpAction();
     }
 
+    /**
+     * Retrieve factory definition from service config
+     */
     private function registerService(): void
     {
         $service = $this->config->get('service', []);
         $factories = (empty($service['factories']) ? [] : $service['factories']);
 
         foreach ($factories as $name => $factory) {
-            $this->registerFactory($name, $factory, [
-                'setObjectLogger',
-                'setObjectEventManager',
-            ]);
+            if (is_subclass_of(
+                $name,
+                ListenerAggregateInterface::class,
+                true
+            )) {
+                $this->listeners[] = $name;
+            }
+            $this->factories[$name] = $factory;
         }
     }
 
+    /**
+     * Retrieve factory definition from viewhelper config
+     */
     private function registerViewHelper(): void
     {
         $view_helpers = $this->config->get('view_helpers', []);
         $factories = (empty($view_helpers['factories']) ? [] : $view_helpers['factories']);
 
         foreach ($factories as $name => $factory) {
-            $this->registerFactory($name, $factory, [
-                'setObjectLogger',
-                'setObjectEventManager',
-            ]);
+            $this->factories[$name] = $factory;
         }
     }
 
+    /**
+     * Retrieve factory definition from console command config
+     */
     private function registerCommand(): void
     {
         $console = $this->config->get('console', []);
         $factories = (empty($console['factories']) ? [] : $console['factories']);
 
         foreach ($factories as $name => $factory) {
-            $this->registerFactory($name, $factory, [
-                'setObjectLogger',
-                'setObjectEventManager',
-            ]);
+            $this->factories[$name] = $factory;
         }
     }
 
+    /**
+     * Retrieve factory definition from HTTP action
+     */
     private function registerHttpAction(): void
     {
         $action = $this->config->get('action', []);
         $factories = (empty($action['factories']) ? [] : $action['factories']);
 
         foreach ($factories as $name => $factory) {
-            $this->registerFactory($name, $factory, [
-                'setObjectView',
-                'setObjectLogger',
-                'setObjectEventManager',
-                'setObjectIdentityProvider',
-            ]);
+            $this->factories[$name] = $factory;
         }
-    }
-
-    /**
-     * Wrap actualFactory with another layer for injection
-     */
-    private function registerFactory(
-        string $name,
-        $actualFactory,
-        array $dependencies = []
-    ): void {
-        // Check if obj is listener without construct, added to EventManager on later process
-        if (is_subclass_of($name, ListenerAggregateInterface::class, true)) {
-            $this->listeners[] = $name;
-        }
-
-        $factory = function (
-            ContainerInterface $container,
-            $requestedName,
-            ?array $options = null
-        ) use (
-            $name,
-            $actualFactory,
-            $dependencies
-        ) {
-            try {
-                $obj = new $actualFactory();
-                // requestedName always equal name
-                $obj = $obj($container, $requestedName, $options);
-            } catch (Exception $ex) {
-                debug($ex->getMessage());
-                throw new Exception("Factory No entry or class found for '$name'");
-            }
-
-            foreach ($dependencies as $dependency) {
-                $obj = call_user_func_array([$this, $dependency], [$obj, $container]);
-            }
-
-            return $obj;
-        };
-
-        $this->factories[$name] = $factory;
-    }
-
-    private function setObjectView($obj, ContainerInterface $container)
-    {
-        try {
-            if ($obj instanceof AbstractAction) {
-                $view_config = $this->config->get('view');
-                $viewClass = $view_config['class'];
-                $rendererClass = $view_config['renderer'];
-                $default_layout = $view_config['default_layout'];
-
-                // View require to be a unique instance for each action
-                $view = new $viewClass();
-                $view->setRenderer($container->get($rendererClass));
-                $view->setLayout($default_layout);
-                $obj->setView($view);
-            }
-        } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
-        }
-
-        return $obj;
-    }
-
-    private function setObjectLogger($obj, ContainerInterface $container)
-    {
-        try {
-            if ($obj instanceof LoggerAwareInterface) {
-                $obj->setLogger($container->get('Logger'));
-            }
-        } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
-        }
-
-        return $obj;
-    }
-
-    private function setObjectIdentityProvider($obj, ContainerInterface $container)
-    {
-        // Not applicable for service factories due to circular dependency
-        // For Action only
-        try {
-            if (
-                $obj instanceof IdentityAwareInterface
-                and $obj instanceof AbstractAction
-                and $container->has($this->identityProvider)
-            ) {
-                $obj->setIdentityProvider($container->get($this->identityProvider));
-            }
-        } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
-        }
-
-        return $obj;
-    }
-
-    private function setObjectEventManager($obj, ContainerInterface $container)
-    {
-        try {
-            if ($obj instanceof EventManagerAwareInterface) {
-                $obj->setEventManager($container->get('EventManager'));
-            }
-        } catch (Exception $e) {
-            $container->get('Logger')->debug($e->getMessage());
-        }
-
-        return $obj;
     }
 }
