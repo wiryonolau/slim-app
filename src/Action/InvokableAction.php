@@ -8,7 +8,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpForbiddenException;
 use Exception;
-use HttpRequest;
+use Itseasy\Http\HttpRequest;
 
 class InvokableAction extends AbstractAction
 {
