@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace Itseasy\Http;
+
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;

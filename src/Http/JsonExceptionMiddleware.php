@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Itseasy\Http;
 
-use HttpRequest;
+use Itseasy\Http\HttpRequest;
 use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;

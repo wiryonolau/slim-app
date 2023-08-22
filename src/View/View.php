@@ -2,7 +2,7 @@
 
 namespace Itseasy\View;
 
-use HttpRequest;
+use Itseasy\Http\HttpRequest;
 use Laminas\View\Model\ViewModel as LaminasViewModel;
 use Laminas\View\View as LaminasViewView;
 use Laminas\View\ViewEvent as LaminasViewEvent;

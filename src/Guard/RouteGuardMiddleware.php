@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Itseasy\Guard;
 
 use Closure;
-use HttpRequest;
+use Itseasy\Http\HttpRequest;
 use Itseasy\Middleware\AbstractMiddleware;
 use Itseasy\View\Helper\UrlHelper;
 use Psr\Http\Message\ServerRequestInterface as Request;
