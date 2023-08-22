@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Itseasy\Guard;
 
 use Closure;
+use HttpRequest;
 use Itseasy\Middleware\AbstractMiddleware;
 use Itseasy\View\Helper\UrlHelper;
 use Psr\Http\Message\ServerRequestInterface as Request;
@@ -53,6 +54,10 @@ class RouteGuardMiddleware extends AbstractMiddleware
                     ($allow_access ? 'true' : 'false'),
                 ])
             );
+
+            if (HttpRequest::asJson($request)) {
+                throw new HttpForbiddenException($request, 'Unauthorized Access');
+            }
 
             $query = $this->getRedirectQuery($request->getRequestTarget());
             $login_url = call_user_func_array(

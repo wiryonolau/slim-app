@@ -2,6 +2,7 @@
 
 namespace Itseasy\View;
 
+use HttpRequest;
 use Laminas\View\Model\ViewModel as LaminasViewModel;
 use Laminas\View\View as LaminasViewView;
 use Laminas\View\ViewEvent as LaminasViewEvent;
@@ -68,49 +69,14 @@ class View implements ViewInterface
         return $response;
     }
 
+    /**
+     * Old compatibility , response is not required
+     */
     public function renderJson(
         Response $response,
         array $variables = [],
         ?int $id = null
     ): Response {
-        $jsonModel = new LaminasViewModel();
-        $jsonModel->setTemplate('layout/json');
-        $jsonModel->setOption('has_parent', true);
-
-        try {
-            if (!empty($variables["error"])) {
-                $variables =  [
-                    'content' => json_encode([
-                        'jsonrpc' => '2.0',
-                        'id' => (is_null($id) ? time() : $id),
-                        'error' => $variables["error"]
-                    ])
-                ];
-            } else {
-                $variables = [
-                    'content' => json_encode([
-                        'jsonrpc' => '2.0',
-                        'id' => (is_null($id) ? time() : $id),
-                        'result' => $variables,
-                    ]),
-                ];
-            }
-        } catch (Exception $e) {
-            $variables = [
-                'content' => json_encode([
-                    'jsonrpc' => '2.0',
-                    'id' => (is_null($id) ? time() : $id),
-                    'error' => [
-                        'code' => -32603,
-                        'message' => $e->getMessage(),
-                    ],
-                ]),
-            ];
-        }
-
-        $jsonModel->setVariables($variables);
-        $response->getBody()->write($this->view->render($jsonModel));
-
-        return $response->withHeader('Content-type', 'application/json');
+        return HttpRequest::jsonRpcResponse($variables, $id);
     }
 }

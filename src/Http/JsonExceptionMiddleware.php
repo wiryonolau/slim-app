@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Itseasy\Http;
 
+use HttpRequest;
 use Itseasy\Middleware\AbstractMiddleware;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpException;
 use Slim\Psr7\Response;
 
+/**
+ * DEPRECATED - please use HttpExceptionMiddleware, already json aware
+ */
 class JsonExceptionMiddleware extends AbstractMiddleware
 {
     public function __invoke(
@@ -23,24 +27,14 @@ class JsonExceptionMiddleware extends AbstractMiddleware
                 $httpException->getCode(), $httpException->getMessage()
             ]);
 
-            $payload = [
-                'jsonrpc' => '2.0',
-                'id' => time(),
-                'error' => [
-                    'code' => -32603,
-                    'message' => sprintf(
-                        "%s %s",
-                        $httpException->getCode(),
-                        $httpException->getMessage()
-                    )
-                ],
-            ];
-
-            $response = new Response();
-            $response->getBody()->write(json_encode($payload));
-            return $response
-                ->withHeader('Content-Type', 'application/json')
-                ->withStatus(200);
+            return HttpRequest::jsonRpcResponse(["error" => [
+                'code' => -32603,
+                'message' => sprintf(
+                    "%s %s",
+                    $httpException->getCode(),
+                    $httpException->getMessage()
+                )
+            ]]);
         }
     }
 }
