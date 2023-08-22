@@ -7,8 +7,8 @@ namespace Itseasy\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpForbiddenException;
-use Slim\Psr7\Response;
 use Exception;
+use HttpRequest;
 
 class InvokableAction extends AbstractAction
 {
@@ -95,36 +95,7 @@ class InvokableAction extends AbstractAction
         array $variables = [],
         ?int $id = null
     ): ResponseInterface {
-        try {
-            if (!empty($variables["error"])) {
-                $payload =  [
-                    'jsonrpc' => '2.0',
-                    'id' => (is_null($id) ? time() : $id),
-                    'error' => $variables["error"]
-                ];
-            } else {
-                $payload = [
-                    'jsonrpc' => '2.0',
-                    'id' => (is_null($id) ? time() : $id),
-                    'result' => (empty($variables["result"]) ? $variables : $variables["result"]),
-                ];
-            }
-        } catch (Exception $e) {
-            $payload = json_encode([
-                'jsonrpc' => '2.0',
-                'id' => (is_null($id) ? time() : $id),
-                'error' => [
-                    'code' => -32603,
-                    'message' => $e->getMessage(),
-                ],
-            ]);
-        }
-
-        $response = new Response();
-        $response->getBody()->write(json_encode($payload));
-        return $response
-            ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+        return HttpRequest::jsonRpcResponse($variables, $id);
     }
 
     protected function parseRequest(): void
@@ -231,21 +202,6 @@ class InvokableAction extends AbstractAction
 
     protected function asJson(): bool
     {
-        try {
-            if ($this->getQuery("format", "html") == "json") {
-                return true;
-            }
-
-            if ($this->getQuery("output", "html") == "json") {
-                return true;
-            }
-
-            if ($this->request->getHeaderLine("X-Requested-With") == "XMLHttpRequest") {
-                return true;
-            }
-            return false;
-        } catch (Exception $e) {
-            return false;
-        }
+        return HttpRequest::asJson($this->request);
     }
 }
