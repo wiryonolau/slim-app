@@ -38,11 +38,10 @@ class HttpExceptionMiddleware extends AbstractMiddleware
                 return HttpRequest::jsonRpcResponse(["error" => [
                     'code' => -32603,
                     'message' => sprintf(
-                        "%s %s",
-                        $httpException->getCode(),
+                        "%s",
                         $httpException->getMessage()
                     )
-                ]]);
+                ]], null, $httpException->getCode());
             }
 
             $code = $httpException->getCode();

@@ -8,7 +8,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Exception\HttpForbiddenException;
 use Exception;
+use Fig\Http\Message\StatusCodeInterface;
 use Itseasy\Http\HttpRequest;
+use Slim\Exception\HttpException;
 
 class InvokableAction extends AbstractAction
 {
@@ -97,6 +99,7 @@ class InvokableAction extends AbstractAction
     ): ResponseInterface {
         return HttpRequest::jsonRpcResponse($variables, $id);
     }
+
 
     protected function parseRequest(): void
     {
@@ -193,6 +196,13 @@ class InvokableAction extends AbstractAction
             "Location",
             $this->view->url($path, $query)
         );
+    }
+
+    protected function errorResponse(
+        string $message = "",
+        int $http_status_code = StatusCodeInterface::STATUS_OK
+    ): void {
+        throw new HttpException($this->request, $message, $http_status_code);
     }
 
     protected function forbidden(string $message = ""): void
