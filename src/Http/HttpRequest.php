@@ -72,6 +72,6 @@ class HttpRequest
         $response->getBody()->write(json_encode($payload));
         return $response
             ->withHeader('Content-Type', 'application/json')
-            ->withStatus(empty($code) ? StatusCodeInterface::STATUS_OK : $http_status_code);
+            ->withStatus(empty($http_status_code) ? StatusCodeInterface::STATUS_OK : $http_status_code);
     }
 }
