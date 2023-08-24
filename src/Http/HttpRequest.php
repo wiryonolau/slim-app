@@ -17,6 +17,10 @@ class HttpRequest
     public static function asJson(Request $request): bool
     {
         try {
+            if ($request->getHeaderLine('Content-Type') === "application/json") {
+                return true;
+            }
+
             if ($request->getQueryParams()["format"] == "json") {
                 return true;
             }
