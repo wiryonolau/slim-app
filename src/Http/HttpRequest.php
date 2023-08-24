@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Itseasy\Http;
 
+use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -16,6 +17,10 @@ class HttpRequest
     public static function asJson(Request $request): bool
     {
         try {
+            if ($request->getHeaderLine('Content-Type') === "application/json") {
+                return true;
+            }
+
             if ($request->getQueryParams()["format"] == "json") {
                 return true;
             }
@@ -35,7 +40,8 @@ class HttpRequest
 
     public static function jsonRpcResponse(
         array $variables = [],
-        ?int $id = null
+        ?int $id = null,
+        ?int $http_status_code = null
     ): ResponseInterface {
         try {
             if (!empty($variables["error"])) {
@@ -66,6 +72,6 @@ class HttpRequest
         $response->getBody()->write(json_encode($payload));
         return $response
             ->withHeader('Content-Type', 'application/json')
-            ->withStatus(200);
+            ->withStatus(empty($http_status_code) ? StatusCodeInterface::STATUS_OK : $http_status_code);
     }
 }
