@@ -20,6 +20,8 @@ class JsonExceptionMiddleware extends AbstractMiddleware
         Request $request,
         RequestHandler $handler
     ): Response {
+        $this->logger->warn(__CLASS__ . "is deprecated, use HttpExceptionMiddleware instead");
+
         try {
             return $handler->handle($request);
         } catch (HttpException $httpException) {
