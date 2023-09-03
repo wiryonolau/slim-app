@@ -70,7 +70,8 @@ class CsrfMiddleware extends AbstractMiddleware
         }
 
         // Get csrf value
-        $csrf_value = reset(array_filter($csrf_value));
+        $csrf_value = array_filter($csrf_value);
+        $csrf_value = reset($csrf_value);
         $csrf_value = ($csrf_value === false ? null : $csrf_value);
 
         $csrfToken = new CsrfToken($this->tokenManager->getId(), $csrf_value);

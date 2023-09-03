@@ -205,7 +205,7 @@ class InvokableAction extends AbstractAction
         throw new HttpException($this->request, $message, $http_status_code);
     }
 
-    protected function forbidden(string $message = ""): void
+    protected function forbidden(string $message = "Forbidden Access"): void
     {
         throw new HttpForbiddenException($this->request, $message);
     }
