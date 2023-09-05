@@ -23,10 +23,14 @@ class PhpRendererFactory
             $viewHelperConfig['aliases'][ucfirst($alias)] = $helper;
         }
 
-        $templateResolver = new TemplatePathStack([
-            'script_paths' => [$viewConfig['template_path']],
+        $templateResolver =  new TemplatePathStack([
+            'script_paths' => [
+                __DIR__ . '/../../../../view',
+                $viewConfig['template_path'],
+            ],
             'default_suffix' => $viewConfig['default_template_suffix'],
         ]);
+
 
         // Create the renderer
         $renderer = new PhpRenderer();

@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Itseasy\Action;
 
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Message\ResponseInterface;
-use Slim\Exception\HttpForbiddenException;
 use Exception;
+use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
 use Itseasy\Http\HttpRequest;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Exception\HttpException;
+use Slim\Exception\HttpForbiddenException;
+use Slim\Exception\HttpMethodNotAllowedException;
 
 class InvokableAction extends AbstractAction
 {
@@ -32,9 +34,17 @@ class InvokableAction extends AbstractAction
         $method = $this->request->getMethod();
 
         if (!in_array($method, [
-            "GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"
+            RequestMethodInterface::METHOD_GET,
+            RequestMethodInterface::METHOD_HEAD,
+            RequestMethodInterface::METHOD_POST,
+            RequestMethodInterface::METHOD_PUT,
+            RequestMethodInterface::METHOD_DELETE,
+            RequestMethodInterface::METHOD_CONNECT,
+            RequestMethodInterface::METHOD_OPTIONS,
+            RequestMethodInterface::METHOD_TRACE,
+            RequestMethodInterface::METHOD_PATCH
         ])) {
-            throw new Exception("Invalid HTTP Method");
+            throw new HttpMethodNotAllowedException($this->request);
         }
 
         $this->parseRequest();
@@ -200,7 +210,7 @@ class InvokableAction extends AbstractAction
 
     protected function errorResponse(
         string $message = "",
-        int $http_status_code = StatusCodeInterface::STATUS_OK
+        int $http_status_code = StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR
     ): void {
         throw new HttpException($this->request, $message, $http_status_code);
     }
