@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Itseasy\Http;
 
+use Exception;
 use Itseasy\Http\HttpRequest;
 use Itseasy\Middleware\AbstractMiddleware;
+use Itseasy\View\ViewInterface;
 use Psr\Http\Message\ServerRequestInterface as Request;
 use Psr\Http\Server\RequestHandlerInterface as RequestHandler;
 use Slim\Exception\HttpException;
@@ -15,7 +17,7 @@ class HttpExceptionMiddleware extends AbstractMiddleware
 {
     protected $view;
 
-    public function __construct($view)
+    public function __construct(ViewInterface $view)
     {
         $this->view = $view;
     }
@@ -49,9 +51,27 @@ class HttpExceptionMiddleware extends AbstractMiddleware
 
             $variables = [
                 'code' => $httpException->getCode(),
+                'title' => $httpException->getTitle(),
+                'description' => $httpException->getDescription(),
+                'message' => $httpException->getMessage()
             ];
 
-            return $this->view->render($response, $template, $variables);
+            try {
+                return $this->view->render(
+                    $response,
+                    $template,
+                    $variables,
+                    "layout/error"
+                );
+            } catch (Exception $e) {
+                $template = "/error/default";
+                return $this->view->render(
+                    $response,
+                    $template,
+                    $variables,
+                    "layout/error"
+                );
+            }
         }
     }
 }
