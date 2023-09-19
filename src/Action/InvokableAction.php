@@ -53,33 +53,33 @@ class InvokableAction extends AbstractAction
         $function_name = sprintf("%s%s", "http", ucfirst($method));
 
         // call function base on http method e.g httpGet, httpPost, etc
-        if (method_exists($this, $function_name)) {
-            $this->getEventManager()->trigger(
-                sprintf('action.%s.pre', $method),
-                null,
-                [
-                    "request" => $this->request,
-                    "arguments" => $this->arguments,
-                    "parsedBody" => $this->parsedBody
-                ]
-            );
-
-            $actionResponse = call_user_func_array([$this, $function_name], []);
-
-            $this->getEventManager()->trigger(
-                sprintf('action.%s.post', $method),
-                null,
-                [
-                    "request" => $this->request,
-                    "arguments" => $this->arguments,
-                    "parsedBody" => $this->parsedBody
-                ]
-            );
-
-            return $actionResponse;
+        if (!method_exists($this, $function_name)) {
+            $this->forbidden("Action not exist");
         }
 
-        return $this->response;
+        $this->getEventManager()->trigger(
+            sprintf('action.%s.pre', $method),
+            null,
+            [
+                "request" => $this->request,
+                "arguments" => $this->arguments,
+                "parsedBody" => $this->parsedBody
+            ]
+        );
+
+        $actionResponse = call_user_func_array([$this, $function_name], []);
+
+        $this->getEventManager()->trigger(
+            sprintf('action.%s.post', $method),
+            null,
+            [
+                "request" => $this->request,
+                "arguments" => $this->arguments,
+                "parsedBody" => $this->parsedBody
+            ]
+        );
+
+        return $actionResponse;
     }
 
     protected function render(
@@ -210,7 +210,7 @@ class InvokableAction extends AbstractAction
 
     protected function errorResponse(
         string $message = "",
-        int $http_status_code = StatusCodeInterface::STATUS_INTERNAL_SERVER_ERROR
+        int $http_status_code = StatusCodeInterface::STATUS_BAD_REQUEST
     ): void {
         throw new HttpException($this->request, $message, $http_status_code);
     }
