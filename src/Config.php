@@ -68,6 +68,8 @@ class Config implements ArrayAccess
     {
         return isset($this->config[$offset]);
     }
+
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->config[$offset];
