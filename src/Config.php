@@ -7,7 +7,7 @@ namespace Itseasy;
 use ArrayAccess;
 use Exception;
 use Laminas\ConfigAggregator\ConfigAggregator;
-use Laminas\ConfigAggregator\PhpFileProvider;
+use Laminas\ConfigAggregator\LaminasConfigProvider;
 use Laminas\Stdlib\ArrayUtils;
 
 class Config implements ArrayAccess
@@ -56,7 +56,7 @@ class Config implements ArrayAccess
     {
         $providers = [];
         foreach ($config_dirs as $config_dir) {
-            $providers[] = new PhpFileProvider($config_dir);
+            $providers[] = new LaminasConfigProvider($config_dir);
         }
 
         $aggregator = new ConfigAggregator($providers);

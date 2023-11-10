@@ -35,7 +35,8 @@
         "laminas/laminas-cache": "^3.6",
         "laminas/laminas-cache-storage-deprecated-factory": "^1.0",
         "laminas/laminas-serializer": "^2.14",
-        "laminas/laminas-eventmanager": "^3.10"
+        "laminas/laminas-eventmanager": "^3.10",
+        "laminas/laminas-config": "^3.9"
     },
     "autoload": {
         "psr-4": {
