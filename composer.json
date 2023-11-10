@@ -33,7 +33,8 @@
         "laminas/laminas-cache": "^2.13",
         "laminas/laminas-servicemanager": "^3.11",
         "itseasy/util": "^1",
-        "laminas/laminas-eventmanager": "^3.5"
+        "laminas/laminas-eventmanager": "^3.5",
+        "laminas/laminas-config": "^3.7"
     },
     "autoload": {
         "psr-4": {
