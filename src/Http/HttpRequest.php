@@ -130,9 +130,7 @@ class HttpRequest
                 throw new Exception("Message must be EventStreamMessage");
             }
 
-            if ($message->hasData()) {
-                $body->write($message->getMessage());
-            }
+            $message->writeToStream($body);
 
             if (connection_aborted()) {
                 throw new Exception("Connection aborted");

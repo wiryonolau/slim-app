@@ -4,20 +4,30 @@ declare(strict_types=1);
 
 namespace Itseasy\Http;
 
+use Exception;
+use Psr\Http\Message\StreamInterface;
+
 class EventStreamMessage
 {
     protected $event;
     protected $data;
 
-    public function __construct(string $event = "default", array $data = [])
+    public function __construct($data, ?string $event = null)
     {
-        $this->event = $event;
-        $this->data = $data;
+        $this->event = $event ?: "default";
+
+        if (method_exists($data, "getArrayCopy")) {
+            $this->data = $data->getArrayCopy();
+        } elseif (is_array($data)) {
+            $this->data = $data;
+        } else {
+            throw new Exception("data must be array or implement getArrayCopy");
+        }
     }
 
     public function hasData(): bool
     {
-        return (!empty($data));
+        return (!empty($this->data));
     }
 
     public function getMessage(): string
@@ -27,5 +37,12 @@ class EventStreamMessage
             $this->event,
             json_encode($this->data)
         );
+    }
+
+    public function writeToStream(StreamInterface $stream)
+    {
+        if ($this->hasData()) {
+            $stream->write($this->getMessage());
+        }
     }
 }
