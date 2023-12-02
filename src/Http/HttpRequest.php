@@ -98,7 +98,8 @@ class HttpRequest
             StatusCodeInterface::STATUS_OK,
             new Headers([
                 'Content-Type' => 'text/event-stream',
-                'Cache-Control' => 'no-cache'
+                'Cache-Control' => 'no-cache',
+                'X-Accel-Buffering' => 'no'
             ]),
             new NonBufferedBody()
         );
