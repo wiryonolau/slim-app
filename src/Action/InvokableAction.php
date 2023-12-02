@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Itseasy\Action;
 
+use Closure;
 use Exception;
 use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
@@ -252,13 +253,11 @@ class InvokableAction extends AbstractAction
      * @see HttpRequest::eventStreamResponse
      */
     protected function eventStreamResponse(
-        $function,
-        $args = [],
+        Closure $function,
         int $delay = 1
     ): ResponseInterface {
         return HttpRequest::eventStreamResponse(
             $function,
-            $args,
             $delay
         );
     }

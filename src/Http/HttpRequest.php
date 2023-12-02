@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Itseasy\Http;
 
+use Closure;
 use Fig\Http\Message\StatusCodeInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Psr7\Headers;
 use Slim\Psr7\NonBufferedBody;
 use Slim\Psr7\Request;
 use Slim\Psr7\Response;
@@ -85,43 +85,58 @@ class HttpRequest
      * If use nested loop must check itself if connection is aborted
      * response body will be append to args as first argument
      * 
-     * @param array $function function to run to produce message
-     * @param array $args function arguments
+     * @param Closure $function function to run to produce message
      * @param int $delay loop delay
+     * 
+     * @throws Exception
+     * 
+     * @example 
+     * HttpRequest::eventStreamResponse(
+     *  function(StreamInterface $body) : ?EventStreamMessage {
+     *   return new EventStreamMessage("event", ["value" => 1]);
+     *  }
+     * )
+     * 
+     * HttpRequest::eventStreamResponse(
+     *  function(StreamInterface $body) : ?EventStreamMessage {
+     *    $message = new EventStreamMessage("ping", ["time" => 1]);
+     *    $body->write($message->getMessage());
+     *    return;
+     *  }
+     * )
      */
     public static function eventStreamResponse(
-        $function,
-        array $args = [],
+        Closure $function,
         int $delay = 1
     ): ResponseInterface {
-        $response = new Response(
-            StatusCodeInterface::STATUS_OK,
-            new Headers([
-                'Content-Type' => 'text/event-stream',
-                'Cache-Control' => 'no-cache',
-                'X-Accel-Buffering' => 'no'
-            ]),
-            new NonBufferedBody()
-        );
+        $response = new Response();
+        $response = $response->withBody(new NonBufferedBody())
+            ->withHeader('Content-Type', 'text/event-stream')
+            ->withHeader('Cache-Control', 'no-cache')
+            ->withHeader('X-Accel-Buffering', 'no');
 
         $body = $response->getBody();
-        array_unshift($args, $body);
 
-        try {
-            while (true) {
-                $message = call_user_func_array($function, $args);
+        while (true) {
+            sleep($delay);
 
-                if (!empty($message)) {
-                    $body->write($message . ' ');
-                }
+            $message = $function($body);
 
-                if (connection_aborted()) {
-                    throw new Exception("Connection aborted");
-                }
-
-                sleep($delay);
+            if (empty($message)) {
+                continue;
             }
-        } catch (Throwable $t) {
+
+            if (!$message instanceof EventStreamMessage) {
+                throw new Exception("Message must be EventStreamMessage");
+            }
+
+            if ($message->hasData()) {
+                $body->write($message->getMessage());
+            }
+
+            if (connection_aborted()) {
+                throw new Exception("Connection aborted");
+            }
         }
 
         return $response;
