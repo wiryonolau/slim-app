@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Itseasy\Action;
 
+use Closure;
 use Exception;
 use Fig\Http\Message\RequestMethodInterface;
 use Fig\Http\Message\StatusCodeInterface;
@@ -78,7 +79,10 @@ class InvokableAction extends AbstractAction
         // response will be return as json directly
         // if not exists fallback to normat httpGet, httpPost funciton
         if ($this->asJson() and method_exists($this, $json_function_name)) {
-            $actionResponse = call_user_func_array([$this, $http_function_name], []);
+            $actionResponse = call_user_func_array(
+                [$this, $http_function_name],
+                []
+            );
             if (is_array($actionResponse)) {
                 return $this->renderAsJson($actionResponse);
             }
@@ -245,8 +249,23 @@ class InvokableAction extends AbstractAction
         }
     }
 
-    protected function redirect(string $path, array $query = []): ResponseInterface
-    {
+    /**
+     * @see HttpRequest::eventStreamResponse
+     */
+    protected function eventStreamResponse(
+        Closure $function,
+        int $delay = 1
+    ): ResponseInterface {
+        return HttpRequest::eventStreamResponse(
+            $function,
+            $delay
+        );
+    }
+
+    protected function redirect(
+        string $path,
+        array $query = []
+    ): ResponseInterface {
         return $this->response->withHeader(
             "Location",
             $this->view->url($path, $query)
