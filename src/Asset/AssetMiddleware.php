@@ -29,6 +29,7 @@ class AssetMiddleware extends AbstractMiddleware
         'ttf' => 'font/ttf',
         'woff' => 'font/woff',
         'woff2' => 'font/woff2',
+        'json' => 'application/json',
 
         // images
         'bmp' => 'image/bmp',
