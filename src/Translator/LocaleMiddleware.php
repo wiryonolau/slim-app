@@ -35,7 +35,7 @@ class LocaleMiddleware extends AbstractMiddleware
 
     private function getLocale(Request $request)
     {
-        $locale = $this->request->getQueryParams()[self::LOCALE_QUERY];
+        $locale = $request->getQueryParams()[self::LOCALE_QUERY];
         if (empty($locale)) {
             return $this->default_locale;
         }
