@@ -44,7 +44,7 @@ class LaminasServiceManager implements ServiceManagerInterface
         }
 
         if (is_null($translator)) {
-            $translator = new Translator();
+            $translator = Translator::factory($config->getConfig()["translator"] ?? []);
         }
 
         $service = new LaminasServiceManager($config);
