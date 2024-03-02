@@ -4,7 +4,7 @@ namespace Itseasy\Test;
 
 use PHPUnit\Framework\TestCase;
 use Itseasy\Application;
-use Itseasy\Translator;
+use Itseasy\Translator\Translator;
 
 final class TranslationTest extends TestCase
 {

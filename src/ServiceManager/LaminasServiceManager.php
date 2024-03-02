@@ -16,6 +16,9 @@ use Laminas\ServiceManager\ServiceManager;
 use Psr\Container\ContainerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\EventManager\SharedEventManager;
+use Laminas\I18n\Translator\Translator;
+use Laminas\I18n\Translator\TranslatorAwareInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 
 /**
  * For Laminas service is configured first then created the container.
@@ -29,7 +32,8 @@ class LaminasServiceManager implements ServiceManagerInterface
     public static function factory(
         Config $config,
         ?LoggerInterface $logger = null,
-        ?EventManagerInterface $em = null
+        ?EventManagerInterface $em = null,
+        ?TranslatorInterface $translator = null
     ): ContainerInterface {
         if (is_null($logger)) {
             $logger = new Logger();
@@ -37,6 +41,10 @@ class LaminasServiceManager implements ServiceManagerInterface
 
         if (is_null($em)) {
             $em = new EventManager(new SharedEventManager());
+        }
+
+        if (is_null($translator)) {
+            $translator = new Translator();
         }
 
         $service = new LaminasServiceManager($config);
@@ -82,6 +90,10 @@ class LaminasServiceManager implements ServiceManagerInterface
                 if ($instance instanceof EventManagerAwareInterface) {
                     $instance->setEventManager($container->get('EventManager'));
                 }
+
+                if ($instance instanceof TranslatorAwareInterface) {
+                    $instance->setTranslator($container->get("Translator"));
+                }
             }
         ];
 
@@ -91,6 +103,7 @@ class LaminasServiceManager implements ServiceManagerInterface
         self::setConfig($container, $config);
         self::setLogger($container, $logger);
         self::setEventManager($container, $em);
+        self::setTranslator($container, $translator);
 
         // Listener can only be add to EventManager after container done
         foreach ($service->getListeners() as $listener) {
@@ -136,6 +149,13 @@ class LaminasServiceManager implements ServiceManagerInterface
         EventManagerInterface $em
     ): void {
         $container->setService('EventManager', $em);
+    }
+
+    private static function setTranslator(
+        ContainerInterface &$container,
+        TranslatorInterface $translator
+    ): void {
+        $container->setService('Translator', $translator);
     }
 
     public function build(): void

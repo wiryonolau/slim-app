@@ -15,6 +15,9 @@ use Laminas\EventManager\EventManagerAwareInterface;
 use Laminas\EventManager\EventManagerInterface;
 use Laminas\EventManager\ListenerAggregateInterface;
 use Laminas\EventManager\SharedEventManager;
+use Laminas\I18n\Translator\Translator;
+use Laminas\I18n\Translator\TranslatorAwareInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Log\Logger;
 use Laminas\Log\LoggerAwareInterface;
 use Laminas\Log\LoggerInterface;
@@ -27,6 +30,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
 {
     protected $config;
     protected $eventManager;
+    protected $translator;
     protected $identityProvider;
     protected $abstractFactories;
     protected $logger;
@@ -37,7 +41,8 @@ class DIServiceManager extends Container implements ServiceManagerInterface
     public static function factory(
         Config $config,
         ?LoggerInterface $logger = null,
-        ?EventManagerInterface $em = null
+        ?EventManagerInterface $em = null,
+        ?TranslatorInterface $translator = null
     ): ContainerInterface {
         if (is_null($logger)) {
             $logger = new Logger();
@@ -47,6 +52,10 @@ class DIServiceManager extends Container implements ServiceManagerInterface
             $em = new EventManager(new SharedEventManager());
         }
 
+        if (is_null($translator)) {
+            $translator = new Translator();
+        }
+
         // Doesn't support createCompiler in this scenario
         $containerBuilder = new ContainerBuilder(self::class);
         $container = $containerBuilder->build();
@@ -54,6 +63,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $container->setConfig($config);
         $container->setLogger($logger);
         $container->setEventManager($em);
+        $container->setTranslator($translator);
 
         $container->init();
 
@@ -153,6 +163,13 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         $this->set('eventmanager', $this->eventManager);
     }
 
+    public function setTranslator(?TranslatorInterface $translator = null): void
+    {
+        $this->translator = $translator;
+        $this->set('Translator', $this->translator);
+        $this->set('translator', $this->translator);
+    }
+
     public function init(): void
     {
         // Identity not initiate during build, retrieve the class name only
@@ -246,6 +263,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
             $this->registerFactory($name, $factory, [
                 'setObjectView',
                 'setObjectLogger',
+                'setObjectTranslator',
                 'setObjectEventManager',
                 'setObjectIdentityProvider',
             ]);
@@ -309,6 +327,22 @@ class DIServiceManager extends Container implements ServiceManagerInterface
                 $view->setRenderer($this->get($rendererClass));
                 $view->setLayout($default_layout);
                 $obj->setView($view);
+            }
+        } catch (Exception $e) {
+            $this->get('Logger')->debug($e->getMessage());
+        }
+
+        return $obj;
+    }
+
+    private function setObjectTranslator($obj)
+    {
+        try {
+            if (
+                $obj instanceof TranslatorAwareInterface
+                and $obj instanceof AbstractAction
+            ) {
+                $obj->setTranslator($this->translator);
             }
         } catch (Exception $e) {
             $this->get('Logger')->debug($e->getMessage());
