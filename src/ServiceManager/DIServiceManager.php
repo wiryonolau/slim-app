@@ -53,7 +53,7 @@ class DIServiceManager extends Container implements ServiceManagerInterface
         }
 
         if (is_null($translator)) {
-            $translator = new Translator();
+            $translator = Translator::factory($config->getConfig()["translator"] ?? []);
         }
 
         // Doesn't support createCompiler in this scenario

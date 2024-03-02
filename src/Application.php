@@ -6,6 +6,7 @@ namespace Itseasy;
 
 use Exception;
 use Laminas\EventManager\EventManagerInterface;
+use Laminas\I18n\Translator\TranslatorInterface;
 use Laminas\Log as LaminasLog;
 use Laminas\Log\LoggerInterface;
 use Laminas\Stdlib\ArrayUtils;
@@ -26,6 +27,7 @@ class Application
     protected $container = null;
     protected $logger = null;
     protected $eventManager = null;
+    protected $translator = null;
     protected $containerProvider = ServiceManager\DIServiceManager::class;
     protected $application = null;
 
@@ -152,7 +154,12 @@ class Application
     public function setEventManager(EventManagerInterface $eventManager): self
     {
         $this->eventManager = $eventManager;
+        return $this;
+    }
 
+    public function setTranslator(TranslatorInterface $translator): self
+    {
+        $this->translator = $translator;
         return $this;
     }
 
@@ -249,7 +256,8 @@ class Application
         $this->container = $this->containerProvider::factory(
             $this->config,
             $this->logger,
-            $this->eventManager
+            $this->eventManager,
+            $this->translator
         );
 
         if ($this->options['application_type'] == self::APP_HTTP) {
