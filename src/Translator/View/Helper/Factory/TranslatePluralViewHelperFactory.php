@@ -5,7 +5,7 @@ namespace Itseasy\Translator\View\Helper\Factory;
 use Psr\Container\ContainerInterface;
 use Laminas\I18n\View\Helper\AbstractTranslatorHelper;
 use Laminas\I18n\View\Helper\TranslatePlural;
-use Itseasy\Translator;
+use Itseasy\Translator\Translator;
 
 class TranslatePluralViewHelperFactory
 {
