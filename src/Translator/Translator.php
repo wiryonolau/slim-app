@@ -8,7 +8,7 @@ class Translator extends LaminasTranslator
 {
     public function translate($message, $textDomain = 'default', $locale = null)
     {
-        $locale = ($locale ?: $this->getLocale());
+        $locale      = $locale ?: $this->getLocale();
         $translation = $this->getTranslatedMessage($message, $locale, $textDomain);
 
         if ($translation !== null && $translation !== '') {
@@ -22,6 +22,6 @@ class Translator extends LaminasTranslator
             return $this->translate($message, $textDomain, $fallbackLocale);
         }
 
-        return sprintf('%s', $message);
+        return sprintf('{%s}', $message);
     }
 }

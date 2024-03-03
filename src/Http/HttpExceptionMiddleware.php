@@ -38,7 +38,7 @@ class HttpExceptionMiddleware extends AbstractMiddleware
             // Check if this is a ajax request then prevent from sending html error
             if (HttpRequest::asJson($request)) {
                 return HttpRequest::jsonRpcResponse(["error" => [
-                    'code' => -32603,
+                    'code' => $httpException->getCode() ?? -32603,
                     'message' => sprintf(
                         "%s",
                         $httpException->getMessage()
