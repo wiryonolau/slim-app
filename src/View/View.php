@@ -12,6 +12,7 @@ class View implements ViewInterface
 {
     protected $view;
     protected $renderer;
+    protected $layout;
 
     public function __construct()
     {

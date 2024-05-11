@@ -13,6 +13,7 @@ use Slim\Psr7\Response;
 class NavigationMiddleware extends AbstractMiddleware
 {
     protected $config;
+    protected $navigation;
 
     public function __construct(Navigation $navigation)
     {
