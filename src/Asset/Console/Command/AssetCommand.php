@@ -14,6 +14,7 @@ use Exception;
 class AssetCommand extends Command
 {
     protected static $defaultName = "asset";
+    protected $assetManager;
 
     public function __construct(AssetManager $assetManager)
     {
