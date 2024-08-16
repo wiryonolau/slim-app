@@ -14,6 +14,34 @@ use Throwable;
 
 class HttpRequest
 {
+    public static function getRequestIp(Request $request): string
+    {
+        $server = $request->getServerParams();
+        if (!empty($server['HTTP_CLIENT_IP'])) {
+            // Check for IP from shared internet
+            $ip = $server['HTTP_CLIENT_IP'];
+        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+            // Check for IP passed from a proxy
+            $ip = $server['HTTP_X_FORWARDED_FOR'];
+        } else {
+            // Default fallback IP address
+            $ip = $server['REMOTE_ADDR'];
+        }
+
+        // Handle multiple IPs (e.g., when multiple proxies are involved)
+        if (strpos($ip, ',') !== false) {
+            $ip = explode(',', $ip)[0];
+        }
+
+        return trim($ip);
+    }
+
+    public static function getRequestUserAgent(Request $request): string
+    {
+        $server = $request->getServerParams();
+        return $server["HTTP_USER_AGENT"];
+    }
+
     /**
      * Check if request require json response
      */
