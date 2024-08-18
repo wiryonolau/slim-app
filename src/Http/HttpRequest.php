@@ -20,7 +20,7 @@ class HttpRequest
         if (!empty($server['HTTP_CLIENT_IP'])) {
             // Check for IP from shared internet
             $ip = $server['HTTP_CLIENT_IP'];
-        } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        } elseif (!empty($server['HTTP_X_FORWARDED_FOR'])) {
             // Check for IP passed from a proxy
             $ip = $server['HTTP_X_FORWARDED_FOR'];
         } else {
