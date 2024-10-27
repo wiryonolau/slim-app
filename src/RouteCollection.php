@@ -87,6 +87,33 @@ class RouteCollection extends ArrayObject
         return $routes;
     }
 
+    public function listUniqueRoutes(int $limit = PHP_INT_MAX): array
+    {
+        $routes = [];
+
+        foreach ($this as $route) {
+            preg_match('/^\/.*/', $route->pattern, $matches);
+            if (empty($matches)) {
+                continue;
+            }
+
+            $parts = explode('/', $matches[0], $limit);
+            foreach ($parts as $part) {
+                if (empty($part)) {
+                    continue;
+                }
+
+                if (preg_match('/^{.*/', $part)) {
+                    continue;
+                }
+
+                $routes[] = $part;
+            }
+        }
+
+        return array_values(array_unique($routes));
+    }
+
     #[\ReturnTypeWillChange]
     public function append($value)
     {
