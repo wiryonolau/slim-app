@@ -45,7 +45,7 @@ class Config implements ArrayAccess
             $this->config,
             $key,
             $placeholder,
-            true,
+            false,
             "."
         );
     }
