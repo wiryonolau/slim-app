@@ -6,6 +6,7 @@ namespace Itseasy;
 
 use ArrayAccess;
 use Exception;
+use Itseasy\Stdlib\ArrayUtils as ItseasyArrayUtils;
 use Laminas\ConfigAggregator\ConfigAggregator;
 use Laminas\ConfigAggregator\LaminasConfigProvider;
 use Laminas\Stdlib\ArrayUtils;
@@ -40,11 +41,13 @@ class Config implements ArrayAccess
      */
     public function get($key, $placeholder = null)
     {
-        if (empty($this->config[$key])) {
-            return $placeholder;
-        }
-
-        return $this->config[$key];
+        return ItseasyArrayUtils::query(
+            $this->config,
+            $key,
+            $placeholder,
+            true,
+            "."
+        );
     }
 
     public function getConfig(): array
