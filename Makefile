@@ -8,7 +8,7 @@ help: ## This help.
 .DEFAULT_GOAL := help
 
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-PHP_VERSION ?= "8.1"
+PHP_VERSION ?= "8.3"
 MEMCACHED_VERSION ?= "3.2.0"
 
 %:

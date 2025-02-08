@@ -7,7 +7,7 @@
     "editor.quickSuggestionsDelay": 10,
     "editor.suggest.snippetsPreventQuickSuggestions": false,
     "editor.suggestOnTriggerCharacters": false,
-    "editor.wordBasedSuggestions": false,
+    "editor.wordBasedSuggestions": "off",
     "editor.formatOnSave": true,
     "prettier.singleQuote": false,
     "prettier.jsxSingleQuote": false,
